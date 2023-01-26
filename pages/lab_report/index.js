@@ -1,6 +1,6 @@
-import { React, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
-import uuid from "react-uuid";
+
 import {
   ConfigProvider,
   Card,
@@ -29,26 +29,32 @@ import {
   SaveOutlined,
   FormOutlined,
 } from "@ant-design/icons";
+import { Line } from "react-chartjs-2";
+
 import dayjs from "dayjs";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
-import "./LabReport.css";
+
 import DetailComponent from "./DetailComponent";
-import BarcodeComponent from "./BarcodeComponent";
-import CancelComponent from "./CancelComponent";
+import DetailNoteComponent from "./DetailNoteComponent";
 import LabOrderComponent from "./LabOrderComponent";
 import LabOrderPrintComponent from "./LabOrderPrintComponent";
 
-const API_server = "http://localhost:3001";
-const API_post_list = API_server + "/lab_report";
-const API_post_detail = API_server + "/lab_order_detail";
-const API_report_detail = API_server + "/lab_report_detail";
-const API_report_detail_history = API_server + "/lab_report_history";
-const API_post_barcode = API_server + "/lab_barcode";
-const API_get_lab_form_head = API_server + "/lab_form_head";
-const API_get_lab_items_group = API_server + "/lab_items_group";
-const API_post_action = API_server + "/action_event";
-const API_post_cancel_reason = API_server + "/action_calcel_reason";
+const API_server = "http://localhost:3000";
+const API_post_list = API_server + "/api/lab_report";
+const API_post_detail = API_server + "/api/lab_order_detail";
+
+const API_post_barcode = API_server + "/api/lab_barcode";
+const API_get_lab_form_head = API_server + "/api/get_lab_form_head";
+const API_get_lab_items_group = API_server + "/api/get_lab_items_group";
+const API_get_doctor = API_server + "/api/get_doctor";
+
+const API_post_action = API_server + "/api/lab_order_action_event";
+const API_post_cancel_reason = API_server + "/api/lab_order_reject";
+const API_post_note = API_server + "/api/lab_order_note";
+
+const API_report_detail = API_server + "/api/lab_report_detail";
+const API_report_detail_update = API_server + "/api/lab_report_update";
 
 const { Content } = Layout;
 const { RangePicker } = DatePicker;
@@ -67,27 +73,6 @@ function LabReport() {
   const [messageApi, messageContext] = message.useMessage();
   const closeModal = () => {
     Modal.destroyAll();
-  };
-  const showConfirmDelete = (action) => {
-    return axios.post(API_post_detail, {}).then(function (response) {
-      Modal.confirm({
-        centered: true,
-        width: 700,
-        title: "ยืนยันปฎิเสธสิ่งส่งตรวจ",
-        content: (
-          <CancelComponent data={response.data} rejectForm={onAddRejectForm} />
-        ),
-        onOk() {
-          axios
-            .post(API_post_cancel_reason, {
-              form: dataRejectReason,
-            })
-            .then(function (response) {
-              actionControl(action);
-            });
-        },
-      });
-    });
   };
   let acceptPrintBarcode = false;
   const changeAcceptPrintBarcode = (event) => {
@@ -147,6 +132,38 @@ function LabReport() {
   const [loadingData, setLoadingData] = useState(false);
   const [data, setData] = useState([]);
   const [dataReport, setDataReport] = useState([]);
+  const [labOrderUpdate, setLabOrderUpdate] = useState([]);
+  const inputLabOrderUpdate = (lab_items_code, lab_order_result_manual) => {
+    let newData = labOrderUpdate;
+    newData[lab_items_code] = lab_order_result_manual;
+    setLabOrderUpdate(newData);
+  };
+  const [formDisable, setFormDisable] = useState(true);
+  const clickActionForm = (action) => {
+    if (action === "edit") {
+      setFormDisable(false);
+      setLoading(true);
+    } else if (action === "submit") {
+      setLoadingData(true);
+      let dataToUpdate = [];
+      labOrderUpdate.map((item, index) => {
+        dataToUpdate.push({
+          lab_order_number: selectedRadioKeys.join(),
+          lab_items_code: index,
+          lab_order_result_manual: item,
+        });
+      });
+
+      return axios
+        .post(API_report_detail_update, dataToUpdate)
+        .then(function (response) {
+          setFormDisable(true);
+          setLoading(false);
+          setLoadingData(false);
+          setLabOrderUpdate([]);
+        });
+    }
+  };
   const [dataReportHistory, setDataReportHistory] = useState([]);
   const [dataReportStatus, setDataReportStatus] = useState([]);
   const [statusList, setStatusList] = useState("All");
@@ -159,6 +176,8 @@ function LabReport() {
     Approved: 0,
   });
   const [detail, setDetail] = useState(null);
+  const [detailNote, setDetailNote] = useState(null);
+  const [detailGraph, setDetailGraph] = useState(null);
 
   const [sStartDate, setSStartDate] = useState(beforeDate.format(dateFormat));
   const [sEndDate, setSEndDate] = useState(currDate.format(dateFormat));
@@ -187,10 +206,40 @@ function LabReport() {
       });
     }
   };
-  getWorkTypeList(sWork);
+
+  const summitNote = (id, note) => {
+    setLoading(true);
+    return axios
+      .post(API_post_note, {
+        id: id,
+        note: note,
+      })
+      .then(function (response) {
+        setLoading(false);
+      });
+  };
+
+  const dataGraph = [
+    264, 417, 438, 887, 309, 397, 550, 575, 563, 430, 525, 592, 492, 467, 513,
+    546, 983, 340, 539, 243, 226, 192,
+  ];
+  const config = {
+    height: 60,
+    autoFit: false,
+    dataGraph,
+    smooth: true,
+  };
 
   const showDetail = (data) => {
     setDetail(<DetailComponent data={data.lab_head[0]} />);
+    setDetailNote(
+      <DetailNoteComponent
+        data={data.lab_head[0]}
+        api={API_post_note}
+        summitNote={summitNote}
+      />
+    );
+    // setDetailGraph(<TinyLine {...config} />);
     setLoadingData(false);
   };
 
@@ -265,7 +314,6 @@ function LabReport() {
           }
           count["All"] += 1;
         });
-        //console.log(count);
         setDataCountReport(count);
         setData(dataArray);
         setLoading(false);
@@ -440,8 +488,13 @@ function LabReport() {
           <Row>
             <Col xs={24} lg={24}>
               <Row>
-                <Col xs={24} lg={3} className="iconMenu">
-                  <h1>รายงานผล LAB</h1>
+                <Col
+                  xs={24}
+                  lg={3}
+                  className="iconMenu"
+                  style={{ textAlign: "center", display: "grid" }}
+                >
+                  <h1 style={{ margin: "auto 0" }}>รายงานผล LAB</h1>
                 </Col>
                 <Col xs={24} lg={15}>
                   <Card>
@@ -672,7 +725,7 @@ function LabReport() {
                             {
                               key: "1",
                               label: `::ความเห็นเจ้าหน้าที่`,
-                              children: `Content of Tab Pane 1`,
+                              children: <>{detailNote}</>,
                             },
                             {
                               key: "2",
@@ -692,7 +745,7 @@ function LabReport() {
                     size="large"
                   >
                     <Content>
-                      <Card title="::กราฟค่าผล"></Card>
+                      <Card title="::กราฟค่าผล">{detailGraph}</Card>
                     </Content>
                   </Spin>
                 </Col>
@@ -700,16 +753,15 @@ function LabReport() {
             </Col>
             <Col xs={24} lg={12}>
               <Content>
-                <Row>
-                  <Col span={24}>
-                    <Spin
-                      spinning={loadingData}
-                      tip="กำลังโหลดข้อมูล"
-                      size="large"
-                    >
+                <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล" size="large">
+                  <Row>
+                    <Col span={24}>
                       <LabOrderComponent
                         data={dataReport}
                         key={dataReport.lab_items_code}
+                        id={dataReport.lab_items_code}
+                        formDisable={formDisable}
+                        labOrderData={inputLabOrderUpdate}
                       />
 
                       {/* <Table
@@ -739,133 +791,145 @@ function LabReport() {
                         }}
                         pagination={false}
                       /> */}
-                    </Spin>
-                  </Col>
-                  <Col span={24}>
-                    <Card>
-                      <div style={{ textAlign: "center" }}>
-                        <div style={{ display: "inline-flex" }}>
-                          <div style={{ padding: 5 }}>
-                            <Button
-                              style={{
-                                padding: 10,
-                                cursor: "pointer",
-                                height: "auto",
-                                minWidth: 100,
-                              }}
-                              onClick={() => {
-                                showConfirm("accept");
-                              }}
-                              disabled={dataReport.length > 0 ? false : true}
-                            >
-                              <div>
-                                <SaveOutlined
-                                  style={{
-                                    fontSize: 40,
-                                  }}
-                                />
-                              </div>
-                              <div>บันทึกผล</div>
-                            </Button>
-                          </div>
-                          <div style={{ padding: 5 }}>
-                            <Button
-                              style={{
-                                padding: 10,
-                                cursor: "pointer",
-                                height: "auto",
-                                minWidth: 100,
-                              }}
-                              onClick={() => {
-                                showConfirmDelete("reject");
-                              }}
-                              disabled={dataReport.length > 0 ? false : true}
-                            >
-                              <div>
-                                <FormOutlined
-                                  style={{
-                                    fontSize: 40,
-                                  }}
-                                />
-                              </div>
-                              <div>แก้ไขผล</div>
-                            </Button>
-                          </div>
-                          <div style={{ padding: 5 }}>
-                            <Button
-                              style={{
-                                padding: 10,
-                                cursor: "pointer",
-                                height: "auto",
-                                minWidth: 100,
-                              }}
-                              onClick={() => {
-                                showConfirmDelete("reject");
-                              }}
-                              disabled={dataReport.length > 0 ? false : true}
-                            >
-                              <div>
-                                <DiffOutlined
-                                  style={{
-                                    fontSize: 40,
-                                  }}
-                                />
-                              </div>
-                              <div>รายงานผล</div>
-                            </Button>
-                          </div>
-                          <div style={{ padding: 5 }}>
-                            <Button
-                              style={{
-                                padding: 10,
-                                cursor: "pointer",
-                                height: "auto",
-                                minWidth: 100,
-                              }}
-                              onClick={() => {
-                                showConfirm("accept");
-                              }}
-                              disabled={dataReport.length > 0 ? false : true}
-                            >
-                              <div>
-                                <FileDoneOutlined
-                                  style={{
-                                    fontSize: 40,
-                                  }}
-                                />
-                              </div>
-                              <div>รับรองผล</div>
-                            </Button>
-                          </div>
+                    </Col>
+                    <Col span={24}>
+                      <Card>
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ display: "inline-flex" }}>
+                            <div style={{ padding: 5 }}>
+                              <Button
+                                style={{
+                                  padding: 10,
+                                  cursor: "pointer",
+                                  height: "auto",
+                                  minWidth: 100,
+                                }}
+                                onClick={() => {
+                                  clickActionForm("submit");
+                                }}
+                                disabled={formDisable}
+                              >
+                                <div>
+                                  <SaveOutlined
+                                    style={{
+                                      fontSize: 40,
+                                    }}
+                                  />
+                                </div>
+                                <div>บันทึกผล</div>
+                              </Button>
+                            </div>
+                            <div style={{ padding: 5 }}>
+                              <Button
+                                style={{
+                                  padding: 10,
+                                  cursor: "pointer",
+                                  height: "auto",
+                                  minWidth: 100,
+                                }}
+                                onClick={() => {
+                                  clickActionForm("edit");
+                                }}
+                                disabled={
+                                  !formDisable ||
+                                  (dataReport.length > 0 ? false : true)
+                                }
+                              >
+                                <div>
+                                  <FormOutlined
+                                    style={{
+                                      fontSize: 40,
+                                    }}
+                                  />
+                                </div>
+                                <div>แก้ไขผล</div>
+                              </Button>
+                            </div>
+                            <div style={{ padding: 5 }}>
+                              <Button
+                                style={{
+                                  padding: 10,
+                                  cursor: "pointer",
+                                  height: "auto",
+                                  minWidth: 100,
+                                }}
+                                onClick={() => {
+                                  clickActionForm("report");
+                                }}
+                                disabled={
+                                  !formDisable ||
+                                  (dataReport.length > 0 ? false : true)
+                                }
+                              >
+                                <div>
+                                  <DiffOutlined
+                                    style={{
+                                      fontSize: 40,
+                                    }}
+                                  />
+                                </div>
+                                <div>รายงานผล</div>
+                              </Button>
+                            </div>
+                            <div style={{ padding: 5 }}>
+                              <Button
+                                style={{
+                                  padding: 10,
+                                  cursor: "pointer",
+                                  height: "auto",
+                                  minWidth: 100,
+                                }}
+                                onClick={() => {
+                                  clickActionForm("approve");
+                                }}
+                                disabled={
+                                  !formDisable ||
+                                  (dataReport.length > 0 ? false : true)
+                                }
+                              >
+                                <div>
+                                  <FileDoneOutlined
+                                    style={{
+                                      fontSize: 40,
+                                    }}
+                                  />
+                                </div>
+                                <div>รับรองผล</div>
+                              </Button>
+                            </div>
 
-                          <div style={{ padding: 5 }}>
-                            <Button
-                              style={{
-                                padding: 10,
-                                cursor: "pointer",
-                                height: "auto",
-                                minWidth: 100,
-                              }}
-                              onClick={() => {
-                                actionControl("print");
-                              }}
-                              disabled={dataReport.length > 0 ? false : true}
-                            >
-                              <div>
-                                <PrinterOutlined
-                                  style={{
-                                    fontSize: 40,
-                                  }}
-                                />
-                              </div>
-                              <div>พิมพ์ผลซ้ำ</div>
-                            </Button>
+                            <div style={{ padding: 5 }}>
+                              <Button
+                                style={{
+                                  padding: 10,
+                                  cursor: "pointer",
+                                  height: "auto",
+                                  minWidth: 100,
+                                }}
+                                onClick={() => {
+                                  actionControl("print");
+                                }}
+                                disabled={
+                                  !formDisable ||
+                                  (dataReport.length > 0 ? false : true)
+                                }
+                              >
+                                <div>
+                                  <PrinterOutlined
+                                    style={{
+                                      fontSize: 40,
+                                    }}
+                                  />
+                                </div>
+                                <div>พิมพ์ผลซ้ำ</div>
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  </Col>
-                </Row>
+                      </Card>
+                    </Col>
+                  </Row>
+                </Spin>
               </Content>
             </Col>
           </Row>

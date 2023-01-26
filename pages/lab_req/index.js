@@ -131,9 +131,11 @@ function LabReq() {
     });
   };
   const showPrint = () => {
+    console.log(selectedRowKeys.join(), seperateTupe);
     return axios
       .post(API_post_barcode, {
-        id: selectedRowKeys,
+        id: selectedRowKeys.join(),
+        seperate: seperateTupe,
       })
       .then(function (response) {
         Modal.info({
@@ -143,7 +145,7 @@ function LabReq() {
           icon: <PrinterOutlined />,
           content: (
             <div ref={componentRef}>
-              <BarcodeComponent data={response.data.result} />
+              <BarcodeComponent data={response.data} seperate={seperateTupe} />
             </div>
           ),
           footer: (
@@ -481,8 +483,13 @@ function LabReq() {
             <Col xs={24} lg={18}>
               <Content>
                 <Row>
-                  <Col xs={24} lg={4} className="iconMenu">
-                    <h1>ใบรับ LAB</h1>
+                  <Col
+                    xs={24}
+                    lg={4}
+                    className="iconMenu"
+                    style={{ textAlign: "center", display: "grid" }}
+                  >
+                    <h1 style={{ margin: "auto 0" }}>ใบรับ LAB</h1>
                   </Col>
                   <Col xs={24} lg={20}>
                     <Card>
