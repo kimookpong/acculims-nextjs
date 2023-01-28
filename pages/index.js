@@ -9,7 +9,7 @@ function Home() {
         <Link href="/lab_req">ใบรับ LAB</Link>
       </li>
       <li>
-        <Link href="/lab_report">Blog Post</Link>
+        <Link href="/lab_report">รายงานผล LAB</Link>
       </li>
     </ul>
   );

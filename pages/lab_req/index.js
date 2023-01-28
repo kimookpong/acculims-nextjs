@@ -69,7 +69,7 @@ function LabReq() {
 
   const [doctorList, setDoctorlist] = useState([]);
   const getDoctor = (action) => {
-    return axios.post(API_get_doctor).then(function (response) {
+    return axios.get(API_get_doctor).then(function (response) {
       setDoctorlist(response.data);
       return axios
         .post(API_post_detail, {

@@ -3,7 +3,7 @@ import BarcodeDetail from "./BarcodeDetail";
 const BarcodeComponent = (props) => {
   const { data, seperate } = props;
 
-  const [sAddress, setSAddress] = useState(null);
+  // const [sAddress, setSAddress] = useState(null);
   return (
     <table style={{ width: "-webkit-fill-available" }}>
       <tbody>

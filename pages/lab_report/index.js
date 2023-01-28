@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
-
 import {
   ConfigProvider,
   Card,
@@ -18,23 +17,18 @@ import {
   Spin,
   message,
   Modal,
-  Tabs,
 } from "antd";
 import {
-  StopOutlined,
-  CheckCircleOutlined,
   DiffOutlined,
   PrinterOutlined,
   FileDoneOutlined,
   SaveOutlined,
   FormOutlined,
 } from "@ant-design/icons";
-import { Line } from "react-chartjs-2";
 
 import dayjs from "dayjs";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
-
 import DetailComponent from "./DetailComponent";
 import DetailNoteComponent from "./DetailNoteComponent";
 import LabOrderComponent from "./LabOrderComponent";
@@ -132,11 +126,16 @@ function LabReport() {
   const [loadingData, setLoadingData] = useState(false);
   const [data, setData] = useState([]);
   const [dataReport, setDataReport] = useState([]);
+  const [dataItemGroup, setDataItemGroup] = useState([]);
+  const [dataItemGroupSelect, setDataItemGroupSelect] = useState("All");
   const [labOrderUpdate, setLabOrderUpdate] = useState([]);
   const inputLabOrderUpdate = (lab_items_code, lab_order_result_manual) => {
     let newData = labOrderUpdate;
     newData[lab_items_code] = lab_order_result_manual;
     setLabOrderUpdate(newData);
+  };
+  const changeItemGroupSelect = (event) => {
+    setDataItemGroupSelect(event);
   };
   const [formDisable, setFormDisable] = useState(true);
   const clickActionForm = (action) => {
@@ -153,7 +152,6 @@ function LabReport() {
           lab_order_result_manual: item,
         });
       });
-
       return axios
         .post(API_report_detail_update, dataToUpdate)
         .then(function (response) {
@@ -164,7 +162,6 @@ function LabReport() {
         });
     }
   };
-  const [dataReportHistory, setDataReportHistory] = useState([]);
   const [dataReportStatus, setDataReportStatus] = useState([]);
   const [statusList, setStatusList] = useState("All");
   const [dataCountReport, setDataCountReport] = useState({
@@ -177,7 +174,6 @@ function LabReport() {
   });
   const [detail, setDetail] = useState(null);
   const [detailNote, setDetailNote] = useState(null);
-  const [detailGraph, setDetailGraph] = useState(null);
 
   const [sStartDate, setSStartDate] = useState(beforeDate.format(dateFormat));
   const [sEndDate, setSEndDate] = useState(currDate.format(dateFormat));
@@ -219,17 +215,6 @@ function LabReport() {
       });
   };
 
-  const dataGraph = [
-    264, 417, 438, 887, 309, 397, 550, 575, 563, 430, 525, 592, 492, 467, 513,
-    546, 983, 340, 539, 243, 226, 192,
-  ];
-  const config = {
-    height: 60,
-    autoFit: false,
-    dataGraph,
-    smooth: true,
-  };
-
   const showDetail = (data) => {
     setDetail(<DetailComponent data={data.lab_head[0]} />);
     setDetailNote(
@@ -239,7 +224,6 @@ function LabReport() {
         summitNote={summitNote}
       />
     );
-    // setDetailGraph(<TinyLine {...config} />);
     setLoadingData(false);
   };
 
@@ -315,6 +299,7 @@ function LabReport() {
           count["All"] += 1;
         });
         setDataCountReport(count);
+        getWorkTypeList(sWork);
         setData(dataArray);
         setLoading(false);
       });
@@ -362,8 +347,23 @@ function LabReport() {
         id: dataDetail.order_number,
       })
       .then(function (response) {
-        // showDetail(response.data);
+        let dataGroup = [{ label: "All", value: "All" }];
         setDataReport(response.data);
+        response.data.map((item, index) => {
+          if (
+            index === 0 ||
+            response.data[index].sub_code !== response.data[index - 1].sub_code
+          ) {
+            if (response.data[index].sub_code !== null) {
+              dataGroup.push({
+                label: item["lab_items_sub_group_name"],
+                value: item["sub_code"],
+              });
+            }
+          }
+        });
+        setDataItemGroup(dataGroup);
+        setDataItemGroupSelect("All");
       });
   };
   const loadDetail = async (dataDetail) => {
@@ -579,12 +579,12 @@ function LabReport() {
                       <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
                         <Select
                           showSearch
-                          onChange={inputSWorkType}
-                          value={sWorkType}
                           style={{
                             width: 150,
                           }}
-                          options={sWorkTypeList}
+                          value={dataItemGroupSelect}
+                          onChange={changeItemGroupSelect}
+                          options={dataItemGroup}
                         />
                       </Form.Item>
                     </Col>
@@ -718,23 +718,7 @@ function LabReport() {
                     size="large"
                   >
                     <Content>
-                      <Card>
-                        <Tabs
-                          defaultActiveKey="2"
-                          items={[
-                            {
-                              key: "1",
-                              label: `::ความเห็นเจ้าหน้าที่`,
-                              children: <>{detailNote}</>,
-                            },
-                            {
-                              key: "2",
-                              label: `::รายละเอียด`,
-                              children: <>{detail}</>,
-                            },
-                          ]}
-                        />
-                      </Card>
+                      <Card title="::ความเห็นเจ้าหน้าที่">{detailNote}</Card>
                     </Content>
                   </Spin>
                 </Col>
@@ -745,7 +729,7 @@ function LabReport() {
                     size="large"
                   >
                     <Content>
-                      <Card title="::กราฟค่าผล">{detailGraph}</Card>
+                      <Card title="::รายละเอียด">{detail}</Card>
                     </Content>
                   </Spin>
                 </Col>
@@ -758,39 +742,12 @@ function LabReport() {
                     <Col span={24}>
                       <LabOrderComponent
                         data={dataReport}
-                        key={dataReport.lab_items_code}
-                        id={dataReport.lab_items_code}
+                        key={dataReport["lab_items_code"]}
+                        id={dataReport["lab_items_code"]}
                         formDisable={formDisable}
                         labOrderData={inputLabOrderUpdate}
+                        dataItemGroupSelect={dataItemGroupSelect}
                       />
-
-                      {/* <Table
-                        rowClassName="ant-row-design"
-                        className="my-table"
-                        columns={columnsReport}
-                        dataSource={dataReport}
-                        rowKey={"lab_items_name"}
-                        groupBy={["lab_items_sub_group_name"]}
-                        size="small"
-                        scroll={{
-                          x: 1000,
-                          y: 800,
-                        }}
-                        expandedRowRender={(record) => {
-                          console.log(record);
-                          if (record.lab_items_sub_group_name !== null) {
-                            return (
-                              <div>
-                                This is a custom row for sub_code
-                                {record.lab_items_sub_group_name}
-                              </div>
-                            );
-                          } else {
-                            return null;
-                          }
-                        }}
-                        pagination={false}
-                      /> */}
                     </Col>
                     <Col span={24}>
                       <Card>
