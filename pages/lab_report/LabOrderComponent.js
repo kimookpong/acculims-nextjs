@@ -23,7 +23,8 @@ ChartJS.register(
 );
 
 const LabOrderComponent = (props) => {
-  const { data, formDisable, labOrderData, dataItemGroupSelect } = props;
+  const { data, formDisable, labOrderData, dataItemGroupSelect, checkRerun } =
+    props;
   const [titleInformation, setTitleInformation] = useState("");
   const [information, setInformation] = useState("");
 
@@ -307,7 +308,10 @@ const LabOrderComponent = (props) => {
                 ) {
                   if (data[index].sub_code !== null) {
                     text = (
-                      <tr style={{ borderTop: "1px solid #f0f0f0" }}>
+                      <tr
+                        data-row-key={item["lab_items_sub_group_name"]}
+                        style={{ borderTop: "1px solid #f0f0f0" }}
+                      >
                         <td style={{ padding: "8px 8px" }} colSpan={11}>
                           {item["lab_items_sub_group_name"]}
                         </td>
@@ -323,7 +327,7 @@ const LabOrderComponent = (props) => {
                 return (
                   <>
                     {text}
-                    <tr key={index}>
+                    <tr data-row-key={index}>
                       <td
                         style={{
                           padding: "8px 8px",
@@ -397,7 +401,9 @@ const LabOrderComponent = (props) => {
                         )}
                       </td>
                       <td style={{ border: "1px solid #f0f0f0", color: "red" }}>
-                        <WarningOutlined onClick={warningModalBox} />
+                        {item["lab_order_result_rerun"] ? (
+                          <WarningOutlined onClick={warningModalBox} />
+                        ) : null}
                       </td>
                       <td style={{ border: "1px solid #f0f0f0" }}>
                         {item["lab_order_result_rerun"]}
@@ -406,6 +412,9 @@ const LabOrderComponent = (props) => {
                         <Checkbox
                           key={
                             item["lab_order_number"] + item["lab_items_code"]
+                          }
+                          checked={
+                            checkRerun && !!item["lab_order_result_rerun"]
                           }
                         />
                       </td>

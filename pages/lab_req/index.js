@@ -90,6 +90,7 @@ function LabReq() {
                 .post(API_post_cancel_reason, {
                   id: selectedRowKeys.join(),
                   form: dataRejectReason,
+                  date: currDate.format("YYYY-MM-DD"),
                 })
                 .then(function (response) {
                   console.log(response.data);

@@ -36,7 +36,6 @@ const LabOrderPrintComponent = (props) => {
             </td>
           </tr>
         </tbody>
-        <table />
       </table>
       <table
         style={{
@@ -47,7 +46,7 @@ const LabOrderPrintComponent = (props) => {
           fontSize: "90%",
         }}
       >
-        <thead>
+        <tbody>
           <tr
             style={{
               borderBottom: "1px solid #000",
@@ -62,7 +61,7 @@ const LabOrderPrintComponent = (props) => {
             <th style={{ width: "20%" }}>Normal Range</th>
             <th style={{ width: "20%" }}>Last Result</th>
           </tr>
-        </thead>
+        </tbody>
         <tbody>
           {dataList.length > 0 ? (
             dataList.map((item, index) => {

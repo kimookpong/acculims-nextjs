@@ -69,6 +69,10 @@ function LabReport() {
   const closeModal = () => {
     Modal.destroyAll();
   };
+  const [checkRerun, setCheckRerun] = useState(false);
+  let clickRerun = (event) => {
+    setCheckRerun(event.target.checked);
+  };
   let acceptPrintBarcode = false;
   const changeAcceptPrintBarcode = (event) => {
     acceptPrintBarcode = event.target.checked;
@@ -90,6 +94,8 @@ function LabReport() {
           action === "report" ? "ยืนยันรายงานผล LAB?" : "ยืนยันรับรองผล LAB?",
         content: (
           <LabOrderActionComponent
+            action={action}
+            orderNumber={selectedRadioKeys}
             getFormData={getFormData}
             doctorList={responseDoctor.data}
           />
@@ -406,6 +412,11 @@ function LabReport() {
       },
     },
     {
+      title: "P",
+      dataIndex: "h_status",
+      key: "h_status",
+    },
+    {
       title: "Status",
       dataIndex: "h_status",
       key: "h_status",
@@ -608,7 +619,7 @@ function LabReport() {
                     </Col>
                     <Col span={12}>
                       <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                        <Checkbox>ปล่อยผล Rerun</Checkbox>
+                        <Checkbox onClick={clickRerun}>ปล่อยผล Rerun</Checkbox>
                       </Form.Item>
                     </Col>
                     <Col span={24}>
@@ -765,6 +776,7 @@ function LabReport() {
                         formDisable={formDisable}
                         labOrderData={inputLabOrderUpdate}
                         dataItemGroupSelect={dataItemGroupSelect}
+                        checkRerun={checkRerun}
                       />
                     </Col>
                     <Col span={24}>

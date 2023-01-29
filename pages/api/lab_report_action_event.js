@@ -24,18 +24,21 @@ export default function handler(req, res) {
   let query = "";
   if (action === "approve") {
     query = `UPDATE lab_head 
-    SET report_status = 'Approved', 
-        approver_name = '${form.formCode}',  
-        report_date = '${form.formDate}',
-        report_time = '${form.formTime}'
+    SET report_status = 'Approved',      
+    order_note = '${form.formComment}', 
+    approver_name = '${form.formCode}', 
+    approved_date = '${form.formDate}',
+    approved_time = '${form.formTime}'
     WHERE lab_order_number IN (${id.join()})`;
     text = "รับรองผล LAB เรียบร้อยแล้ว";
   } else if (action === "report") {
     query = `UPDATE lab_head 
     SET report_status = 'Reported', 
-        reporter_name = '${form.formCode}',
-        approved_date = '${form.formDate}',
-        approved_time = '${form.formTime}'
+    order_note = '${form.formComment}', 
+    report_remark = '${form.formComment}',
+    reporter_name = '${form.formCode}',
+    report_date = '${form.formDate}',
+    report_time = '${form.formTime}'
     WHERE lab_order_number IN (${id.join()})`;
     text = "รายงานผล LAB เรียบร้อยแล้ว";
   }
