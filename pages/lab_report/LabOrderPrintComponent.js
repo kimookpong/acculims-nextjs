@@ -23,16 +23,20 @@ const LabOrderPrintComponent = (props) => {
         <tbody>
           <tr>
             <td style={{ width: "30%" }}>
-              <p>NAME : {detail["name"]}</p>
+              <p>
+                <b>NAME</b> : {detail["name"]}
+              </p>
             </td>
             <td style={{ width: "40%" }}>
               <p>
-                HN : {detail["hn"]} SEX : {detail["SEX"]} AGE : {detail["year"]}{" "}
-                ปี {detail["month"]} เดือน{" "}
+                <b>HN</b> : {detail["hn"]} <b>SEX</b> : {detail["SEX"]}{" "}
+                <b>AGE</b> : {detail["year"]} ปี {detail["month"]} เดือน{" "}
               </p>
             </td>
             <td style={{ width: "30%", textAlign: "right" }}>
-              <p>จุดที่สั่ง : {detail["wardname"]}</p>
+              <p>
+                <b>จุดที่สั่ง</b> : {detail["wardname"]}
+              </p>
             </td>
           </tr>
         </tbody>
@@ -153,16 +157,20 @@ const LabOrderPrintComponent = (props) => {
           <tr>
             <td style={{ width: "40%", verticalAlign: "top" }}>
               <p style={{ marginBottom: 0 }}>
-                Received date : {detail["receive_date"]}
+                <b>Received date</b> : {detail["receive_date"]}
               </p>
               <p style={{ margin: 0 }}>
-                Reported date : {detail["report_date"]}
+                <b>Reported date</b> : {detail["report_date"]}
               </p>
               <p style={{ margin: 0 }}>
-                Approved date : {detail["approved_date"]}
+                <b>Approved date</b> : {detail["approved_date"]}
               </p>
-              <p style={{ margin: 0 }}>Turn around time : </p>
-              <p style={{ margin: 0 }}>Note : {detail["order_note"]}</p>
+              <p style={{ margin: 0 }}>
+                <b>Turn around time</b> :{" "}
+              </p>
+              <p style={{ margin: 0 }}>
+                <b>Note</b> : {detail["order_note"]}
+              </p>
             </td>
             <td
               style={{
@@ -177,9 +185,15 @@ const LabOrderPrintComponent = (props) => {
                   margin: "5px",
                 }}
               >
-                <p style={{ margin: 0 }}>L = Low </p>
-                <p style={{ margin: 0 }}>H = High </p>
-                <p style={{ margin: 0 }}>P = Repeated </p>
+                <p style={{ margin: 0 }}>
+                  <b>L</b> = Low{" "}
+                </p>
+                <p style={{ margin: 0 }}>
+                  <b>H</b> = High{" "}
+                </p>
+                <p style={{ margin: 0 }}>
+                  <b>P</b> = Repeated{" "}
+                </p>
               </div>
             </td>
             <td

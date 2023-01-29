@@ -905,7 +905,8 @@ function LabReport() {
                                 }}
                                 disabled={
                                   !formDisable ||
-                                  (dataReport.length > 0 ? false : true)
+                                  (dataReport.length > 0 ? false : true) ||
+                                  dataReportStatus !== "Approved"
                                 }
                               >
                                 <div>
