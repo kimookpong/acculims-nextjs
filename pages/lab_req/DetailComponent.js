@@ -1,5 +1,5 @@
 const DetailComponent = (props) => {
-  const { data } = props;
+  const { data, lab_profile, lab_single } = props;
   return (
     <table style={{ width: "-webkit-fill-available" }}>
       <tbody>
@@ -85,10 +85,34 @@ const DetailComponent = (props) => {
         <tr>
           <td colSpan={3}>Lab Profile : </td>
         </tr>
-
+        {lab_profile.map((items, index) => {
+          return (
+            <tr
+              key={items["lab_order_number"] + items["lab_profile"].toString()}
+            >
+              <td colSpan={3} style={{ paddingLeft: "15px" }}>
+                {index + 1}. {items["lab_profile"]}
+              </td>
+            </tr>
+          );
+        })}
         <tr>
           <td colSpan={3}>Lab Single : </td>
         </tr>
+        {lab_single.map((items, index) => {
+          return (
+            <tr
+              key={
+                items["lab_order_number"] +
+                items["lab_items_group_name"].toString()
+              }
+            >
+              <td colSpan={3} style={{ paddingLeft: "15px" }}>
+                {index + 1}. {items["lab_items_group_name"]}
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

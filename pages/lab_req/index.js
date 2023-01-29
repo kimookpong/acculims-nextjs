@@ -108,13 +108,34 @@ function LabReq() {
   const changeAcceptPrintBarcode = (event) => {
     acceptPrintBarcode = event.target.checked;
   };
+  const submitForm = (action) => {
+    actionControl(action);
+    closeModal();
+  };
   const showConfirm = (action) => {
+    let ableSubmit = true;
     Modal.confirm({
       centered: true,
       title: action === "accept" ? "ยืนยันรับใบ LAB?" : "ยืนยันลบใบ LAB?",
       content: (
         <Row>
-          <Col span={24}>เลขที่สั่ง : {selectedRowKeys.join()}</Col>
+          <Col span={24}>
+            เลขที่สั่ง :
+            {selectedRowKeys.map((items) => {
+              if (
+                acceptCondition.find(
+                  (element) =>
+                    element["order_number"] === items &&
+                    element["status"] === true
+                )
+              ) {
+                return <span> {items}, </span>;
+              } else {
+                ableSubmit = false;
+                return <span style={{ color: "red" }}> {items}, </span>;
+              }
+            })}
+          </Col>
           <Col span={24}>
             {action === "accept" ? (
               <Checkbox onClick={changeAcceptPrintBarcode}>
@@ -122,7 +143,34 @@ function LabReq() {
               </Checkbox>
             ) : null}
           </Col>
+          <Col span={24}>
+            {!ableSubmit ? (
+              <span style={{ color: "red" }}>
+                {" "}
+                ** สถานะไม่ถูกต้อง ไม่สามารถดำเนินการได้
+              </span>
+            ) : (
+              ""
+            )}
+          </Col>
         </Row>
+      ),
+      footer: (
+        <div className="ant-modal-confirm-btns">
+          <Button key="back" onClick={closeModal}>
+            ยกเลิก
+          </Button>
+          <Button
+            key="submit"
+            type="primary"
+            onClick={() => {
+              return submitForm(action);
+            }}
+            disabled={!ableSubmit}
+          >
+            ยืนยัน
+          </Button>
+        </div>
       ),
       onOk() {
         actionControl(action);
@@ -226,7 +274,13 @@ function LabReq() {
   };
 
   const showDetail = (data) => {
-    setDetail(<DetailComponent data={data.lab_head[0]} />);
+    setDetail(
+      <DetailComponent
+        data={data.lab_head[0]}
+        lab_profile={data.lab_profile}
+        lab_single={data.lab_single}
+      />
+    );
     setDetailNote(
       <DetailNoteComponent
         data={data.lab_head[0]}
@@ -240,6 +294,10 @@ function LabReq() {
 
   const setStatusListonClick = (id) => {
     setStatusList(id);
+    onSelectChange([]);
+    setDetail(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
+    setDetailNote(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
+    setDetailThing(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
   };
 
   const inputSType = (event) => {
@@ -278,7 +336,7 @@ function LabReq() {
       setDetailThing(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
       setLoading(true);
 
-      setSelectedRowKeys([]);
+      onSelectChange([]);
 
       const filter = {
         date_start: sStartDate,
@@ -331,7 +389,7 @@ function LabReq() {
   const actionControl = async (action) => {
     if (action === "print") {
       showPrint();
-      setSelectedRowKeys([]);
+      onSelectChange([]);
     } else {
       return axios
         .post(API_post_action, {
@@ -347,7 +405,7 @@ function LabReq() {
           if (acceptPrintBarcode) {
             showPrint();
           }
-          setSelectedRowKeys([]);
+          onSelectChange([]);
           setRefreshKey((oldKey) => oldKey + 1);
           acceptPrintBarcode = false;
         });
@@ -421,9 +479,36 @@ function LabReq() {
       key: "address",
     },
   ];
+  // let acceptCondition = [];
+  const [acceptCondition, setAcceptCondition] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
+    let accept = [];
+    if (newSelectedRowKeys.length > 0) {
+      newSelectedRowKeys.map((items) => {
+        if (
+          data.find(
+            (element) =>
+              element["order_number"] === items &&
+              element["h_status"] === "Pending"
+          )
+        ) {
+          accept.push({
+            order_number: items,
+            status: true,
+          });
+        } else {
+          accept.push({
+            order_number: items,
+            status: false,
+          });
+        }
+      });
+      setAcceptCondition(accept);
+    } else {
+      setAcceptCondition([]);
+    }
   };
   const clickSelectRow = (newSelectedRow) => {
     if (selectedRowKeys.includes(newSelectedRow)) {
@@ -434,9 +519,9 @@ function LabReq() {
           return false;
         }
       });
-      setSelectedRowKeys(newSelectedRowKeys);
+      onSelectChange(newSelectedRowKeys);
     } else {
-      setSelectedRowKeys([...selectedRowKeys, newSelectedRow]);
+      onSelectChange([...selectedRowKeys, newSelectedRow]);
     }
   };
   const rowSelection = {
@@ -696,9 +781,7 @@ function LabReq() {
                             onClick={() => {
                               showConfirmDelete("reject");
                             }}
-                            disabled={
-                              selectedRowKeys.length === 1 ? false : true
-                            }
+                            disabled={selectedRowKeys.length !== 1}
                           >
                             <div>
                               <StopOutlined

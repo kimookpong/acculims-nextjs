@@ -322,7 +322,7 @@ const LabOrderComponent = (props) => {
                 }
 
                 return (
-                  <div key={index}>
+                  <>
                     {text}
                     <tr>
                       <td
@@ -448,7 +448,7 @@ const LabOrderComponent = (props) => {
                         </TT>
                       </td>
                     </tr>
-                  </div>
+                  </>
                 );
               }
             })
