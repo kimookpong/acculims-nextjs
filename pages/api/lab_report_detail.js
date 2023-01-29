@@ -34,13 +34,15 @@ export default function handler(req, res) {
     DATE_FORMAT(lab_head.order_time,'%H:%i'))
     AS order_date_time,
     
-  (SELECT lab_items_sub_group_name FROM lab_items_sub_group WHERE sub_code = lab_items_sub_group_code) AS lab_items_sub_group_name
+  (SELECT lab_items_sub_group_name FROM lab_items_sub_group WHERE sub_code = lab_items_sub_group_code) AS lab_items_sub_group_name,
+  (SELECT lab_items_group_code FROM lab_items_sub_group WHERE sub_code = lab_items_sub_group_code) AS group_code,
+  (SELECT lab_items_group_name FROM lab_items_group  WHERE  lab_items_group_code = group_code) AS group_name
 
   FROM lab_order
   LEFT JOIN lab_items ON lab_order.lab_items_code = lab_items.lab_items_code
   LEFT JOIN lab_head ON lab_order.lab_order_number = lab_head.lab_order_number
   WHERE lab_order.lab_order_number = '${id}' 
-  ORDER BY lab_order.lab_items_sub_group_code DESC`;
+  ORDER BY group_code,sub_code DESC`;
 
   connection.query(query, function (err, rows, fields) {
     if (err) {
@@ -68,7 +70,7 @@ export default function handler(req, res) {
       `;
       queryResult = queryResult + query2;
     });
-    console.log(queryResult);
+
     connection.query(queryResult, function (err2, rows2, fields) {
       if (err2) {
         console.error(err2);

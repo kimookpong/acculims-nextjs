@@ -5,6 +5,7 @@ const connection = mysql.createConnection({
   user: process.env.DB_USER,
   pass: process.env.DB_PASS,
   database: process.env.DB_DATABASE,
+  multipleStatements: true,
 });
 
 connection.connect(function (err) {
@@ -16,17 +17,23 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
-  //const form = req.body.form;
+  let queryArray = "";
+  req.body.map((item) => {
+    queryArray =
+      queryArray +
+      `UPDATE lab_order SET lab_order_result_manual = '${item.lab_order_result_manual}' WHERE lab_order_number = '${item.lab_order_number}' AND lab_items_code = ${item.lab_items_code};`;
+  });
+  console.log(queryArray);
 
-  const query = `SELECT 
+  const query = `SELECT
   form_name AS value,
   form_name AS label
   FROM lab_form_head`;
-  connection.query(query, function (err, rows, fields) {
+  connection.query(queryArray, function (err, rows, fields) {
     if (err) {
       console.error(err);
       return;
     }
-    res.status(200).json(rows);
+    res.status(200).json({ result: true });
   });
 }

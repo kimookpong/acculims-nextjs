@@ -33,6 +33,7 @@ import DetailComponent from "./DetailComponent";
 import DetailNoteComponent from "./DetailNoteComponent";
 import LabOrderComponent from "./LabOrderComponent";
 import LabOrderPrintComponent from "./LabOrderPrintComponent";
+import LabOrderActionComponent from "./LabOrderActionComponent";
 
 const API_server = "http://localhost:3000";
 const API_post_list = API_server + "/api/lab_report";
@@ -43,7 +44,7 @@ const API_get_lab_form_head = API_server + "/api/get_lab_form_head";
 const API_get_lab_items_group = API_server + "/api/get_lab_items_group";
 const API_get_doctor = API_server + "/api/get_doctor";
 
-const API_post_action = API_server + "/api/lab_order_action_event";
+const API_post_action = API_server + "/api/lab_report_action_event";
 const API_post_cancel_reason = API_server + "/api/lab_order_reject";
 const API_post_note = API_server + "/api/lab_order_note";
 
@@ -72,55 +73,70 @@ function LabReport() {
   const changeAcceptPrintBarcode = (event) => {
     acceptPrintBarcode = event.target.checked;
   };
+  let dataSubmitForm = [];
+  const getFormData = (formCodeData, formCommentData) => {
+    dataSubmitForm = {
+      formCode: formCodeData,
+      formComment: formCommentData,
+      formDate: currDate.format("YYYY-MM-DD"),
+      formTime: currDate.format("HH:mm:ss"),
+    };
+  };
   const showConfirm = (action) => {
-    Modal.confirm({
-      centered: true,
-      title: action === "accept" ? "ยืนยันรับใบ LAB?" : "ยืนยันลบใบ LAB?",
-      content: (
-        <Row>
-          <Col span={24}>เลขที่สั่ง : </Col>
-          <Col span={24}>
-            {action === "accept" ? (
-              <Checkbox onClick={changeAcceptPrintBarcode}>
-                พิมพ์ Barcode
-              </Checkbox>
-            ) : null}
-          </Col>
-        </Row>
-      ),
-      onOk() {
-        actionControl(action);
-      },
+    return axios.get(API_get_doctor).then(function (responseDoctor) {
+      Modal.confirm({
+        centered: true,
+        title:
+          action === "report" ? "ยืนยันรายงานผล LAB?" : "ยืนยันรับรองผล LAB?",
+        content: (
+          <LabOrderActionComponent
+            getFormData={getFormData}
+            doctorList={responseDoctor.data}
+          />
+        ),
+        onOk() {
+          actionControl(action);
+        },
+      });
     });
   };
+
   const showPrint = () => {
-    Modal.info({
-      centered: true,
-      width: 730,
-      title: "พิมพ์ Barcode",
-      icon: <PrinterOutlined />,
-      content: (
-        <div ref={componentRef}>
-          <LabOrderPrintComponent
-            data={dataReport}
-            key={dataReport.lab_order_number}
-          />
-        </div>
-      ),
-      footer: (
-        <div className="ant-modal-footer">
-          <ReactToPrint
-            trigger={() => {
-              return <Button key="back">พิมพ์</Button>;
-            }}
-            content={() => componentRef.current}
-          />
-          <Button key="submit" type="primary" onClick={closeModal}>
-            ตกลง
-          </Button>
-        </div>
-      ),
-    });
+    return axios
+      .post(API_post_detail, {
+        id: selectedRadioKeys.join(),
+      })
+      .then(function (response) {
+        console.log(response.data.lab_head[0]);
+        Modal.info({
+          centered: true,
+          width: 730,
+          title: "พิมพ์ Barcode",
+          icon: <PrinterOutlined />,
+          content: (
+            <div ref={componentRef}>
+              <LabOrderPrintComponent
+                data={dataReport}
+                key={dataReport.lab_order_number}
+                detail={response.data.lab_head[0]}
+              />
+            </div>
+          ),
+          footer: (
+            <div className="ant-modal-footer">
+              <ReactToPrint
+                trigger={() => {
+                  return <Button key="back">พิมพ์</Button>;
+                }}
+                content={() => componentRef.current}
+              />
+              <Button key="submit" type="primary" onClick={closeModal}>
+                ตกลง
+              </Button>
+            </div>
+          ),
+        });
+      });
   };
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
@@ -142,6 +158,10 @@ function LabReport() {
     if (action === "edit") {
       setFormDisable(false);
       setLoading(true);
+    } else if (action === "report") {
+      showConfirm(action);
+    } else if (action === "approve") {
+      showConfirm(action);
     } else if (action === "submit") {
       setLoadingData(true);
       let dataToUpdate = [];
@@ -323,21 +343,18 @@ function LabReport() {
     } else {
       return axios
         .post(API_post_action, {
+          id: selectedRadioKeys,
           action: action,
+          form: dataSubmitForm,
         })
         .then(function (response) {
+          console.log(response.data);
           messageApi.open({
             type: response.data.result === true ? "success" : "error",
             content: response.data.alert,
           });
-
-          if (acceptPrintBarcode) {
-            showPrint();
-          }
+          dataSubmitForm = [];
           setRefreshKey((oldKey) => oldKey + 1);
-          //loadData();
-          //setAcceptPrintBarcode(false);
-          acceptPrintBarcode = false;
         });
     }
   };
@@ -352,12 +369,13 @@ function LabReport() {
         response.data.map((item, index) => {
           if (
             index === 0 ||
-            response.data[index].sub_code !== response.data[index - 1].sub_code
+            response.data[index].group_code !==
+              response.data[index - 1].group_code
           ) {
-            if (response.data[index].sub_code !== null) {
+            if (response.data[index].group_code !== null) {
               dataGroup.push({
-                label: item["lab_items_sub_group_name"],
-                value: item["sub_code"],
+                label: item["group_name"],
+                value: item["group_code"],
               });
             }
           }
@@ -789,7 +807,10 @@ function LabReport() {
                                 }}
                                 disabled={
                                   !formDisable ||
-                                  (dataReport.length > 0 ? false : true)
+                                  (dataReport.length > 0 ? false : true) ||
+                                  (dataReportStatus !== "Pending" &&
+                                    dataReportStatus !== "Process" &&
+                                    dataReportStatus !== "Completed")
                                 }
                               >
                                 <div>
@@ -815,7 +836,10 @@ function LabReport() {
                                 }}
                                 disabled={
                                   !formDisable ||
-                                  (dataReport.length > 0 ? false : true)
+                                  (dataReport.length > 0 ? false : true) ||
+                                  (dataReportStatus !== "Pending" &&
+                                    dataReportStatus !== "Process" &&
+                                    dataReportStatus !== "Completed")
                                 }
                               >
                                 <div>
@@ -841,7 +865,8 @@ function LabReport() {
                                 }}
                                 disabled={
                                   !formDisable ||
-                                  (dataReport.length > 0 ? false : true)
+                                  (dataReport.length > 0 ? false : true) ||
+                                  dataReportStatus !== "Reported"
                                 }
                               >
                                 <div>

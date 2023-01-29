@@ -1,5 +1,5 @@
 import { Empty, Input, Popover, Checkbox, Tooltip as TT } from "antd";
-import { LineChartOutlined } from "@ant-design/icons";
+import { LineChartOutlined, WarningOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import {
   Chart as ChartJS,
@@ -45,7 +45,7 @@ const LabOrderComponent = (props) => {
   const openGraph = (lab_items_name, dataGraphItem, isNotNumber) => {
     setTitleInformation(
       <>
-        <LineChartOutlined /> ข้อมูล {lab_items_name}
+        <LineChartOutlined /> ประวัติข้อมูล {lab_items_name}
       </>
     );
     let dataType;
@@ -154,6 +154,10 @@ const LabOrderComponent = (props) => {
     return dataRaw;
   };
 
+  const warningModalBox = (record) => {
+    console.log(record);
+  };
+
   return (
     <>
       <table
@@ -194,6 +198,11 @@ const LabOrderComponent = (props) => {
             >
               Flag
             </th>
+            <th
+              style={{ padding: "8px 8px", backgroundColor: "#f1ffb8" }}
+              className={"ant-table-cell"}
+              width={"5%"}
+            ></th>
             <th
               style={{ padding: "8px 8px", backgroundColor: "#f1ffb8" }}
               className={"ant-table-cell"}
@@ -262,7 +271,7 @@ const LabOrderComponent = (props) => {
             data.map((item, index) => {
               if (
                 dataItemGroupSelect === "All" ||
-                dataItemGroupSelect === item["sub_code"]
+                dataItemGroupSelect === item["group_code"]
               ) {
                 let text;
                 let arrayHistory;
@@ -324,7 +333,15 @@ const LabOrderComponent = (props) => {
                         onMouseOver={() => {
                           openGraph(
                             item["lab_items_name"],
-                            arrayHistory,
+                            [
+                              {
+                                value: item["lab_order_result_manual"]
+                                  ? item["lab_order_result_manual"]
+                                  : item["lab_order_result_instrument"],
+                                label: item["order_date_time"],
+                              },
+                              ...arrayHistory,
+                            ],
                             isNaN(item["lab_order_result_manual"]) ||
                               isNaN(item["lab_order_result_instrument"]) ||
                               isNaN(arrayHistory[0]["value"]) ||
@@ -378,6 +395,9 @@ const LabOrderComponent = (props) => {
                         ) : (
                           <>{item["flag"]}</>
                         )}
+                      </td>
+                      <td style={{ border: "1px solid #f0f0f0", color: "red" }}>
+                        <WarningOutlined onClick={warningModalBox} />
                       </td>
                       <td style={{ border: "1px solid #f0f0f0" }}>
                         {item["lab_order_result_rerun"]}

@@ -16,7 +16,6 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
-  console.log("debug from api: ", req.body);
   const date_start = req.body.date_start;
   const date_stop = req.body.date_stop;
   const time_start = req.body.time_start;
@@ -79,6 +78,8 @@ export default function handler(req, res) {
     DATE_FORMAT(lab_head.receive_time,'%H:%i'))
     AS time_receive_report,
   lab_head.department as department,
+  lab_head.receive_status, 
+  lab_head.report_status, 
   patient.informaddr as address
   FROM lab_head
   LEFT JOIN lab_order ON lab_order.lab_order_number = lab_head.lab_order_number 

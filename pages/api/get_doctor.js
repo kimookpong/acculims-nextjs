@@ -17,7 +17,7 @@ connection.connect(function (err) {
 
 export default function handler(req, res) {
   const query = `SELECT 
-  code AS value,
+  name AS value,
   name AS label
   FROM doctor`;
   connection.query(query, function (err, rows, fields) {

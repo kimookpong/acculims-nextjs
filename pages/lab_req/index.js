@@ -67,10 +67,8 @@ function LabReq() {
     Modal.destroyAll();
   };
 
-  const [doctorList, setDoctorlist] = useState([]);
   const getDoctor = (action) => {
-    return axios.get(API_get_doctor).then(function (response) {
-      setDoctorlist(response.data);
+    return axios.get(API_get_doctor).then(function (responseDoctor) {
       return axios
         .post(API_post_detail, {
           id: selectedRowKeys.join(),
@@ -84,7 +82,7 @@ function LabReq() {
               <CancelComponent
                 data={response.data.lab_head[0]}
                 rejectForm={onAddRejectForm}
-                doctorList={doctorList}
+                doctorList={responseDoctor.data}
               />
             ),
             onOk() {

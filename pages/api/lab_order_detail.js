@@ -35,6 +35,25 @@ export default function handler(req, res) {
   doctor.name as docname, 
   if(trim(lab_head.department) ='IPD',ward.name,kskdepartment.department) as wardname, 
   lab_head.lab_head_remark, 
+  lab_head.receive_status, 
+  lab_head.report_status, 
+
+  concat(
+    DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+    DATE_FORMAT(lab_head.receive_time,'%H:%i:%s'))
+    AS receive_date,
+  concat(
+    DATE_FORMAT(DATE_ADD(lab_head.report_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+    DATE_FORMAT(lab_head.report_time,'%H:%i:%s'))
+    AS report_date,
+  concat(
+    DATE_FORMAT(DATE_ADD(lab_head.approved_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+    DATE_FORMAT(lab_head.approved_time,'%H:%i:%s'))
+    AS approved_date,
+
+  lab_head.reporter_name, 
+  lab_head.approver_name, 
+
   lab_head.order_note 
   FROM lab_head 
   LEFT JOIN patient ON lab_head.hn = patient.hn 

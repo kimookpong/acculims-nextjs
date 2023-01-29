@@ -79,6 +79,8 @@ export default function handler(req, res) {
     DATE_FORMAT(lab_head.receive_time,'%H:%i'))
     AS time_receive_report,
   lab_head.department as department,
+  lab_head.receive_status, 
+  lab_head.report_status, 
   patient.informaddr as address
   FROM lab_head
   LEFT JOIN lab_order ON lab_order.lab_order_number = lab_head.lab_order_number 
