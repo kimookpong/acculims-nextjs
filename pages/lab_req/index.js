@@ -129,10 +129,14 @@ function LabReq() {
                     element["status"] === true
                 )
               ) {
-                return <span> {items}, </span>;
+                return <span key={items}> {items}, </span>;
               } else {
                 ableSubmit = false;
-                return <span style={{ color: "red" }}> {items}, </span>;
+                return (
+                  <span key={items} style={{ color: "red" }}>
+                    {items},
+                  </span>
+                );
               }
             })}
           </Col>
