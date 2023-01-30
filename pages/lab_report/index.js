@@ -243,13 +243,23 @@ function LabReport() {
   };
 
   const showDetail = (data) => {
-    setDetail(<DetailComponent data={data.lab_head[0]} />);
+    setDetail(
+      !!data.lab_head[0]["department"] ? (
+        <DetailComponent data={data.lab_head[0]} />
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      )
+    );
     setDetailNote(
-      <DetailNoteComponent
-        data={data.lab_head[0]}
-        api={API_post_note}
-        summitNote={summitNote}
-      />
+      !!data.lab_head[0] ? (
+        <DetailNoteComponent
+          data={!!data.lab_head[0] ? data.lab_head[0] : ""}
+          api={API_post_note}
+          summitNote={summitNote}
+        />
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      )
     );
     setLoadingData(false);
   };
@@ -775,7 +785,7 @@ function LabReport() {
                   <Row>
                     <Col span={24}>
                       <LabOrderComponent
-                        data={dataReport}
+                        data={!!dataReport ? dataReport : null}
                         key={dataReport["lab_items_code"]}
                         id={dataReport["lab_items_code"]}
                         formDisable={formDisable}

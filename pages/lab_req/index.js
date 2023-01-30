@@ -78,12 +78,14 @@ function LabReq() {
             centered: true,
             width: 700,
             title: "ยืนยันปฎิเสธสิ่งส่งตรวจ",
-            content: (
+            content: !!response.data.lab_head[0] ? (
               <CancelComponent
                 data={response.data.lab_head[0]}
                 rejectForm={onAddRejectForm}
                 doctorList={responseDoctor.data}
               />
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ),
             onOk() {
               return axios
@@ -279,20 +281,34 @@ function LabReq() {
 
   const showDetail = (data) => {
     setDetail(
-      <DetailComponent
-        data={data.lab_head[0]}
-        lab_profile={data.lab_profile}
-        lab_single={data.lab_single}
-      />
+      !!data.lab_head[0] ? (
+        <DetailComponent
+          data={data.lab_head[0]}
+          lab_profile={data.lab_profile}
+          lab_single={data.lab_single}
+        />
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      )
     );
     setDetailNote(
-      <DetailNoteComponent
-        data={data.lab_head[0]}
-        api={API_post_note}
-        summitNote={summitNote}
-      />
+      !!data.lab_head[0] ? (
+        <DetailNoteComponent
+          data={!!data.lab_head[0] ? data.lab_head[0] : ""}
+          api={API_post_note}
+          summitNote={summitNote}
+        />
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      )
     );
-    setDetailThing(<DetailThingComponent data={data.lab_order} />);
+    setDetailThing(
+      !!data.lab_order ? (
+        <DetailThingComponent data={data.lab_order} />
+      ) : (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      )
+    );
     setLoadingData(false);
   };
 
