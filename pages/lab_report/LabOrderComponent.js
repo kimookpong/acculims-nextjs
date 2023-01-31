@@ -27,6 +27,7 @@ const LabOrderComponent = (props) => {
     props;
   const [titleInformation, setTitleInformation] = useState("");
   const [information, setInformation] = useState("");
+  const [rerunArray, setRerunArray] = useState([0]);
 
   const changeInput_lab_order_result_manual = (event) => {
     labOrderData(event.target.id, event.target.value);
@@ -156,7 +157,17 @@ const LabOrderComponent = (props) => {
   };
 
   const warningModalBox = (record) => {
-    console.log(record);
+    if (record.target.checked) {
+      console.log("add");
+      setRerunArray([...rerunArray, record.target.lab_items_code]);
+    } else {
+      console.log("remove");
+      setRerunArray(
+        rerunArray.filter((items, i) => items !== record.target.lab_items_code)
+      );
+    }
+
+    console.log(rerunArray);
   };
 
   return (
@@ -167,7 +178,7 @@ const LabOrderComponent = (props) => {
           overflowX: "auto",
           whiteSpace: "nowrap",
           borderCollapse: "collapse",
-          maxHeight: "840px",
+          maxHeight: "485px",
         }}
       >
         <thead className={"ant-table-thead"}>
@@ -310,7 +321,13 @@ const LabOrderComponent = (props) => {
                     if (data[index].sub_code !== null) {
                       text = (
                         <tr style={{ borderTop: "1px solid #f0f0f0" }}>
-                          <td style={{ padding: "8px 8px" }} colSpan={11}>
+                          <td
+                            style={{
+                              padding: "8px 8px",
+                              border: "1px solid #f0f0f0",
+                            }}
+                            colSpan={15}
+                          >
                             {item["lab_items_sub_group_name"]}
                           </td>
                         </tr>
@@ -415,9 +432,16 @@ const LabOrderComponent = (props) => {
                             key={
                               item["lab_order_number"] + item["lab_items_code"]
                             }
-                            checked={
-                              checkRerun && !!item["lab_order_result_rerun"]
+                            lab_items_code={item["lab_items_code"]}
+                            lab_order_result_rerun={
+                              item["lab_order_result_rerun"]
                             }
+                            // checked={
+                            //   (checkRerun &&
+                            //     !!item["lab_order_result_rerun"]) ||
+                            //   rerunArray.includes(item["lab_items_code"])
+                            // }
+                            disabled={!item["lab_order_result_rerun"]}
                             onChange={warningModalBox}
                           />
                         </td>
@@ -459,7 +483,7 @@ const LabOrderComponent = (props) => {
               })
             ) : (
               <tr key={"55555"}>
-                <td colSpan={11}>
+                <td colSpan={15}>
                   <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                 </td>
               </tr>

@@ -26,9 +26,7 @@ const BarcodeDetail = (props) => {
         </p>
         <p style={{ margin: 0 }}>{element["form_name"]}</p>
         <p style={{ margin: 0, fontSize: 16 }}>
-          {seperate
-            ? element["lab_items_name"]
-            : lab_items_name.length > 80
+          {lab_items_name.length > 80
             ? lab_items_name.substring(0, 80) + "..."
             : lab_items_name}
         </p>

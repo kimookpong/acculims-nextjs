@@ -70,12 +70,12 @@ export default function handler(req, res) {
     AS priority,
   lab_head.lis_order_no as No,
   concat(
-    DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
-    DATE_FORMAT(lab_head.order_time,'%H:%i'))
+    DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
+    DATE_FORMAT(lab_head.order_time,'%H:%i:%s'))
     AS order_date_time,
  concat(
-  DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
-    DATE_FORMAT(lab_head.receive_time,'%H:%i'))
+  DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
+    DATE_FORMAT(lab_head.receive_time,'%H:%i:%s'))
     AS time_receive_report,
   lab_head.department as department,
   lab_head.receive_status, 

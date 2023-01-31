@@ -26,7 +26,6 @@ import {
   SaveOutlined,
   FormOutlined,
 } from "@ant-design/icons";
-
 import dayjs from "dayjs";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
@@ -59,7 +58,7 @@ const { Content } = Layout;
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const currDate = dayjs();
-const beforeDate = currDate.subtract(4, "month");
+const beforeDate = currDate.subtract(3, "month");
 
 function LabReport() {
   const componentRef = useRef();
@@ -74,6 +73,7 @@ function LabReport() {
     Modal.destroyAll();
   };
   const [checkRerun, setCheckRerun] = useState(false);
+  const [checkPrint, setCheckPrint] = useState(false);
   let clickRerun = (event) => {
     setCheckRerun(event.target.checked);
   };
@@ -96,6 +96,7 @@ function LabReport() {
       formTime: currDate.format("HH:mm:ss"),
       formPartial: formPartialData ? "P" : "",
     };
+    setCheckPrint(formPrintData);
   };
   const showConfirm = (action) => {
     return axios.get(API_lis_user).then(function (responseDoctor) {
@@ -134,10 +135,10 @@ function LabReport() {
     });
   };
 
-  const showPrint = () => {
+  const showPrint = (order_number) => {
     return axios
       .post(API_post_detail, {
-        id: selectedRadioKeys.join(),
+        id: order_number,
       })
       .then(function (response) {
         console.log(response.data.lab_head[0]);
@@ -150,6 +151,7 @@ function LabReport() {
             <div ref={componentRef}>
               <LabOrderPrintComponent
                 data={dataReport}
+                dataPartial={dataReportPartial}
                 key={dataReport.lab_order_number}
                 detail={response.data.lab_head[0]}
               />
@@ -223,6 +225,7 @@ function LabReport() {
     }
   };
   const [dataReportStatus, setDataReportStatus] = useState([]);
+  const [dataReportPartial, setDataReportPartial] = useState("");
   const [statusList, setStatusList] = useState("All");
   const [dataCountReport, setDataCountReport] = useState({
     All: 0,
@@ -312,8 +315,10 @@ function LabReport() {
     setSInput(event.target.value);
   };
   const inputSDateRange = (event) => {
-    setSStartDate(dayjs(event[0]).format(dateFormat));
-    setSEndDate(dayjs(event[1]).format(dateFormat));
+    if (!!event) {
+      setSStartDate(dayjs(event[0]).format(dateFormat));
+      setSEndDate(dayjs(event[1]).format(dateFormat));
+    }
   };
   const inputSWork = (event) => {
     setSWorkType("All");
@@ -337,6 +342,7 @@ function LabReport() {
       setDataReport([]);
       setLoading(true);
       setDataReportStatus(null);
+      setDataReportPartial("");
 
       const filter = {
         date_start: sStartDate,
@@ -393,22 +399,28 @@ function LabReport() {
   ]);
 
   const actionControl = async (action) => {
+    let order_number = selectedRadioKeys;
     if (action === "print") {
-      showPrint();
+      showPrint(order_number.join());
     } else {
       return axios
         .post(API_post_action, {
-          id: selectedRadioKeys,
+          id: order_number,
           action: action,
           form: dataSubmitForm,
         })
         .then(function (response) {
-          console.log(response.data);
           messageApi.open({
             type: response.data.result === true ? "success" : "error",
             content: response.data.alert,
           });
           dataSubmitForm = [];
+
+          console.log("print status ", checkPrint);
+          if (checkPrint && response.data.result === true) {
+            showPrint(order_number.join());
+          }
+
           setRefreshKey((oldKey) => oldKey + 1);
         });
     }
@@ -455,7 +467,7 @@ function LabReport() {
       title: "เลขที่สั่ง",
       dataIndex: "order_number",
       key: "order_number",
-      width: 80,
+      width: 70,
     },
     {
       title: "P",
@@ -468,50 +480,51 @@ function LabReport() {
       title: "Status",
       dataIndex: "h_status",
       key: "h_status",
+      width: 80,
     },
     {
       title: "HN",
       dataIndex: "HN",
       key: "HN",
+      width: 80,
     },
     {
       title: "ชื่อผู้ป่วย",
       dataIndex: "patient_name",
       key: "patient_name",
       ellipsis: true,
+      width: 200,
     },
     {
       title: "ชื่อใบสั่ง",
       dataIndex: "form_name",
       key: "form_name",
       ellipsis: true,
+      width: 200,
     },
     {
       title: "ความเร่งด่วน",
       dataIndex: "priority",
       key: "priority",
+      width: 100,
     },
     {
       title: "วันเวลาที่สั่ง",
       dataIndex: "order_date_time",
       key: "order_date_time",
-      ellipsis: true,
+      width: 150,
     },
     {
       title: "วันเวลาที่รับ",
       dataIndex: "time_receive_report",
       key: "time_receive_report",
-      ellipsis: true,
+      width: 150,
     },
     {
-      title: "ห้องที่ส่งตรวจ",
+      title: "ห้อง",
       dataIndex: "department",
       key: "department",
-    },
-    {
-      title: "ที่อยู่",
-      dataIndex: "address",
-      key: "address",
+      width: 70,
     },
   ];
 
@@ -529,6 +542,7 @@ function LabReport() {
     loadDetail(record);
     loadReport(record);
     setDataReportStatus(record.h_status);
+    setDataReportPartial(record.p);
   };
 
   const rangePresets = [
@@ -565,16 +579,11 @@ function LabReport() {
           <Row>
             <Col xs={24} lg={24}>
               <Row>
-                <Col
-                  xs={24}
-                  lg={3}
-                  className="iconMenu"
-                  style={{ textAlign: "center", display: "grid" }}
-                >
+                <Col xs={24} lg={3} className="iconMenu">
                   <h1 style={{ margin: "auto 0" }}>รายงานผล LAB</h1>
                 </Col>
                 <Col xs={24} lg={15}>
-                  <Card>
+                  <Card style={{ background: "#e2edf8", margin: "0 10px" }}>
                     <Row gutter={24}>
                       <Col span={10}>
                         <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
@@ -683,7 +692,7 @@ function LabReport() {
 
             <Col xs={24} lg={12}>
               <Content>
-                <Row>
+                <Row style={{ margin: "10px 0" }}>
                   <Col span={24}>
                     <Row>
                       <Col span={4}>
@@ -691,6 +700,7 @@ function LabReport() {
                           onClick={() => setStatusListonClick("All")}
                           type={statusList === "All" ? "primary" : "default"}
                           block
+                          style={{ padding: 0 }}
                         >
                           All({dataCountReport["All"].toLocaleString()})
                         </Button>
@@ -702,6 +712,7 @@ function LabReport() {
                             statusList === "Pending" ? "primary" : "default"
                           }
                           block
+                          style={{ padding: 0 }}
                         >
                           Pending({dataCountReport["Pending"].toLocaleString()})
                         </Button>
@@ -713,6 +724,7 @@ function LabReport() {
                             statusList === "Process" ? "primary" : "default"
                           }
                           block
+                          style={{ padding: 0 }}
                         >
                           Process(
                           {dataCountReport["Process"].toLocaleString()})
@@ -725,6 +737,7 @@ function LabReport() {
                             statusList === "Completed" ? "primary" : "default"
                           }
                           block
+                          style={{ padding: 0 }}
                         >
                           Completed(
                           {dataCountReport["Completed"].toLocaleString()})
@@ -737,6 +750,7 @@ function LabReport() {
                             statusList === "Reported" ? "primary" : "default"
                           }
                           block
+                          style={{ padding: 0 }}
                         >
                           Reported(
                           {dataCountReport["Reported"].toLocaleString()})
@@ -749,6 +763,7 @@ function LabReport() {
                             statusList === "Approved" ? "primary" : "default"
                           }
                           block
+                          style={{ padding: 0 }}
                         >
                           Approved(
                           {dataCountReport["Approved"].toLocaleString()})
@@ -774,7 +789,7 @@ function LabReport() {
                     rowKey={"order_number"}
                     size="small"
                     scroll={{
-                      x: 1300,
+                      x: 1130,
                     }}
                     sticky
                     onRow={(record, rowIndex) => {
@@ -795,7 +810,12 @@ function LabReport() {
                     size="large"
                   >
                     <Content>
-                      <Card title="::ความเห็นเจ้าหน้าที่">{detailNote}</Card>
+                      <Card
+                        title="::ความเห็นเจ้าหน้าที่"
+                        style={{ marginRight: "5px", marginTop: "10px" }}
+                      >
+                        {detailNote}
+                      </Card>
                     </Content>
                   </Spin>
                 </Col>
@@ -806,7 +826,12 @@ function LabReport() {
                     size="large"
                   >
                     <Content>
-                      <Card title="::รายละเอียด">{detail}</Card>
+                      <Card
+                        title="::รายละเอียด"
+                        style={{ marginLeft: "5px", marginTop: "10px" }}
+                      >
+                        {detail}
+                      </Card>
                     </Content>
                   </Spin>
                 </Col>
@@ -815,7 +840,7 @@ function LabReport() {
             <Col xs={24} lg={12}>
               <Content>
                 <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล" size="large">
-                  <Row>
+                  <Row style={{ padding: "10px 0 10px 10px" }}>
                     <Col span={24}>
                       <LabOrderComponent
                         data={!!dataReport ? dataReport : null}
@@ -828,7 +853,7 @@ function LabReport() {
                       />
                     </Col>
                     <Col span={24}>
-                      <Card>
+                      <Card style={{ marginTop: "10px" }}>
                         <div style={{ textAlign: "center" }}>
                           <div style={{ display: "inline-flex" }}>
                             <div style={{ padding: 5 }}>
@@ -870,7 +895,8 @@ function LabReport() {
                                   (dataReport.length > 0 ? false : true) ||
                                   (dataReportStatus !== "Pending" &&
                                     dataReportStatus !== "Process" &&
-                                    dataReportStatus !== "Completed")
+                                    dataReportStatus !== "Completed" &&
+                                    dataReportPartial !== "P")
                                 }
                               >
                                 <div>
@@ -926,7 +952,8 @@ function LabReport() {
                                 disabled={
                                   !formDisable ||
                                   (dataReport.length > 0 ? false : true) ||
-                                  dataReportStatus !== "Reported"
+                                  (dataReportStatus !== "Reported" &&
+                                    dataReportPartial !== "P")
                                 }
                               >
                                 <div>

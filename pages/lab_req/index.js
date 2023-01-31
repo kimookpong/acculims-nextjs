@@ -18,6 +18,7 @@ import {
   message,
   Modal,
   Empty,
+  Segmented,
 } from "antd";
 import StickyBox from "react-sticky-box";
 import {
@@ -30,11 +31,17 @@ import dayjs from "dayjs";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
 //import "./LabReq.css";
+import moment from "moment";
+import "moment/locale/th";
+import "moment-timezone";
+
 import DetailComponent from "./DetailComponent";
 import DetailNoteComponent from "./DetailNoteComponent";
 import DetailThingComponent from "./DetailThingComponent";
 import BarcodeComponent from "./BarcodeComponent";
 import CancelComponent from "./CancelComponent";
+
+moment.locale("th");
 
 const API_server = "";
 const API_post_list = API_server + "/api/lab_order";
@@ -54,9 +61,35 @@ const { Content } = Layout;
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const currDate = dayjs();
-const beforeDate = currDate.subtract(4, "month");
+const beforeDate = currDate.subtract(3, "month");
 
 function LabReq() {
+  const locale = {
+    lang: {
+      placeholder: "เลือกวันที่",
+      rangePlaceholder: ["วันเริ่มต้น", "วันสิ้นสุด"],
+      today: "วันนี้",
+      now: "ตอนนี้",
+      backToToday: "กลับไปยังวันนี้",
+      ok: "ตกลง",
+      clear: "ลบ",
+      month: "เดือน",
+      year: "ปี",
+      timeSelect: "เลือกเวลา",
+      dateSelect: "เลือกวัน",
+      monthSelect: "เลือกเดือน",
+      yearSelect: "เลือกปี",
+      decadeSelect: "เลือกทศวรรษ",
+      yearFormat: "YYYY",
+      dateFormat: "D/M/YYYY",
+      dayFormat: "D",
+      dateTimeFormat: "D/M/YYYY HH:mm:ss",
+      monthBeforeYear: true,
+    },
+    timePickerLocale: {
+      placeholder: "เลือกเวลา",
+    },
+  };
   const componentRef = useRef();
   const [refreshKey, setRefreshKey] = useState(0);
   let dataRejectReason = [];
@@ -328,8 +361,10 @@ function LabReq() {
     setSInput(event.target.value);
   };
   const inputSDateRange = (event) => {
-    setSStartDate(dayjs(event[0]).format(dateFormat));
-    setSEndDate(dayjs(event[1]).format(dateFormat));
+    if (!!event) {
+      setSStartDate(dayjs(event[0]).format(dateFormat));
+      setSEndDate(dayjs(event[1]).format(dateFormat));
+    }
   };
   const inputSWork = (event) => {
     setSWorkType("All");
@@ -449,55 +484,57 @@ function LabReq() {
       title: "เลขที่สั่ง",
       dataIndex: "order_number",
       key: "order_number",
-      sorter: {
-        compare: (a, b) => a.order_number - b.order_number,
-        multiple: 1,
-      },
+      width: 70,
     },
     {
       title: "Status",
       dataIndex: "h_status",
       key: "h_status",
+      width: 80,
     },
     {
       title: "HN",
       dataIndex: "HN",
       key: "HN",
+      width: 80,
     },
     {
       title: "ชื่อผู้ป่วย",
       dataIndex: "patient_name",
       key: "patient_name",
+      ellipsis: true,
+      width: 200,
     },
     {
       title: "ชื่อใบสั่ง",
       dataIndex: "form_name",
       key: "form_name",
+      ellipsis: true,
+      width: 200,
     },
     {
       title: "ความเร่งด่วน",
       dataIndex: "priority",
       key: "priority",
+      width: 100,
     },
     {
       title: "วันเวลาที่สั่ง",
       dataIndex: "order_date_time",
       key: "order_date_time",
+      width: 150,
     },
     {
       title: "วันเวลาที่รับ",
       dataIndex: "time_receive_report",
       key: "time_receive_report",
+      width: 150,
     },
     {
-      title: "ห้องที่ส่งตรวจ",
+      title: "ห้อง",
       dataIndex: "department",
       key: "department",
-    },
-    {
-      title: "ที่อยู่",
-      dataIndex: "address",
-      key: "address",
+      width: 70,
     },
   ];
   // let acceptCondition = [];
@@ -587,22 +624,18 @@ function LabReq() {
         <Content>
           <Row>
             <Col xs={24} lg={18}>
-              <Content>
+              <Content style={{ marginRight: "10px" }}>
                 <Row>
-                  <Col
-                    xs={24}
-                    lg={4}
-                    className="iconMenu"
-                    style={{ textAlign: "center", display: "grid" }}
-                  >
+                  <Col xs={24} lg={4} className="iconMenu">
                     <h1 style={{ margin: "auto 0" }}>ใบรับ LAB</h1>
                   </Col>
                   <Col xs={24} lg={20}>
-                    <Card>
+                    <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
                       <Row gutter={24}>
                         <Col span={10}>
                           <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
                             <RangePicker
+                              locale="th"
                               block
                               presets={rangePresets}
                               value={[
@@ -678,7 +711,7 @@ function LabReq() {
                     </Card>
                   </Col>
                 </Row>
-                <Row>
+                <Row style={{ margin: "10px 0" }}>
                   <Col span={16}>
                     <Row>
                       <Col span={6}>
@@ -733,7 +766,7 @@ function LabReq() {
                   </Col>
                 </Row>
               </Content>
-              <Content>
+              <Content style={{ marginRight: "10px" }}>
                 <Spin spinning={loading} tip="กำลังโหลดข้อมูล" size="large">
                   <Table
                     rowSelection={rowSelection}
@@ -749,7 +782,7 @@ function LabReq() {
                     rowKey={"order_number"}
                     size="small"
                     scroll={{
-                      x: 1300,
+                      x: 1100,
                     }}
                     sticky
                     onRow={(record, rowIndex) => {
@@ -763,9 +796,9 @@ function LabReq() {
                   />
                 </Spin>
               </Content>
-              <Row>
+              <Row style={{ marginRight: "10px" }}>
                 <Col span={24}>
-                  <Card>
+                  <Card style={{ marginTop: "10px" }}>
                     <div style={{ textAlign: "center" }}>
                       <div style={{ display: "inline-flex" }}>
                         <div style={{ padding: 5 }}>
@@ -871,8 +904,15 @@ function LabReq() {
               <StickyBox>
                 <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล" size="large">
                   <Content>
-                    <Card title="รายละเอียด Lab Order">{detail}</Card>
-                    <Card title="Lab Note">{detailNote}</Card>
+                    <Card
+                      title="รายละเอียด Lab Order"
+                      style={{ marginBottom: "10px" }}
+                    >
+                      {detail}
+                    </Card>
+                    <Card title="Lab Note" style={{ marginBottom: "10px" }}>
+                      {detailNote}
+                    </Card>
                     <Card title="ประเภทสิ่งส่งตรวจ">{detailThing}</Card>
                   </Content>
                 </Spin>

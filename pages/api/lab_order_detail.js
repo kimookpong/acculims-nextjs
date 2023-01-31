@@ -82,17 +82,16 @@ export default function handler(req, res) {
   LEFT JOIN lab_items_sub_group ON lab_order.lab_items_sub_group_code = lab_items_sub_group.lab_items_sub_group_code 
   WHERE lab_order.lab_order_number = '${id}' 
   AND lab_order.lab_items_sub_group_code <> ''
+  AND lab_order.single_profile = 'p'
   GROUP BY lab_order.lab_items_sub_group_code ;`;
 
   query_item =
     query_item +
-    `SELECT lab_order.lab_order_number,lab_items.lab_items_group,lab_items_group.lab_items_group_name
+    `SELECT lab_order.lab_order_number,lab_items.lab_items_name
   FROM lab_order
   LEFT JOIN lab_items ON lab_order.lab_items_code = lab_items.lab_items_code
-  LEFT JOIN lab_items_group ON lab_items.lab_items_group = lab_items_group.lab_items_group_code
   WHERE lab_order.lab_order_number = '${id}'
-  AND lab_order.lab_items_code <> '' 
-  GROUP BY lab_items.lab_items_group;`;
+  AND lab_order.single_profile = 's';`;
 
   connection.query(query, function (err, rows, fields) {
     if (err) {

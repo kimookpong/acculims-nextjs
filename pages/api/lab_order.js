@@ -27,7 +27,7 @@ export default function handler(req, res) {
   const form_name = req.body.form_name;
   const address = req.body.address;
 
-  let cond = ` WHERE lab_head.order_date <= '${date_stop}' AND lab_head.order_date >= '${date_start}' `;
+  let cond = ` AND lab_head.order_date <= '${date_stop}' AND lab_head.order_date >= '${date_start}' `;
 
   if (department === "OPD") {
     cond = cond + ` AND lab_head.department = '${department}' `;
@@ -71,12 +71,12 @@ export default function handler(req, res) {
     AS priority,
   lab_head.lis_order_no as No,
   concat(
-    DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
-    DATE_FORMAT(lab_head.order_time,'%H:%i'))
+    DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
+    DATE_FORMAT(lab_head.order_time,'%H:%i:%s'))
     AS order_date_time,
  concat(
-  DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
-    DATE_FORMAT(lab_head.receive_time,'%H:%i'))
+  DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
+    DATE_FORMAT(lab_head.receive_time,'%H:%i:%s'))
     AS time_receive_report,
   lab_head.department as department,
   lab_head.receive_status, 
@@ -85,8 +85,8 @@ export default function handler(req, res) {
   FROM lab_head
   LEFT JOIN lab_order ON lab_order.lab_order_number = lab_head.lab_order_number 
   LEFT JOIN patient ON lab_head.hn = patient.hn
+  WHERE  lab_head.receive_status <> 'Delete'
   ${cond} 
-  AND lab_head.receive_status <> 'Delete'
   GROUP BY lab_head.lab_order_number`;
 
   connection.query(query, function (err, rows, fields) {

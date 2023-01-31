@@ -2,7 +2,7 @@ import { React, useEffect, useState } from "react";
 import { Empty, Input } from "antd";
 
 const LabOrderPrintComponent = (props) => {
-  const { data, detail } = props;
+  const { data, detail, dataPartial } = props;
   const [dataList, setDataList] = useState([]);
 
   useEffect(() => {
@@ -97,37 +97,46 @@ const LabOrderPrintComponent = (props) => {
               return (
                 <>
                   {text}
-                  <tr
-                    key={item["lab_items_name"].toString()}
-                    style={{ borderBottom: "1px solid #f0f0f0" }}
-                  >
-                    <td>
-                      {item["lab_items_sub_group_name"] !== null ? (
-                        <span style={{ paddingLeft: "15px" }}>
-                          {item["lab_items_name"]}
-                        </span>
-                      ) : (
-                        <>{item["lab_items_name"]}</>
-                      )}
-                    </td>
-                    <td>
-                      {item["lab_order_result_manual"]
-                        ? item["lab_order_result_manual"]
-                        : item["lab_order_result_instrument"]}
-                    </td>
-                    <td>
-                      <b>{item["flag"]}</b>
-                    </td>
-                    <td>{item["lab_items_unit"]}</td>
-                    <td>{item["lab_items_normal_value"]}</td>
-                    <td>
-                      {!!item["history"] && item["history"].length > 0
-                        ? !!item["history"]["lab_order_result"]
-                          ? item["history"]["lab_order_result"]
-                          : item["history"][0]["lab_order_result"]
-                        : null}
-                    </td>
-                  </tr>
+                  {(dataPartial === "P" &&
+                    (!!item["lab_order_result_manual"] ||
+                      !!item["lab_order_result_instrument"])) ||
+                  dataPartial !== "P" ||
+                  !!item["lab_order_result_manual"] ||
+                  !!item["lab_order_result_instrument"] ? (
+                    <tr
+                      key={item["lab_items_name"].toString()}
+                      style={{ borderBottom: "1px solid #f0f0f0" }}
+                    >
+                      <td>
+                        {item["lab_items_sub_group_name"] !== null ? (
+                          <span style={{ paddingLeft: "15px" }}>
+                            {item["lab_items_name"]}
+                          </span>
+                        ) : (
+                          <>{item["lab_items_name"]}</>
+                        )}
+                      </td>
+                      <td>
+                        {item["lab_order_result_manual"]
+                          ? item["lab_order_result_manual"]
+                          : item["lab_order_result_instrument"]}
+                      </td>
+                      <td>
+                        <b>{item["flag"]}</b>
+                      </td>
+                      <td>{item["lab_items_unit"]}</td>
+                      <td>{item["lab_items_normal_value"]}</td>
+                      <td>
+                        {!!item["history"] && item["history"].length > 0
+                          ? !!item["history"]["lab_order_result"]
+                            ? item["history"]["lab_order_result"]
+                            : item["history"][0]["lab_order_result"]
+                          : null}
+                      </td>
+                    </tr>
+                  ) : (
+                    <></>
+                  )}
                 </>
               );
             })

@@ -4,10 +4,6 @@ const DetailComponent = (props) => {
     <table style={{ width: "-webkit-fill-available" }}>
       <tbody>
         <tr>
-          <td colSpan={3}>-------------------------------------------</td>
-        </tr>
-
-        <tr>
           <td>ประเภท</td>
           <td>:</td>
           <td>{!!data ? data["department"] : ""}</td>
@@ -109,14 +105,9 @@ const DetailComponent = (props) => {
         {!!lab_single ? (
           lab_single.map((items, index) => {
             return (
-              <tr
-                key={
-                  items["lab_order_number"] +
-                  items["lab_items_group_name"].toString()
-                }
-              >
+              <tr key={items["lab_order_number"] + items["lab_items_name"]}>
                 <td colSpan={3} style={{ paddingLeft: "15px" }}>
-                  {index + 1}. {items["lab_items_group_name"]}
+                  {index + 1}. {items["lab_items_name"]}
                 </td>
               </tr>
             );

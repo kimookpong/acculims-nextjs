@@ -157,6 +157,7 @@ const CancelComponent = (props_reject) => {
                 onChange={onChangeTime}
                 format="HH:mm"
                 style={{ width: 200 }}
+                placeholder="เลือกเวลาแจ้ง"
               />
             </Form.Item>
           </Col>

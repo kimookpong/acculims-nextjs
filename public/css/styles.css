@@ -1,0 +1,20 @@
+.iconMenu {
+    text-align: center;
+    display: grid;
+    background: #6ab187;
+    color: #fff;
+    border-radius: 0.5rem;
+}
+
+
+.ant-card-head{
+    background-color: rgb(243, 246, 249) !important;
+}
+
+th.ant-table-cell {
+    background-color: rgb(243, 246, 249) !important;
+}
+
+.ant-table-row {
+    cursor: pointer;
+}
