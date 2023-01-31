@@ -6,31 +6,31 @@ const LabOrderActionComponent = (props) => {
   const { getFormData, doctorList, orderNumber, action } = props;
   const [formCode, setFormCode] = useState("");
   const [formComment, setFormComment] = useState("");
-  const [formRerun, setFormRerun] = useState(false);
+  const [formPartial, setFormPartial] = useState(false);
   const [formLab, setFormLab] = useState(false);
   const [formPrint, setFormPrint] = useState(false);
   const inputFormCode = (event) => {
-    setFormCode(event);
+    setFormCode(event.target.value);
   };
   const inputFormComment = (event) => {
     setFormComment(event.target.value);
   };
-  const inputFormRerun = (event) => {
-    setFormRerun(event.target.checked);
+  const inputFormPartial = (event) => {
+    setFormPartial(event.target.checked);
   };
   const inputFormLab = (event) => {
     setFormLab(event.target.checked);
   };
   const inputFormPrint = (event) => {
-    formPrint(event.target.checked);
+    setFormPrint(event.target.checked);
   };
   const actionFormReturn = () => {
-    return getFormData(formCode, formComment, formRerun, formLab, formPrint);
+    return getFormData(formCode, formComment, formPartial, formLab, formPrint);
   };
 
   useEffect(() => {
     actionFormReturn();
-  }, [formCode, formComment, formRerun, formLab, formPrint]);
+  }, [formCode, formComment, formPartial, formLab, formPrint]);
 
   return (
     <Row>
@@ -44,14 +44,7 @@ const LabOrderActionComponent = (props) => {
             <tr>
               <td style={{ width: "30%" }}>รหัส : </td>
               <td>
-                <Select
-                  showSearch
-                  onChange={inputFormCode}
-                  style={{
-                    width: 200,
-                  }}
-                  options={doctorList}
-                />
+                <Input onChange={inputFormCode} />
               </td>
             </tr>
             <tr>
@@ -74,7 +67,7 @@ const LabOrderActionComponent = (props) => {
               <tr>
                 <td style={{ width: "50%" }}>ปล่อยผลบางส่วน</td>
                 <td>
-                  <Checkbox onChange={inputFormRerun} />
+                  <Checkbox onChange={inputFormPartial} />
                 </td>
               </tr>
               <tr>

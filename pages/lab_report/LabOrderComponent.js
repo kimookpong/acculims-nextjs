@@ -416,7 +416,7 @@ const LabOrderComponent = (props) => {
                               item["lab_order_number"] + item["lab_items_code"]
                             }
                             checked={
-                              checkRerun || !!item["lab_order_result_rerun"]
+                              checkRerun && !!item["lab_order_result_rerun"]
                             }
                             onChange={warningModalBox}
                           />

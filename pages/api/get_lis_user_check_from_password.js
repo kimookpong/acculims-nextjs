@@ -16,10 +16,13 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
+  const password = req.body.password;
+
   const query = `SELECT 
-  user_name AS value,
-  concat(pname,fname,' ',lname) AS label
-  FROM lis_user`;
+  user_name,
+  concat(pname,fname,' ',lname) AS name
+  FROM lis_user 
+  WHERE password = '${password}'`;
   connection.query(query, function (err, rows, fields) {
     if (err) {
       console.error(err);

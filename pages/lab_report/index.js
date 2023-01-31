@@ -44,6 +44,9 @@ const API_post_barcode = API_server + "/api/lab_barcode";
 const API_get_lab_form_head = API_server + "/api/get_lab_form_head";
 const API_get_lab_items_group = API_server + "/api/get_lab_items_group";
 const API_get_doctor = API_server + "/api/get_doctor";
+const API_lis_user = API_server + "/api/get_lis_user";
+const API_get_lis_user_check_from_password =
+  API_server + "/api/get_lis_user_check_from_password";
 
 const API_post_action = API_server + "/api/lab_report_action_event";
 const API_post_cancel_reason = API_server + "/api/lab_order_reject";
@@ -79,16 +82,23 @@ function LabReport() {
     acceptPrintBarcode = event.target.checked;
   };
   let dataSubmitForm = [];
-  const getFormData = (formCodeData, formCommentData) => {
+  const getFormData = (
+    formCodeData,
+    formCommentData,
+    formPartialData,
+    formLabData,
+    formPrintData
+  ) => {
     dataSubmitForm = {
       formCode: formCodeData,
       formComment: formCommentData,
       formDate: currDate.format("YYYY-MM-DD"),
       formTime: currDate.format("HH:mm:ss"),
+      formPartial: formPartialData ? "P" : "",
     };
   };
   const showConfirm = (action) => {
-    return axios.get(API_get_doctor).then(function (responseDoctor) {
+    return axios.get(API_lis_user).then(function (responseDoctor) {
       Modal.confirm({
         centered: true,
         title:
@@ -101,6 +111,22 @@ function LabReport() {
             doctorList={responseDoctor.data}
           />
         ),
+        // footer: (
+        //   <div className="ant-modal-confirm-btns">
+        //     <Button key="back" onClick={closeModal}>
+        //       ยกเลิก
+        //     </Button>
+        //     <Button
+        //       key="submit"
+        //       type="primary"
+        //       onClick={() => {
+        //         return actionControl(action);
+        //       }}
+        //     >
+        //       ยืนยัน
+        //     </Button>
+        //   </div>
+        // ),
         onOk() {
           actionControl(action);
         },
@@ -179,14 +205,21 @@ function LabReport() {
           lab_order_result_manual: item,
         });
       });
-      return axios
-        .post(API_report_detail_update, dataToUpdate)
-        .then(function (response) {
-          setFormDisable(true);
-          setLoading(false);
-          setLoadingData(false);
-          setLabOrderUpdate([]);
-        });
+      if (dataToUpdate.length > 0) {
+        return axios
+          .post(API_report_detail_update, dataToUpdate)
+          .then(function (response) {
+            setFormDisable(true);
+            setLoading(false);
+            setLoadingData(false);
+            setLabOrderUpdate([]);
+          });
+      } else {
+        setFormDisable(true);
+        setLoading(false);
+        setLoadingData(false);
+        setLabOrderUpdate([]);
+      }
     }
   };
   const [dataReportStatus, setDataReportStatus] = useState([]);
