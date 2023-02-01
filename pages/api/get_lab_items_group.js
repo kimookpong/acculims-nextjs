@@ -5,11 +5,6 @@ const connection = mysql.createConnection({
   user: process.env.DB_USER,
   pass: process.env.DB_PASS,
   database: process.env.DB_DATABASE,
-  port: 25060,
-  ssl: {
-    // set the SSL mode here
-    rejectUnauthorized: false,
-  },
 });
 
 connection.connect(function (err) {
