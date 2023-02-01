@@ -76,6 +76,10 @@ th.ant-table-cell {
     line-height: 1.5714285714285714;
 }
 
+.react-datepicker button {
+    background: rgb(45, 183, 245) ;
+    color: #fff;
+}
 .react-datepicker__day--in-range, .react-datepicker__day--in-selecting-range, .react-datepicker__day--selected, .react-datepicker__month--in-range, .react-datepicker__month--in-selecting-range, .react-datepicker__month--selected, .react-datepicker__month-text--in-range, .react-datepicker__month-text--in-selecting-range, .react-datepicker__month-text--selected, .react-datepicker__quarter--in-range, .react-datepicker__quarter--in-selecting-range, .react-datepicker__quarter--selected, .react-datepicker__quarter-text--in-range, .react-datepicker__quarter-text--in-selecting-range, .react-datepicker__quarter-text--selected, .react-datepicker__year-text--in-range, .react-datepicker__year-text--in-selecting-range, .react-datepicker__year-text--selected {
     background-color: rgb(45, 183, 245) !important;
 }
