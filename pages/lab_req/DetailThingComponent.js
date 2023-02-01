@@ -19,7 +19,7 @@ const DetailThingComponent = (props) => {
           ) : (
             <tr>
               <td>
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                <Empty description={false} />
               </td>
             </tr>
           )

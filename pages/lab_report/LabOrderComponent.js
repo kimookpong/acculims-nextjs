@@ -484,7 +484,7 @@ const LabOrderComponent = (props) => {
             ) : (
               <tr key={"55555"}>
                 <td colSpan={15}>
-                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                  <Empty description={false} />
                 </td>
               </tr>
             )

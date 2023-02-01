@@ -143,7 +143,7 @@ const LabOrderPrintComponent = (props) => {
           ) : (
             <tr>
               <td colSpan={11}>
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                <Empty description={false} />
               </td>
             </tr>
           )}

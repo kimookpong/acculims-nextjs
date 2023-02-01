@@ -1,5 +1,6 @@
 import { React, useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
+import { ThaiDatePicker } from "thaidatepicker-react";
 import {
   ConfigProvider,
   Card,
@@ -18,7 +19,6 @@ import {
   message,
   Modal,
   Empty,
-  Segmented,
 } from "antd";
 import StickyBox from "react-sticky-box";
 import {
@@ -31,17 +31,12 @@ import dayjs from "dayjs";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
 //import "./LabReq.css";
-import moment from "moment";
-import "moment/locale/th";
-import "moment-timezone";
 
 import DetailComponent from "./DetailComponent";
 import DetailNoteComponent from "./DetailNoteComponent";
 import DetailThingComponent from "./DetailThingComponent";
 import BarcodeComponent from "./BarcodeComponent";
 import CancelComponent from "./CancelComponent";
-
-moment.locale("th");
 
 const API_server = "";
 const API_post_list = API_server + "/api/lab_order";
@@ -64,34 +59,9 @@ const currDate = dayjs();
 const beforeDate = currDate.subtract(3, "month");
 
 function LabReq() {
-  const locale = {
-    lang: {
-      placeholder: "เลือกวันที่",
-      rangePlaceholder: ["วันเริ่มต้น", "วันสิ้นสุด"],
-      today: "วันนี้",
-      now: "ตอนนี้",
-      backToToday: "กลับไปยังวันนี้",
-      ok: "ตกลง",
-      clear: "ลบ",
-      month: "เดือน",
-      year: "ปี",
-      timeSelect: "เลือกเวลา",
-      dateSelect: "เลือกวัน",
-      monthSelect: "เลือกเดือน",
-      yearSelect: "เลือกปี",
-      decadeSelect: "เลือกทศวรรษ",
-      yearFormat: "YYYY",
-      dateFormat: "D/M/YYYY",
-      dayFormat: "D",
-      dateTimeFormat: "D/M/YYYY HH:mm:ss",
-      monthBeforeYear: true,
-    },
-    timePickerLocale: {
-      placeholder: "เลือกเวลา",
-    },
-  };
   const componentRef = useRef();
   const [refreshKey, setRefreshKey] = useState(0);
+
   let dataRejectReason = [];
   const onAddRejectForm = (newItem) => {
     dataRejectReason = newItem;
@@ -100,7 +70,6 @@ function LabReq() {
   const closeModal = () => {
     Modal.destroyAll();
   };
-
   const getDoctor = (action) => {
     return axios.get(API_lis_user).then(function (responseDoctor) {
       return axios
@@ -119,7 +88,7 @@ function LabReq() {
                 doctorList={responseDoctor.data}
               />
             ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              <Empty description={false} />
             ),
             onOk() {
               return axios
@@ -186,7 +155,6 @@ function LabReq() {
           <Col span={24}>
             {!ableSubmit ? (
               <span style={{ color: "red" }}>
-                {" "}
                 ** สถานะไม่ถูกต้อง ไม่สามารถดำเนินการได้
               </span>
             ) : (
@@ -261,15 +229,9 @@ function LabReq() {
     Received: 0,
     Reject: 0,
   });
-  const [detail, setDetail] = useState(
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-  );
-  const [detailNote, setDetailNote] = useState(
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-  );
-  const [detailThing, setDetailThing] = useState(
-    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-  );
+  const [detail, setDetail] = useState(<Empty description={false} />);
+  const [detailNote, setDetailNote] = useState(<Empty description={false} />);
+  const [detailThing, setDetailThing] = useState(<Empty description={false} />);
 
   const [sStartDate, setSStartDate] = useState(beforeDate.format(dateFormat));
   const [sEndDate, setSEndDate] = useState(currDate.format(dateFormat));
@@ -282,6 +244,17 @@ function LabReq() {
   const [sAddress, setSAddress] = useState(null);
 
   const [seperateTupe, setSeperateTupe] = useState(false);
+
+  const handleDatePickerChangeStart = (christDate) => {
+    if (!!christDate) {
+      setSStartDate(dayjs(christDate).format(dateFormat));
+    }
+  };
+  const handleDatePickerChangeEnd = (christDate) => {
+    if (!!christDate) {
+      setSEndDate(dayjs(christDate).format(dateFormat));
+    }
+  };
 
   const getWorkTypeList = (id) => {
     if (id === 2) {
@@ -322,7 +295,7 @@ function LabReq() {
           lab_single={data.lab_single}
         />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        <Empty description={false} />
       )
     );
     setDetailNote(
@@ -333,14 +306,14 @@ function LabReq() {
           summitNote={summitNote}
         />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        <Empty description={false} />
       )
     );
     setDetailThing(
       !!data.lab_order ? (
         <DetailThingComponent data={data.lab_order} />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        <Empty description={false} />
       )
     );
     setLoadingData(false);
@@ -349,9 +322,9 @@ function LabReq() {
   const setStatusListonClick = (id) => {
     setStatusList(id);
     onSelectChange([]);
-    setDetail(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
-    setDetailNote(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
-    setDetailThing(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
+    setDetail(<Empty description={false} />);
+    setDetailNote(<Empty description={false} />);
+    setDetailThing(<Empty description={false} />);
   };
 
   const inputSType = (event) => {
@@ -362,7 +335,7 @@ function LabReq() {
   };
   const inputSDateRange = (event) => {
     if (!!event) {
-      setSStartDate(dayjs(event[0]).format(dateFormat));
+      setSStartDate(dayjs(event).format(dateFormat));
       setSEndDate(dayjs(event[1]).format(dateFormat));
     }
   };
@@ -387,9 +360,9 @@ function LabReq() {
 
   useEffect(() => {
     const loadData = async () => {
-      setDetail(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
-      setDetailNote(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
-      setDetailThing(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
+      setDetail(<Empty description={false} />);
+      setDetailNote(<Empty description={false} />);
+      setDetailThing(<Empty description={false} />);
       setLoading(true);
 
       onSelectChange([]);
@@ -490,7 +463,7 @@ function LabReq() {
       title: "Status",
       dataIndex: "h_status",
       key: "h_status",
-      width: 80,
+      width: 85,
     },
     {
       title: "HN",
@@ -617,8 +590,10 @@ function LabReq() {
       value: [dayjs().subtract(12, "month"), dayjs()],
     },
   ];
+
+  const customizeRenderEmpty = () => <Empty description={false} />;
   return (
-    <ConfigProvider locale={thTH}>
+    <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
       {messageContext}
       <Layout style={{ background: "white" }}>
         <Content>
@@ -632,18 +607,21 @@ function LabReq() {
                   <Col xs={24} lg={20}>
                     <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
                       <Row gutter={24}>
-                        <Col span={10}>
+                        <Col xs={12} lg={5}>
                           <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <RangePicker
-                              locale="th"
-                              block
-                              presets={rangePresets}
-                              value={[
-                                dayjs(sStartDate, dateFormat),
-                                dayjs(sEndDate, dateFormat),
-                              ]}
-                              format={dateFormat}
-                              onChange={inputSDateRange}
+                            <ThaiDatePicker
+                              placeholder="วันที่เริ่มต้น"
+                              value={dayjs(sStartDate, dateFormat)}
+                              onChange={handleDatePickerChangeStart}
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={12} lg={5}>
+                          <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
+                            <ThaiDatePicker
+                              placeholder="วันที่สิ้นสุด"
+                              value={dayjs(sEndDate, dateFormat)}
+                              onChange={handleDatePickerChangeEnd}
                             />
                           </Form.Item>
                         </Col>
@@ -784,7 +762,7 @@ function LabReq() {
                     scroll={{
                       x: 1100,
                     }}
-                    sticky
+                    // sticky
                     onRow={(record, rowIndex) => {
                       return {
                         onClick: (event) => {
@@ -798,7 +776,10 @@ function LabReq() {
               </Content>
               <Row style={{ marginRight: "10px" }}>
                 <Col span={24}>
-                  <Card style={{ marginTop: "10px" }}>
+                  <Card
+                    className="backgroundGreen"
+                    style={{ marginTop: "10px" }}
+                  >
                     <div style={{ textAlign: "center" }}>
                       <div style={{ display: "inline-flex" }}>
                         <div style={{ padding: 5 }}>

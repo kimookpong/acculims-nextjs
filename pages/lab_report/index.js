@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
+import { ThaiDatePicker } from "thaidatepicker-react";
 import {
   ConfigProvider,
   Card,
@@ -248,6 +249,17 @@ function LabReport() {
   const [sDepart, setSDepart] = useState("ALL");
   const [sAddress, setSAddress] = useState(null);
 
+  const handleDatePickerChangeStart = (christDate) => {
+    if (!!christDate) {
+      setSStartDate(dayjs(christDate).format(dateFormat));
+    }
+  };
+  const handleDatePickerChangeEnd = (christDate) => {
+    if (!!christDate) {
+      setSEndDate(dayjs(christDate).format(dateFormat));
+    }
+  };
+
   const getWorkTypeList = (id) => {
     if (id === 2) {
       return axios.get(API_get_lab_form_head).then(function (response) {
@@ -283,7 +295,7 @@ function LabReport() {
       !!data.lab_head[0]["department"] ? (
         <DetailComponent data={data.lab_head[0]} />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        <Empty description={false} />
       )
     );
     setDetailNote(
@@ -294,7 +306,7 @@ function LabReport() {
           summitNote={summitNote}
         />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        <Empty description={false} />
       )
     );
     setLoadingData(false);
@@ -304,8 +316,8 @@ function LabReport() {
     setStatusList(id);
     setSelectedRadioKeys([]);
     setDataReport([]);
-    setDetail(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
-    setDetailNote(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
+    setDetail(<Empty description={false} />);
+    setDetailNote(<Empty description={false} />);
   };
 
   const inputSType = (event) => {
@@ -337,8 +349,8 @@ function LabReport() {
 
   useEffect(() => {
     const loadData = async () => {
-      setDetail(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
-      setDetailNote(<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />);
+      setDetail(<Empty description={false} />);
+      setDetailNote(<Empty description={false} />);
       setDataReport([]);
       setLoading(true);
       setDataReportStatus(null);
@@ -480,7 +492,7 @@ function LabReport() {
       title: "Status",
       dataIndex: "h_status",
       key: "h_status",
-      width: 80,
+      width: 85,
     },
     {
       title: "HN",
@@ -571,8 +583,10 @@ function LabReport() {
       value: [dayjs().subtract(12, "month"), dayjs()],
     },
   ];
+
+  const customizeRenderEmpty = () => <Empty description={false} />;
   return (
-    <ConfigProvider locale={thTH}>
+    <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
       {messageContext}
       <Layout style={{ background: "white" }}>
         <Content>
@@ -585,17 +599,21 @@ function LabReport() {
                 <Col xs={24} lg={15}>
                   <Card style={{ background: "#e2edf8", margin: "0 10px" }}>
                     <Row gutter={24}>
-                      <Col span={10}>
+                      <Col xs={12} lg={5}>
                         <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                          <RangePicker
-                            block
-                            presets={rangePresets}
-                            value={[
-                              dayjs(sStartDate, dateFormat),
-                              dayjs(sEndDate, dateFormat),
-                            ]}
-                            format={dateFormat}
-                            onChange={inputSDateRange}
+                          <ThaiDatePicker
+                            placeholder="วันที่เริ่มต้น"
+                            value={dayjs(sStartDate, dateFormat)}
+                            onChange={handleDatePickerChangeStart}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={12} lg={5}>
+                        <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
+                          <ThaiDatePicker
+                            placeholder="วันที่สิ้นสุด"
+                            value={dayjs(sEndDate, dateFormat)}
+                            onChange={handleDatePickerChangeEnd}
                           />
                         </Form.Item>
                       </Col>
@@ -791,7 +809,7 @@ function LabReport() {
                     scroll={{
                       x: 1130,
                     }}
-                    sticky
+                    //sticky
                     onRow={(record, rowIndex) => {
                       return {
                         onClick: (event) => {
@@ -853,7 +871,10 @@ function LabReport() {
                       />
                     </Col>
                     <Col span={24}>
-                      <Card style={{ marginTop: "10px" }}>
+                      <Card
+                        className="backgroundGreen"
+                        style={{ marginTop: "10px" }}
+                      >
                         <div style={{ textAlign: "center" }}>
                           <div style={{ display: "inline-flex" }}>
                             <div style={{ padding: 5 }}>
