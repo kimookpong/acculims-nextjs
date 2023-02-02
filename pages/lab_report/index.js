@@ -591,12 +591,12 @@ function LabReport() {
       <Layout style={{ background: "white" }}>
         <Content>
           <Row>
-            <Col xs={24} lg={24}>
+            <Col xs={24} lg={18}>
               <Row>
                 <Col xs={24} lg={3} className="iconMenu">
                   <h1 style={{ margin: "auto 0" }}>รายงานผล LAB</h1>
                 </Col>
-                <Col xs={24} lg={15}>
+                <Col xs={24} lg={21}>
                   <Card style={{ background: "#e2edf8", margin: "0 10px" }}>
                     <Row gutter={24}>
                       <Col xs={12} lg={5}>
@@ -677,7 +677,11 @@ function LabReport() {
                     </Row>
                   </Card>
                 </Col>
-                <Col xs={24} lg={6}>
+              </Row>
+            </Col>
+            <Col xs={24} lg={6}>
+              <Row>
+                <Col xs={24} lg={24}>
                   <Row style={{ padding: 24 }}>
                     <Col span={12}>
                       <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
