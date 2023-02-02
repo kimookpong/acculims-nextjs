@@ -58,6 +58,8 @@ const dateFormat = "YYYY-MM-DD";
 const currDate = dayjs();
 const beforeDate = currDate.subtract(3, "month");
 
+const customizeRenderEmpty = () => <Empty description={false} />;
+
 function LabReq() {
   const componentRef = useRef();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -88,7 +90,7 @@ function LabReq() {
                 doctorList={responseDoctor.data}
               />
             ) : (
-              <Empty description={false} />
+              { customizeRenderEmpty }
             ),
             onOk() {
               return axios
@@ -229,9 +231,9 @@ function LabReq() {
     Received: 0,
     Reject: 0,
   });
-  const [detail, setDetail] = useState(<Empty description={false} />);
-  const [detailNote, setDetailNote] = useState(<Empty description={false} />);
-  const [detailThing, setDetailThing] = useState(<Empty description={false} />);
+  const [detail, setDetail] = useState(customizeRenderEmpty);
+  const [detailNote, setDetailNote] = useState(customizeRenderEmpty);
+  const [detailThing, setDetailThing] = useState(customizeRenderEmpty);
 
   const [sStartDate, setSStartDate] = useState(beforeDate.format(dateFormat));
   const [sEndDate, setSEndDate] = useState(currDate.format(dateFormat));
@@ -295,7 +297,7 @@ function LabReq() {
           lab_single={data.lab_single}
         />
       ) : (
-        <Empty description={false} />
+        { customizeRenderEmpty }
       )
     );
     setDetailNote(
@@ -306,14 +308,14 @@ function LabReq() {
           summitNote={summitNote}
         />
       ) : (
-        <Empty description={false} />
+        { customizeRenderEmpty }
       )
     );
     setDetailThing(
       !!data.lab_order ? (
         <DetailThingComponent data={data.lab_order} />
       ) : (
-        <Empty description={false} />
+        { customizeRenderEmpty }
       )
     );
     setLoadingData(false);
@@ -322,9 +324,9 @@ function LabReq() {
   const setStatusListonClick = (id) => {
     setStatusList(id);
     onSelectChange([]);
-    setDetail(<Empty description={false} />);
-    setDetailNote(<Empty description={false} />);
-    setDetailThing(<Empty description={false} />);
+    setDetail(customizeRenderEmpty);
+    setDetailNote(customizeRenderEmpty);
+    setDetailThing(customizeRenderEmpty);
   };
 
   const inputSType = (event) => {
@@ -360,9 +362,9 @@ function LabReq() {
 
   useEffect(() => {
     const loadData = async () => {
-      setDetail(<Empty description={false} />);
-      setDetailNote(<Empty description={false} />);
-      setDetailThing(<Empty description={false} />);
+      setDetail(customizeRenderEmpty);
+      setDetailNote(customizeRenderEmpty);
+      setDetailThing(customizeRenderEmpty);
       setLoading(true);
 
       onSelectChange([]);
@@ -591,7 +593,6 @@ function LabReq() {
     },
   ];
 
-  const customizeRenderEmpty = () => <Empty description={false} />;
   return (
     <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
       {messageContext}

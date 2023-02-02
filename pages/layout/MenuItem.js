@@ -1,13 +1,14 @@
+import { React, useState } from "react";
+import { useSession } from "next-auth/react";
 import {
-  FileOutlined,
   PieChartOutlined,
-  UserOutlined,
   DesktopOutlined,
-  TeamOutlined,
+  MedicineBoxOutlined,
 } from "@ant-design/icons";
-import { Menu } from "antd";
+import { Menu, Layout } from "antd";
 import Link from "next/link";
 
+const { Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -41,17 +42,39 @@ const items = [
   ),
 ];
 const MenuItem = () => {
-  const onClick = (e) => {
-    console.log("click ", e);
-  };
+  const [collapsed, setCollapsed] = useState(true);
+
+  const { data: session } = useSession();
+  if (!session) {
+    return <></>;
+  }
+
   return (
-    <Menu
-      onClick={onClick}
-      theme="dark"
-      defaultSelectedKeys={["1"]}
-      mode="inline"
-      items={items}
-    />
+    <Sider
+      collapsible
+      collapsed={collapsed}
+      onCollapse={(value) => setCollapsed(value)}
+    >
+      <div
+        style={{
+          height: 66,
+          textAlign: "center",
+          display: "grid",
+          color: "#fff",
+        }}
+      >
+        <h1 style={{ margin: "auto 0px" }}>
+          <MedicineBoxOutlined /> Acculims
+        </h1>
+      </div>
+      <Menu
+        // onClick={onClick}
+        theme="dark"
+        defaultSelectedKeys={["1"]}
+        mode="inline"
+        items={items}
+      />
+    </Sider>
   );
 };
 
