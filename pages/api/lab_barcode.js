@@ -1,12 +1,19 @@
 const mysql = require("mysql2");
 
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT,
+  host: "mariadb-108926-0.cloudclusters.net",
+  user: "acculims",
+  password: "acculims2023",
+  database: "acculims",
+  port: 10242,
   multipleStatements: true,
+
+  // host: process.env.DB_HOST,
+  // user: process.env.DB_USER,
+  // password: process.env.DB_PASS,
+  // database: process.env.DB_DATABASE,
+  // port: process.env.DB_PORT,
+  // multipleStatements: true,
 });
 
 connection.connect(function (err) {
