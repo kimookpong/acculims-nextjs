@@ -601,10 +601,10 @@ function LabReq() {
             <Col xs={24} lg={18}>
               <Content style={{ marginRight: "10px" }}>
                 <Row>
-                  <Col xs={24} lg={4} className="iconMenu">
+                  <Col xs={24} lg={3} className="iconMenu">
                     <h1 style={{ margin: "auto 0" }}>ใบรับ LAB</h1>
                   </Col>
-                  <Col xs={24} lg={20}>
+                  <Col xs={24} lg={21}>
                     <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
                       <Row gutter={24}>
                         <Col xs={12} lg={5}>
