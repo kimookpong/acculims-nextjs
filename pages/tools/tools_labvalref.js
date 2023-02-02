@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { DatePicker, Table} from 'antd';
+import { DatePicker, Table, Select, Space} from 'antd';
 
-function page() {
-    
+const tools_labvalref = () => {    
     const [lab_group, setlabgroup] = useState();
     const [lab_name, setlabname] = useState();
     const [data, setData] = useState();
+    const [dropdowndata, setDropDownData] = useState();
+
+    const onChange = (value) => { console.log(`selected ${value}`); };
+    const onSearch = (value) => { console.log('search:', value); };
 
     const columns = [
     {
@@ -70,17 +73,37 @@ function page() {
         );
     }
 
+    async function addValue(value) {
+        axios.post('http://localhost:3000/api/add_lis_hospital', 
+        {name:name, nameeng:nameeng, address:address, tel:tel, dept:dept, logo:logo})
+            .then(response => {
+            console.log(response.data);
+            setData(response.data);
+            })
+            .catch(error => { console.error(error); }
+        );
+    }
+
     return (
       <div>
         <a>กลุ่ม Lab: </a>
-        <input type="text" value={lab_group} onChange={e => setlabgroup(e.target.value)}/>
+        <Select
+        showSearch
+        placeholder="Select a person"
+        optionFilterProp="children"
+        onChange={onChange}
+        onSearch={onSearch}
+        filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+        options={dropdowndata} />
+        
         <a>ชื่อ Lab: </a>
         <input type="text" value={lab_name} onChange={e => setlabname(e.target.value)}/>
         <br></br>
-        <button onClick = {sendValue}>Show</button>
+        <button onClick = {sendValue}>Refresh</button>
+        <button onClick = {addValue}>Add Item</button>
         <Table dataSource={data} rowKey={'lab_order_number'} columns={columns}/>
       </div>
     )
 }
 
-export default page
+export default tools_labvalref

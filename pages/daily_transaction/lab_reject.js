@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { DatePicker, Table, Input, Button, Space} from 'antd';
 
-function page() {
-    
+const lab_reject = () => {    
     const onChangedDateStart = (date, dateString) => { setdatestart(dateString); }
     const onChangedDateStop = (date, dateString) => { setdatestop(dateString); }
     const [date_start, setdatestart] = useState('2022-09-01');
@@ -133,4 +132,4 @@ function page() {
     )
 }
 
-export default page
+export default lab_reject
