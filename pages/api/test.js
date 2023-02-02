@@ -18,15 +18,5 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
-  const query = `SELECT 
-  form_name AS value,
-  form_name AS label
-  FROM lab_form_head`;
-  connection.query(query, function (err, rows, fields) {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    res.status(200).json(rows);
-  });
+  res.status(200).json("ok");
 }

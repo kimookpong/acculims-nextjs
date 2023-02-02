@@ -484,7 +484,7 @@ const LabOrderComponent = (props) => {
             ) : (
               <tr key={"55555"}>
                 <td colSpan={15}>
-                  <Empty description={false} />
+                  <Empty description={false} style={{ padding: "20px" }} />
                 </td>
               </tr>
             )
