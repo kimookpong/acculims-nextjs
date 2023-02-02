@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { DatePicker, Table, Input } from "antd";
 
-const CritReport = () => {
+const crit_report = () => {
   const onChangedDateStart = (date, dateString) => {
     setdatestart(dateString);
   };
@@ -136,4 +136,4 @@ const CritReport = () => {
   );
 };
 
-export default CritReport;
+export default crit_report;
