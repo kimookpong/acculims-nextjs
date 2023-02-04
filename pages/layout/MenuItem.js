@@ -43,11 +43,12 @@ const items = [
 ];
 const MenuItem = () => {
   const [collapsed, setCollapsed] = useState(true);
-
+  
   const { data: session } = useSession();
   if (!session) {
     return <></>;
   }
+
 
   return (
     <Sider

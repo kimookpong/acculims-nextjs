@@ -2,6 +2,9 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
+const api_link = "https://www.melivecode.com/api/login";
+//const api_link = "/api/db_login";
+
 export default NextAuth({
   providers: [
     CredentialsProvider({
@@ -21,7 +24,7 @@ export default NextAuth({
         //     return null;
         //   });
 
-        const res = await fetch("/api/db_login", {
+        const res = await fetch(api_link, {
           method: "POST",
           body: JSON.stringify(credentials),
           headers: { "Content-Type": "application/json" },
