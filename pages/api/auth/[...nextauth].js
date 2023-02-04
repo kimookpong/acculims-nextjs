@@ -2,8 +2,8 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
-const api_link = "https://www.melivecode.com/api/login";
-//const api_link = "/api/db_login";
+//const api_link = "https://www.melivecode.com/api/login";
+const api_link = "/api/db_login";
 
 export default NextAuth({
   providers: [
