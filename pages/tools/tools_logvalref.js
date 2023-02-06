@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DatePicker, Table } from 'antd';
 
-const tools_logvalref = () => {    
+const ToolsLogvalref = () => {    
     const onChangedDateStart = (date, dateString) => { setdatestart(dateString); }
     const onChangedDateStop = (date, dateString) => { setdatestop(dateString); }
     const [date_start, setdatestart] = useState('2022-09-01');
@@ -38,7 +38,7 @@ const tools_logvalref = () => {
     }];
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/get_approved_log',
+        axios.post('/api/get_approved_log',
         {date_start:date_start, date_stop:date_stop})
             .then(response => {
             console.log(response.data);
@@ -58,4 +58,4 @@ const tools_logvalref = () => {
     )
 }
 
-export default tools_logvalref
+export default ToolsLogvalref
