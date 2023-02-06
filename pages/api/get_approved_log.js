@@ -16,7 +16,21 @@ connection.connect(function(err) {
 });
 
 export default function handler(req, res) {
-  const query = `SELECT * FROM approved_log`;
+  let date_start = req.body.date_start;
+  let date_stop = req.body.date_stop;
+
+  let date_kstart = date_start.split('-')
+  let date_kstop = date_stop.split('-')
+    
+  date_start = date_kstart[2] + '-' + date_kstart[1] + '-' + (parseInt(date_kstart[0]) + 543)
+  date_stop = date_kstop[2] + '-' + date_kstop[1] + '-' + (parseInt(date_kstop[0]) + 543)
+  
+  let cond = ``;  
+  if(date_start != undefined && date_stop != undefined){cond = cond + `WHERE date_time BETWEEN '${date_start}' AND '${date_stop}'`}
+
+  const query = `SELECT * FROM approved_log ${cond}`;
+  console.log('query = ',query)
+
   connection.query(query, function(err, rows, fields) {
     if (err) {
       console.error(err);

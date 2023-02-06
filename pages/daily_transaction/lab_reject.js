@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { DatePicker, Table, Input, Button, Space} from 'antd';
 
-const lab_reject = () => {    
+const lab_reject = () => {
     const onChangedDateStart = (date, dateString) => { setdatestart(dateString); }
     const onChangedDateStop = (date, dateString) => { setdatestop(dateString); }
     const [date_start, setdatestart] = useState('2022-09-01');
@@ -108,7 +108,7 @@ const lab_reject = () => {
     },];
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/get_lis_order_reject', 
+        axios.post('http://localhost:3000/api/get_lis_order_reject',
         {date_start:date_start, date_stop:date_stop, hn:hn})
             .then(response => {
             console.log(response.data);
