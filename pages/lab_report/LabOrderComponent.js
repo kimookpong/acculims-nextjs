@@ -372,7 +372,7 @@ const LabOrderComponent = (props) => {
                           }}
                         >
                           <Popover
-                            placement="leftTop"
+                            placement="leftBottom"
                             content={information}
                             title={titleInformation}
                           >

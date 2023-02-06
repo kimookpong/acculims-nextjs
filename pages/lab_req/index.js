@@ -38,7 +38,7 @@ import DetailThingComponent from "./DetailThingComponent";
 import BarcodeComponent from "./BarcodeComponent";
 import CancelComponent from "./CancelComponent";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import LoginComponent from "../layout/LoginComponent";
 
 const API_server = "";

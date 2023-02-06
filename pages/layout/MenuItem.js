@@ -4,6 +4,9 @@ import {
   PieChartOutlined,
   DesktopOutlined,
   MedicineBoxOutlined,
+  FileDoneOutlined,
+  HomeOutlined,
+  FileSearchOutlined,
 } from "@ant-design/icons";
 import { Menu, Layout } from "antd";
 import Link from "next/link";
@@ -18,12 +21,12 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem(<Link href="/">Home</Link>, "1", <PieChartOutlined />),
-  getItem(<Link href="/lab_req">ใบรับ LAB</Link>, "2", <DesktopOutlined />),
+  getItem(<Link href="/">Home</Link>, "1", <HomeOutlined />),
+  getItem(<Link href="/lab_req">ใบรับ LAB</Link>, "2", <FileDoneOutlined />),
   getItem(
     <Link href="/lab_report">รายงานผล LAB</Link>,
     "3",
-    <DesktopOutlined />
+    <FileSearchOutlined />
   ),
   getItem(
     <Link href="/daily_transaction/crit_report">crit_report</Link>,

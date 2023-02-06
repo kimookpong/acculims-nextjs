@@ -36,6 +36,9 @@ import LabOrderComponent from "./LabOrderComponent";
 import LabOrderPrintComponent from "./LabOrderPrintComponent";
 import LabOrderActionComponent from "./LabOrderActionComponent";
 
+import { useSession } from "next-auth/react";
+import LoginComponent from "../layout/LoginComponent";
+
 const API_server = "";
 const API_post_list = API_server + "/api/lab_report";
 const API_post_detail = API_server + "/api/lab_order_detail";
@@ -63,6 +66,8 @@ const beforeDate = currDate.subtract(3, "month");
 
 function LabReport() {
   const componentRef = useRef();
+
+  const { data: session } = useSession();
 
   const [refreshKey, setRefreshKey] = useState(0);
   let dataRejectReason = [];
@@ -585,6 +590,11 @@ function LabReport() {
   ];
 
   const customizeRenderEmpty = () => <Empty description={false} />;
+
+  if (!session) {
+    return <LoginComponent />;
+  }
+
   return (
     <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
       {messageContext}
