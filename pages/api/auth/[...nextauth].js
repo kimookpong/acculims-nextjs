@@ -14,16 +14,6 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        // await axios
-        //   .post("localhost:3000/api/db_login", JSON.stringify(credentials))
-        //   .then(function (response) {
-        //     console.log(response);
-        //     if (response.data.status === "ok") {
-        //       return response.data.user;
-        //     }
-        //     return null;
-        //   });
-
         const res = await fetch(api_link, {
           method: "POST",
           body: JSON.stringify(credentials),

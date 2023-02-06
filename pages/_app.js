@@ -1,7 +1,7 @@
 import { React, useState } from "react";
 import { Layout, Space, theme } from "antd";
 import MenuItem from "./layout/MenuItem";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import "../public/css/styles.css";
 import { MedicineBoxOutlined } from "@ant-design/icons";
 
