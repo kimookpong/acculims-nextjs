@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
-const api_link = "http://localhost:3000/api/db_login";
+const api_link = `${process.env.NEXTAUTH_URL}/api/db_login`;
 
 export default NextAuth({
   providers: [
