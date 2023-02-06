@@ -2,8 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
-//const api_link = "https://www.melivecode.com/api/login";
-const api_link = "/api/db_login";
+const api_link = "http://localhost:3000/api/db_login";
 
 export default NextAuth({
   providers: [
@@ -14,16 +13,17 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const res = await fetch(api_link, {
-          method: "POST",
-          body: JSON.stringify(credentials),
-          headers: { "Content-Type": "application/json" },
-        });
-        const data = await res.json();
-        if (data.status === "ok") {
-          return data.user;
-        }
-        return null;
+        return await axios
+          .post(api_link, {
+            username: credentials.username,
+            password: credentials.password,
+          })
+          .then(function (response) {
+            if (response.data.status === "ok") {
+              return response.data.user;
+            }
+            return null;
+          });
       },
     }),
   ],

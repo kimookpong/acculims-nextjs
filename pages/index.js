@@ -1,20 +1,23 @@
 import { useSession, signOut } from "next-auth/react";
 import LoginComponent from "./layout/LoginComponent";
-import Router, { useRouter } from "next/router";
+import { Button, Result } from "antd";
+import { SmileOutlined } from "@ant-design/icons";
 
 function Home() {
   const { data: session } = useSession();
   if (!session) {
-    //router.push("/myroute");
     return <LoginComponent />;
   }
   return (
-    <>
-      Signed in as {session.user.email} <br />
-      {session.user.avatar}
-      <br />
-      <button onClick={() => signOut()}>Sign out</button>
-    </>
+    <Result
+      icon={<SmileOutlined />}
+      title={"ยินดีต้อนรับ " + session.user.name}
+      extra={
+        <Button type="primary" onClick={() => signOut()}>
+          ออกจากระบบ
+        </Button>
+      }
+    />
   );
 }
 

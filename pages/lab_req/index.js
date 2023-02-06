@@ -38,6 +38,9 @@ import DetailThingComponent from "./DetailThingComponent";
 import BarcodeComponent from "./BarcodeComponent";
 import CancelComponent from "./CancelComponent";
 
+import { useSession, signOut } from "next-auth/react";
+import LoginComponent from "../layout/LoginComponent";
+
 const API_server = "";
 const API_post_list = API_server + "/api/lab_order";
 const API_post_detail = API_server + "/api/lab_order_detail";
@@ -62,6 +65,9 @@ const customizeRenderEmpty = () => <Empty description={false} />;
 
 function LabReq() {
   const componentRef = useRef();
+
+  const { data: session } = useSession();
+
   const [refreshKey, setRefreshKey] = useState(0);
 
   let dataRejectReason = [];
@@ -592,7 +598,9 @@ function LabReq() {
       value: [dayjs().subtract(12, "month"), dayjs()],
     },
   ];
-
+  if (!session) {
+    return <LoginComponent />;
+  }
   return (
     <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
       {messageContext}
