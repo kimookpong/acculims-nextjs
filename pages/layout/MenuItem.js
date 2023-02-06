@@ -21,7 +21,6 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem(<Link href="/">Home</Link>, "1", <HomeOutlined />),
   getItem(<Link href="/lab_req">ใบรับ LAB</Link>, "2", <FileDoneOutlined />),
   getItem(
     <Link href="/lab_report">รายงานผล LAB</Link>,
@@ -67,7 +66,9 @@ const MenuItem = () => {
         }}
       >
         <h1 style={{ margin: "auto 0px" }}>
-          <MedicineBoxOutlined /> Acculims
+          <Link href="/">
+            <MedicineBoxOutlined /> Acculims
+          </Link>
         </h1>
       </div>
       <Menu
