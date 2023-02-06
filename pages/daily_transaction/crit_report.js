@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { DatePicker, Table, Input} from 'antd';
 
-const crit_report = () => {
+const CritReport = () => {
     
     const onChangedDateStart = (date, dateString) => { setdatestart(dateString); }
     const onChangedDateStop = (date, dateString) => { setdatestop(dateString); }
@@ -77,7 +77,7 @@ const crit_report = () => {
     },];
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/get_lis_critical', 
+        axios.post('/api/get_lis_critical', 
         {date_start:date_start, date_stop:date_stop, hn:hn, patient_name:patient_name, call_name:call_name, take_name:take_name})
             .then(response => {
             console.log(response.data);
@@ -110,4 +110,4 @@ const crit_report = () => {
     )
 }
 
-export default crit_report
+export default CritReport;

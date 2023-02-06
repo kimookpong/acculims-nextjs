@@ -27,6 +27,7 @@
     "moment-timezone": "^0.5.40",
     "mysql2": "^3.0.1",
     "next": "13.1.5",
+    "next-auth": "^4.19.2",
     "react": "18.2.0",
     "react-barcode": "^1.4.6",
     "react-chartjs-2": "^5.2.0",
