@@ -4,8 +4,100 @@ import { ThaiDatePicker } from "thaidatepicker-react";
 
 // THAI DATEPICKER
 import DatePicker from "react-multi-date-picker";
-import thai from "../lib/thai";
-import thai_th from "../lib/thai_th";
+const thai = {
+  name: "thai",
+  startYear: 1,
+  yearLength: 365,
+  epoch: 1523097,
+  century: 25,
+  weekStartDayIndex: 1,
+  getMonthLengths(isLeap) {
+    return [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  },
+  isLeap(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  },
+  getLeaps(currentYear) {
+    if (currentYear === 0) return;
+
+    let year = currentYear > 0 ? 1 : -1;
+
+    let leaps = [],
+      condition = () =>
+        currentYear > 0 ? year <= currentYear : currentYear <= year,
+      increase = () => (currentYear > 0 ? year++ : year--);
+
+    while (condition()) {
+      if (this.isLeap(year)) leaps.push(year);
+
+      increase();
+    }
+
+    return leaps;
+  },
+  getDayOfYear({ year, month, day }) {
+    let monthLengths = this.getMonthLengths(this.isLeap(year));
+
+    for (let i = 0; i < month.index; i++) {
+      day += monthLengths[i];
+    }
+
+    return day;
+  },
+  getAllDays(date) {
+    const { year } = date;
+
+    return (
+      this.yearLength * (year - 1) +
+      this.leapsLength(year) +
+      this.getDayOfYear(date)
+    );
+  },
+  leapsLength(year) {
+    return (
+      (((year - 1) / 4) | 0) +
+      (-((year - 1) / 100) | 0) +
+      (((year - 1) / 400) | 0)
+    );
+  },
+  guessYear(days, currentYear) {
+    let year = ~~(days / 365.24);
+
+    return year + (currentYear > 0 ? 1 : -1);
+  },
+};
+const thai_th = {
+  name: "thai_th",
+  months: [
+    ["มกราคม", "ม.ค."],
+    ["กุมภาพันธ์", "ก.พ."],
+    ["มีนาคม", "มี.ค."],
+    ["เมษายน", "เม.ย.	"],
+    ["พฤษภาคม", "พ.ค."],
+    ["มิถุนายน", "มิ.ย."],
+    ["กรกฎาคม", "ก.ค."],
+    ["สิงหาคม", "ส.ค."],
+    ["กันยายน", "ก.ย."],
+    ["ตุลาคม", "ต.ค."],
+    ["พฤศจิกายน", "พ.ย."],
+    ["ธันวาคม", "ธ.ค."],
+  ],
+  weekDays: [
+    ["วันเสาร์", "ส"],
+    ["วันอาทิตย์", "อา"],
+    ["วันจันทร์", "จ"],
+    ["วันอังคาร", "อ"],
+    ["วันพุธ", "พ"],
+    ["วันพฤหัส", "พฤ"],
+    ["วันศุกร์", "ศ"],
+  ],
+  digits: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+  meridiems: [
+    ["ก่อนเที่ยง", "เอเอ็ม"],
+    ["หลังเที่ยง", "พีเอ็ม"],
+  ],
+};
+// END THAI DATEPICKER
 
 import {
   ConfigProvider,
