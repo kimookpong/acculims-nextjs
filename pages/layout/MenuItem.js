@@ -67,6 +67,11 @@ const items = [
     "11",
     <DesktopOutlined />
   ),
+  getItem(
+    <Link href="/about/about">Approved Log</Link>,
+    "12",
+    <DesktopOutlined />
+  ),
 ];
 const MenuItem = () => {
   const [collapsed, setCollapsed] = useState(true);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { DatePicker, Table } from 'antd';
+import { DatePicker, Table, Button } from 'antd';
 
 const ToolsLogvalref = () => {    
     const onChangedDateStart = (date, dateString) => { setdatestart(dateString); }
@@ -38,7 +38,7 @@ const ToolsLogvalref = () => {
     }];
 
     async function sendValue(value) {
-        axios.post('/api/get_approved_log',
+        axios.post('http://localhost:3000/api/get_approved_log',
         {date_start:date_start, date_stop:date_stop})
             .then(response => {
             console.log(response.data);
@@ -50,10 +50,11 @@ const ToolsLogvalref = () => {
 
     return (
       <div>
-        <a>From: </a><DatePicker onChange={onChangedDateStart}/>
-        <a> To: </a><DatePicker onChange={onChangedDateStop}/>
+        <a>From: </a><DatePicker format="DD-MM-YYYY" onChange={onChangedDateStart}/>
+        <a> To: </a><DatePicker format="DD-MM-YYYY" onChange={onChangedDateStop}/>
+        <a> </a>
+        <Button shape="round" type="primary" onClick = {sendValue}>Refresh</Button>
         <Table dataSource={data} rowKey={'id_link_instrument'} columns={columns}/>
-        <button onClick = {sendValue}>Refresh</button>
       </div>
     )
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { DatePicker, Table, Input} from 'antd';
+import { DatePicker, Table, Button} from 'antd';
+import styles from '../../styles/Home.module.css'
 
 const CritReport = () => {
     
@@ -77,7 +78,7 @@ const CritReport = () => {
     },];
 
     async function sendValue(value) {
-        axios.post('/api/get_lis_critical', 
+        axios.post('http://localhost:3000/api/get_lis_critical', 
         {date_start:date_start, date_stop:date_stop, hn:hn, patient_name:patient_name, call_name:call_name, take_name:take_name})
             .then(response => {
             console.log(response.data);
@@ -92,22 +93,25 @@ const CritReport = () => {
         <a>From: </a><DatePicker onChange={onChangedDateStart}/>
         <a> To: </a><DatePicker onChange={onChangedDateStop}/>
         <br></br>
-        <a>HN: </a>
-        <input type="text" value={hn} onChange={e => sethn(e.target.value)}/>
-        <br></br>
-        <a>ชื่อ-สกุล: </a>
-        <input type="text" value={patient_name} onChange={e => setpname(e.target.value)}/>
-        <br></br>
-        <a>ชื่อผู้โทร: </a>
-        <input type="text" value={call_name} onChange={e => setcall(e.target.value)}/>
-        <br></br>
-        <a>ชื่อผู้รับสาย: </a>
-        <input type="text" value={take_name} onChange={e => settake(e.target.value)}/>
-        <br></br>
-        <button onClick = {sendValue}>Print</button>
+        <p className={styles.card}>
+            <a>HN: </a>
+            <input type="text" value={hn} onChange={e => sethn(e.target.value)}/>
+            <br></br>
+            <a>ชื่อ-สกุล: </a>
+            <input type="text" value={patient_name} onChange={e => setpname(e.target.value)}/>
+            <br></br>
+            <a>ชื่อผู้โทร: </a>
+            <input type="text" value={call_name} onChange={e => setcall(e.target.value)}/>
+            <br></br>
+            <a>ชื่อผู้รับสาย: </a>
+            <input type="text" value={take_name} onChange={e => settake(e.target.value)}/>
+        </p>
+        <Button type="primary" shape="round" onClick = {sendValue}>Reload</Button>
+        <a> </a>
+        <Button shape="round" onClick = {sendValue}>Print</Button>
         <Table dataSource={data} rowKey={'lab_order_number'} columns={columns}/>
       </div>
     )
 }
 
-export default CritReport;
+export default CritReport
