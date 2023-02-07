@@ -64,7 +64,7 @@ const ToolsLabvalref = () => {
     }];
 
     async function sendLabItemGroup(value) {
-        axios.post('http://localhost:3000/api/get_lab_items_group')
+        axios.post('/api/get_lab_items_group')
             .then(response => {
             console.log(response.data);
             setDropDownData(response.data);
@@ -74,7 +74,7 @@ const ToolsLabvalref = () => {
     }
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/get_lab_items', {lab_group:lab_group, lab_name:lab_name})
+        axios.post('/api/get_lab_items', {lab_group:lab_group, lab_name:lab_name})
             .then(response => {
             console.log(response.data);
             setData(response.data);
@@ -84,7 +84,7 @@ const ToolsLabvalref = () => {
     }
 
     async function addValue(value) {
-        axios.post('http://localhost:3000/api/add_lab_ref', 
+        axios.post('/api/add_lab_ref', 
         {lab_items_code:lab_items_code, display_order:display_order, lab_items_name:lab_items_name, lab_items_unit:lab_items_unit, lab_items_normal_value:lab_items_normal_value, lab_items_hint:lab_items_hint, service_price:service_price, range_check:range_check})
             .then(response => {
             console.log(response.data);

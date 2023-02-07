@@ -108,7 +108,7 @@ const LabReject = () => {
     },];
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/get_lis_order_reject',
+        axios.post('/api/get_lis_order_reject',
         {date_start:date_start, date_stop:date_stop, lab_order_number:lab_order_number})
             .then(response => {
             console.log(response.data);

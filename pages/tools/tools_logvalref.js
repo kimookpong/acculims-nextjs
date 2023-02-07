@@ -38,7 +38,7 @@ const ToolsLogvalref = () => {
     }];
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/get_approved_log',
+        axios.post('/api/get_approved_log',
         {date_start:date_start, date_stop:date_stop})
             .then(response => {
             console.log(response.data);

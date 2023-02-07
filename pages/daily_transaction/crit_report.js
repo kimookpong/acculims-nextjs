@@ -78,7 +78,7 @@ const CritReport = () => {
     },];
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/get_lis_critical', 
+        axios.post('/api/get_lis_critical', 
         {date_start:date_start, date_stop:date_stop, hn:hn, patient_name:patient_name, call_name:call_name, take_name:take_name})
             .then(response => {
             console.log(response.data);

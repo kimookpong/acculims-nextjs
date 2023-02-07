@@ -12,7 +12,7 @@ function ToolsUservalref(){
     const [user_type, settype] = useState('');
 
     async function sendValue(value) {
-        axios.post('http://localhost:3000/api/add_user',
+        axios.post('/api/add_user',
         {fname:fname, lname:lname, job_id:job_id, user_name:user_name, password:password, user_type:user_type})
             .then(response => {
             console.log(response.data);
