@@ -1,11 +1,9 @@
-import { React, useState } from "react";
-import { Layout, Space, theme } from "antd";
+import { React } from "react";
+import { Layout, Space } from "antd";
 import MenuItem from "./layout/MenuItem";
 import { SessionProvider, useSession } from "next-auth/react";
 import "../public/css/styles.css";
-import { MedicineBoxOutlined } from "@ant-design/icons";
 
-const { Sider } = Layout;
 export default function MyApp({
   Component,
   pageProps: { session, ...pageProps },

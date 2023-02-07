@@ -31,7 +31,8 @@ th.ant-table-cell {
     cursor: pointer;
 }
 
-.react-datepicker__input-container input {
+.react-datepicker__input-container input,
+.datepicker-input {
     box-sizing: border-box;
     margin: 0;
     padding: 4px 11px;
@@ -53,7 +54,9 @@ th.ant-table-cell {
     transition: all 0.2s;
 }
 .react-datepicker__input-container input:hover,
-.react-datepicker__input-container input:focus-visible{
+.react-datepicker__input-container input:focus-visible,
+.datepicker-input:hover,
+.datepicker-input:focus-visible{
     border-color: #4096ff;
     border-inline-end-width: 1px;
 }

@@ -1,7 +1,7 @@
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { Layout, Space, Button } from "antd";
 import { LoginOutlined } from "@ant-design/icons";
-const { Header, Footer, Sider, Content } = Layout;
+const { Content } = Layout;
 const contentStyle = {
   textAlign: "center",
   position: "fixed",
@@ -9,7 +9,6 @@ const contentStyle = {
   left: "50%",
 };
 const LoginComponent = () => {
-  const { data: session, status } = useSession();
   return (
     <Space
       direction="vertical"

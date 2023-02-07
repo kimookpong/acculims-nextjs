@@ -1,6 +1,104 @@
 import { React, useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
 import { ThaiDatePicker } from "thaidatepicker-react";
+
+// THAI DATEPICKER
+import DatePicker from "react-multi-date-picker";
+const thai = {
+  name: "thai",
+  startYear: 1,
+  yearLength: 365,
+  epoch: 1523097,
+  century: 25,
+  weekStartDayIndex: 1,
+  getMonthLengths(isLeap) {
+    return [31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  },
+  isLeap(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  },
+  getLeaps(currentYear) {
+    if (currentYear === 0) return;
+
+    let year = currentYear > 0 ? 1 : -1;
+
+    let leaps = [],
+      condition = () =>
+        currentYear > 0 ? year <= currentYear : currentYear <= year,
+      increase = () => (currentYear > 0 ? year++ : year--);
+
+    while (condition()) {
+      if (this.isLeap(year)) leaps.push(year);
+
+      increase();
+    }
+
+    return leaps;
+  },
+  getDayOfYear({ year, month, day }) {
+    let monthLengths = this.getMonthLengths(this.isLeap(year));
+
+    for (let i = 0; i < month.index; i++) {
+      day += monthLengths[i];
+    }
+
+    return day;
+  },
+  getAllDays(date) {
+    const { year } = date;
+
+    return (
+      this.yearLength * (year - 1) +
+      this.leapsLength(year) +
+      this.getDayOfYear(date)
+    );
+  },
+  leapsLength(year) {
+    return (
+      (((year - 1) / 4) | 0) +
+      (-((year - 1) / 100) | 0) +
+      (((year - 1) / 400) | 0)
+    );
+  },
+  guessYear(days, currentYear) {
+    let year = ~~(days / 365.24);
+
+    return year + (currentYear > 0 ? 1 : -1);
+  },
+};
+const thai_th = {
+  name: "thai_th",
+  months: [
+    ["มกราคม", "ม.ค."],
+    ["กุมภาพันธ์", "ก.พ."],
+    ["มีนาคม", "มี.ค."],
+    ["เมษายน", "เม.ย.	"],
+    ["พฤษภาคม", "พ.ค."],
+    ["มิถุนายน", "มิ.ย."],
+    ["กรกฎาคม", "ก.ค."],
+    ["สิงหาคม", "ส.ค."],
+    ["กันยายน", "ก.ย."],
+    ["ตุลาคม", "ต.ค."],
+    ["พฤศจิกายน", "พ.ย."],
+    ["ธันวาคม", "ธ.ค."],
+  ],
+  weekDays: [
+    ["วันเสาร์", "ส"],
+    ["วันอาทิตย์", "อา"],
+    ["วันจันทร์", "จ"],
+    ["วันอังคาร", "อ"],
+    ["วันพุธ", "พ"],
+    ["วันพฤหัส", "พฤ"],
+    ["วันศุกร์", "ศ"],
+  ],
+  digits: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+  meridiems: [
+    ["ก่อนเที่ยง", "เอเอ็ม"],
+    ["หลังเที่ยง", "พีเอ็ม"],
+  ],
+};
+// END THAI DATEPICKER
+
 import {
   ConfigProvider,
   Card,
@@ -12,7 +110,6 @@ import {
   Radio,
   Form,
   Input,
-  DatePicker,
   Select,
   Checkbox,
   Spin,
@@ -30,7 +127,6 @@ import {
 import dayjs from "dayjs";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
-//import "./LabReq.css";
 
 import DetailComponent from "./DetailComponent";
 import DetailNoteComponent from "./DetailNoteComponent";
@@ -56,9 +152,9 @@ const API_post_cancel_reason = API_server + "/api/lab_order_reject";
 const API_post_note = API_server + "/api/lab_order_note";
 
 const { Content } = Layout;
-const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const currDate = dayjs();
+//const currDate = defaultDate.add(543, "year");
 const beforeDate = currDate.subtract(3, "month");
 
 const customizeRenderEmpty = () => <Empty description={false} />;
@@ -106,7 +202,6 @@ function LabReq() {
                   date: currDate.format("YYYY-MM-DD"),
                 })
                 .then(function (response) {
-                  console.log(response.data);
                   actionControl(action);
                 });
             },
@@ -194,7 +289,6 @@ function LabReq() {
     });
   };
   const showPrint = () => {
-    console.log(selectedRowKeys.join(), seperateTupe);
     return axios
       .post(API_post_barcode, {
         id: selectedRowKeys.join(),
@@ -618,19 +712,29 @@ function LabReq() {
                       <Row gutter={24}>
                         <Col xs={12} lg={5}>
                           <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <ThaiDatePicker
-                              placeholder="วันที่เริ่มต้น"
-                              value={dayjs(sStartDate, dateFormat)}
+                            <DatePicker
+                              calendar={thai}
+                              locale={thai_th}
+                              value={dayjs(sStartDate, dateFormat)
+                                .add(543, "year")
+                                .format("DD-MM-YYYY")}
+                              format="DD-MM-YYYY"
                               onChange={handleDatePickerChangeStart}
+                              inputClass="datepicker-input"
                             />
                           </Form.Item>
                         </Col>
                         <Col xs={12} lg={5}>
                           <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <ThaiDatePicker
-                              placeholder="วันที่สิ้นสุด"
-                              value={dayjs(sEndDate, dateFormat)}
+                            <DatePicker
+                              calendar={thai}
+                              locale={thai_th}
+                              value={dayjs(sEndDate, dateFormat)
+                                .add(543, "year")
+                                .format("DD-MM-YYYY")}
+                              format="DD-MM-YYYY"
                               onChange={handleDatePickerChangeEnd}
+                              inputClass="datepicker-input"
                             />
                           </Form.Item>
                         </Col>

@@ -10,7 +10,7 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
-  const query = "SELECT `lab_items_group_name` FROM `lab_items_group`";
+  const query = `SELECT lab_items_group_name AS value, lab_items_group_name AS label FROM lab_items_group`;
   connection.query(query, function (err, rows, fields) {
     if (err) {
       console.error(err);
