@@ -175,8 +175,6 @@ const ToolsStatreport = () => {
         );
     }
 
-    const fileName = "Statistic Report";
-
     return (
       <div>
         <a>From: </a><DatePicker format="DD-MM-YYYY" onChange={onChangedDateStart}/>
@@ -188,7 +186,7 @@ const ToolsStatreport = () => {
         <p>Create Report</p>
         <ExportExcel excelData={data} fileName={"Statistic Report"}/>
         <br></br>
-        <Button shape="round" onClick={()=>this.downloadExcel(data, fileName)}>Download</Button>
+        <Button shape="round" onClick={() => ExportExcel(data, "Statistic Report")}>Download</Button>
       </div>
     )
 }
