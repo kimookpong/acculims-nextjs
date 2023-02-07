@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
 import { ThaiDatePicker } from "thaidatepicker-react";
+
+import DatePicker from "react-multi-date-picker";
+import thai from "../lib/thai";
+import thai_th from "../lib/thai_th";
+
 import {
   ConfigProvider,
   Card,
@@ -12,7 +17,6 @@ import {
   Radio,
   Form,
   Input,
-  DatePicker,
   Select,
   Checkbox,
   Spin,
@@ -59,7 +63,6 @@ const API_report_detail = API_server + "/api/lab_report_detail";
 const API_report_detail_update = API_server + "/api/lab_report_update";
 
 const { Content } = Layout;
-const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const currDate = dayjs();
 const beforeDate = currDate.subtract(3, "month");
@@ -611,19 +614,29 @@ function LabReport() {
                     <Row gutter={24}>
                       <Col xs={12} lg={5}>
                         <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                          <ThaiDatePicker
-                            placeholder="วันที่เริ่มต้น"
-                            value={dayjs(sStartDate, dateFormat)}
+                          <DatePicker
+                            calendar={thai}
+                            locale={thai_th}
+                            value={dayjs(sStartDate, dateFormat)
+                              .add(543, "year")
+                              .format("DD-MM-YYYY")}
+                            format="DD-MM-YYYY"
                             onChange={handleDatePickerChangeStart}
+                            inputClass="datepicker-input"
                           />
                         </Form.Item>
                       </Col>
                       <Col xs={12} lg={5}>
                         <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                          <ThaiDatePicker
-                            placeholder="วันที่สิ้นสุด"
-                            value={dayjs(sEndDate, dateFormat)}
+                          <DatePicker
+                            calendar={thai}
+                            locale={thai_th}
+                            value={dayjs(sEndDate, dateFormat)
+                              .add(543, "year")
+                              .format("DD-MM-YYYY")}
+                            format="DD-MM-YYYY"
                             onChange={handleDatePickerChangeEnd}
+                            inputClass="datepicker-input"
                           />
                         </Form.Item>
                       </Col>

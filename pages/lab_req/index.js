@@ -1,6 +1,12 @@
 import { React, useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
 import { ThaiDatePicker } from "thaidatepicker-react";
+
+// THAI DATEPICKER
+import DatePicker from "react-multi-date-picker";
+import thai from "../lib/thai";
+import thai_th from "../lib/thai_th";
+
 import {
   ConfigProvider,
   Card,
@@ -12,7 +18,6 @@ import {
   Radio,
   Form,
   Input,
-  DatePicker,
   Select,
   Checkbox,
   Spin,
@@ -30,7 +35,6 @@ import {
 import dayjs from "dayjs";
 import axios from "axios";
 import ReactToPrint from "react-to-print";
-//import "./LabReq.css";
 
 import DetailComponent from "./DetailComponent";
 import DetailNoteComponent from "./DetailNoteComponent";
@@ -56,9 +60,9 @@ const API_post_cancel_reason = API_server + "/api/lab_order_reject";
 const API_post_note = API_server + "/api/lab_order_note";
 
 const { Content } = Layout;
-const { RangePicker } = DatePicker;
 const dateFormat = "YYYY-MM-DD";
 const currDate = dayjs();
+//const currDate = defaultDate.add(543, "year");
 const beforeDate = currDate.subtract(3, "month");
 
 const customizeRenderEmpty = () => <Empty description={false} />;
@@ -106,7 +110,6 @@ function LabReq() {
                   date: currDate.format("YYYY-MM-DD"),
                 })
                 .then(function (response) {
-                  console.log(response.data);
                   actionControl(action);
                 });
             },
@@ -194,7 +197,6 @@ function LabReq() {
     });
   };
   const showPrint = () => {
-    console.log(selectedRowKeys.join(), seperateTupe);
     return axios
       .post(API_post_barcode, {
         id: selectedRowKeys.join(),
@@ -618,19 +620,29 @@ function LabReq() {
                       <Row gutter={24}>
                         <Col xs={12} lg={5}>
                           <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <ThaiDatePicker
-                              placeholder="วันที่เริ่มต้น"
-                              value={dayjs(sStartDate, dateFormat)}
+                            <DatePicker
+                              calendar={thai}
+                              locale={thai_th}
+                              value={dayjs(sStartDate, dateFormat)
+                                .add(543, "year")
+                                .format("DD-MM-YYYY")}
+                              format="DD-MM-YYYY"
                               onChange={handleDatePickerChangeStart}
+                              inputClass="datepicker-input"
                             />
                           </Form.Item>
                         </Col>
                         <Col xs={12} lg={5}>
                           <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <ThaiDatePicker
-                              placeholder="วันที่สิ้นสุด"
-                              value={dayjs(sEndDate, dateFormat)}
+                            <DatePicker
+                              calendar={thai}
+                              locale={thai_th}
+                              value={dayjs(sEndDate, dateFormat)
+                                .add(543, "year")
+                                .format("DD-MM-YYYY")}
+                              format="DD-MM-YYYY"
                               onChange={handleDatePickerChangeEnd}
+                              inputClass="datepicker-input"
                             />
                           </Form.Item>
                         </Col>
