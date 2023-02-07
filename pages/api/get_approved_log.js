@@ -1,11 +1,5 @@
-const mysql = require('mysql2');
-
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  pass: process.env.DB_PASS,
-  database: process.env.DB_DATABASE
-});
+import dbconnect from "./dbconnect";
+const connection = dbconnect();
 
 connection.connect(function(err) {
   if (err) {
