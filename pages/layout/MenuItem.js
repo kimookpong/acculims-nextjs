@@ -28,18 +28,43 @@ const items = [
     <FileSearchOutlined />
   ),
   getItem(
-    <Link href="/daily_transaction/crit_report">crit_report</Link>,
+    <Link href="/daily_transaction/crit_report">รายงานค่าวิกฤติ</Link>,
     "4",
     <DesktopOutlined />
   ),
   getItem(
-    <Link href="/daily_transaction/lab_reject">lab_reject</Link>,
+    <Link href="/daily_transaction/lab_reject">ปฎิเสธสิ่งส่งตรวจ</Link>,
     "5",
     <DesktopOutlined />
   ),
   getItem(
-    <Link href="/tools/tools_labvalref">tools_labvalref</Link>,
+    <Link href="/tools/tools_hosvalref">จัดการข้อมูลโรงพยาบาล</Link>,
     "6",
+    <DesktopOutlined />
+  ),
+  getItem(
+    <Link href="/tools/tools_labvalref">จัดการข้อมูลรายการ LAB</Link>,
+    "7",
+    <DesktopOutlined />
+  ),
+  getItem(
+    <Link href="/tools/tools_hisvalref">จัดการข้อมูล Matching Code HIS:LIS</Link>,
+    "8",
+    <DesktopOutlined />
+  ),
+  getItem(
+    <Link href="/tools/tools_uservalref">จัดการข้อมูลผู้ใช้งาน</Link>,
+    "9",
+    <DesktopOutlined />
+  ),
+  getItem(
+    <Link href="/tools/tools_optionvalref">Option</Link>,
+    "10",
+    <DesktopOutlined />
+  ),
+  getItem(
+    <Link href="/tools/tools_logvalref">Approved Log</Link>,
+    "11",
     <DesktopOutlined />
   ),
 ];
