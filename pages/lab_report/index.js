@@ -818,7 +818,13 @@ function LabReport() {
                       </Form.Item>
                     </Col>
                     <Col span={24}>
-                      <h4 style={{ marginTop: 10 }}>
+                      <h4
+                        style={{
+                          margin: "5px",
+                          fontSize: "26px",
+                          textAlign: "center",
+                        }}
+                      >
                         Status ={" "}
                         <span style={{ color: "red" }}>{dataReportStatus}</span>
                       </h4>

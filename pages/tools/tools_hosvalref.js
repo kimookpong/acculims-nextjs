@@ -1,7 +1,7 @@
 import axios from "axios";
-//import styles from "../../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { Spin, Space, Card, Form, Button, Input } from "antd";
+import { BankOutlined } from "@ant-design/icons";
 
 const ToolsHosvalref = () => {
   const [name, setname] = useState("");
@@ -48,8 +48,20 @@ const ToolsHosvalref = () => {
       });
   };
 
+  const dataTitle = {
+    title: (
+      <>
+        <BankOutlined /> จัดการข้อมูลโรงพยาบาล
+      </>
+    ),
+  };
   return (
-    <Card title="Hospital Information">
+    <Card
+      title={dataTitle.title}
+      headStyle={{
+        color: "#002140",
+      }}
+    >
       <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล">
         <Form
           name="basic"
