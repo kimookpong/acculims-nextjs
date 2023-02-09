@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { DatePicker, Button, Table, Spin } from "antd";
 
-import ExportExcel from "./ExportExcel";
+import ExportExcel from "../layout/ExportExcel";
 
 const ToolsStatreport = () => {
   const [loadingData, setLoadingData] = useState(false);
@@ -197,8 +197,6 @@ const ToolsStatreport = () => {
       <br></br>
       <p>Download Report</p>
       <ExportExcel excelData={data} fileName={"Statistic Report"} />
-      <br></br>
-
       <a> </a>
       <Button shape="round">Workload Report</Button>
       <a> </a>
