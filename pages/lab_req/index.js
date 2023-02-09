@@ -1,6 +1,5 @@
 import { React, useEffect, useState, useRef } from "react";
 import thTH from "antd/locale/th_TH";
-import { ThaiDatePicker } from "thaidatepicker-react";
 
 // THAI DATEPICKER
 import DatePicker from "react-multi-date-picker";
