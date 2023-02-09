@@ -10,18 +10,21 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
+  const lab_order_number = req.body.lab_order_number;
   let queryArray = "";
-  req.body.map((item) => {
+  req.body.data.map((item) => {
     queryArray =
       queryArray +
       `UPDATE lab_order SET lab_order_result_manual = '${item.lab_order_result_manual}' WHERE lab_order_number = '${item.lab_order_number}' AND lab_items_code = ${item.lab_items_code};`;
   });
+
+  queryArray =
+    queryArray +
+    `UPDATE lab_head 
+    SET report_status = 'Completed', approved_date = null, approved_time = null,reporter_name = null 
+    WHERE lab_order_number = (${lab_order_number});`;
   console.log(queryArray);
 
-  const query = `SELECT
-  form_name AS value,
-  form_name AS label
-  FROM lab_form_head`;
   connection.query(queryArray, function (err, rows, fields) {
     if (err) {
       console.error(err);

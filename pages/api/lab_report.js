@@ -50,7 +50,8 @@ export default function handler(req, res) {
     cond = cond + ` AND patient.informaddr LIKE '%${address}%' `;
   }
 
-  const query = `SELECT 
+  const query = `
+  SELECT 
   lab_head.lab_order_number as order_number,
   lab_head.report_status as h_status,
   lab_head.hn as HN,
@@ -67,10 +68,20 @@ export default function handler(req, res) {
     DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.order_time,'%H:%i:%s'))
     AS order_date_time,
- concat(
-  DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
+  concat(
+    DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.receive_time,'%H:%i:%s'))
     AS time_receive_report,
+  concat(
+    DATE_FORMAT(DATE_ADD(lab_head.approved_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
+    DATE_FORMAT(lab_head.approved_time,'%H:%i:%s'))
+    AS time_report,
+
+  concat(
+    DATEDIFF(lab_head.approved_date, lab_head.receive_date), ',', 
+    TIMEDIFF(lab_head.approved_time ,lab_head.receive_time)) 
+  as timediff,
+
   lab_head.department as department,
   lab_head.receive_status, 
   lab_head.report_status, 

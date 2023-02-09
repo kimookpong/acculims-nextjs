@@ -21,6 +21,12 @@ export default function handler(req, res) {
   lab_items.lab_items_unit,
   lab_items.lab_items_normal_value,
   lab_order.lab_items_sub_group_code as sub_code,
+
+  lab_items.normal_value_min_male as min_male,
+  lab_items.normal_value_max_male as max_male,
+  lab_items.normal_value_min_female as min_female,
+  lab_items.normal_value_max_female as max_female,
+
   lab_head.hn,
   concat(
     DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',

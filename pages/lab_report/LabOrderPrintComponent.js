@@ -175,7 +175,7 @@ const LabOrderPrintComponent = (props) => {
                 <b>Approved date</b> : {detail["approved_date"]}
               </p>
               <p style={{ margin: 0 }}>
-                <b>Turn around time</b> :{" "}
+                <b>Turn around time</b> : {detail["timediff"]}
               </p>
               <p style={{ margin: 0 }}>
                 <b>Note</b> : {detail["order_note"]}

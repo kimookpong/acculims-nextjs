@@ -311,12 +311,16 @@ function LabReport() {
       });
       if (dataToUpdate.length > 0) {
         return axios
-          .post(API_report_detail_update, dataToUpdate)
+          .post(API_report_detail_update, {
+            data: dataToUpdate,
+            lab_order_number: selectedRadioKeys.join(),
+          })
           .then(function (response) {
             setFormDisable(true);
             setLoading(false);
             setLoadingData(false);
             setLabOrderUpdate([]);
+            setRefreshKey((oldKey) => oldKey + 1);
           });
       } else {
         setFormDisable(true);
@@ -575,6 +579,22 @@ function LabReport() {
       });
   };
 
+  const calculateDiff = (raw_data) => {
+    let raw = raw_data.split(",");
+    if (parseInt(raw[0])) {
+      return raw[0] + " วัน";
+    }
+    let time_raw = raw[1].split(":");
+    if (parseInt(time_raw[0])) {
+      return (
+        parseInt(time_raw[0]) + " ชั่วโมง " + parseInt(time_raw[1]) + " นาที"
+      );
+    } else if (parseInt(time_raw[1])) {
+      return parseInt(time_raw[1]) + " นาที";
+    }
+    return parseInt(time_raw[2]) + " วินาที";
+  };
+
   const columns = [
     {
       title: "เลขที่สั่ง",
@@ -622,15 +642,23 @@ function LabReport() {
       width: 100,
     },
     {
-      title: "วันเวลาที่สั่ง",
-      dataIndex: "order_date_time",
-      key: "order_date_time",
-      width: 150,
-    },
-    {
       title: "วันเวลาที่รับ",
       dataIndex: "time_receive_report",
       key: "time_receive_report",
+      width: 150,
+    },
+    {
+      title: "วันเวลาที่รับรอง",
+      dataIndex: "time_report",
+      key: "time_report",
+      render: (text) => <>{text ? text : "-"}</>,
+      width: 150,
+    },
+    {
+      title: "ระยะเวลาดำเนินการ",
+      dataIndex: "timediff",
+      key: "timediff",
+      render: (text) => <>{text ? calculateDiff(text) : "-"}</>,
       width: 150,
     },
     {
@@ -1039,11 +1067,7 @@ function LabReport() {
                                 }}
                                 disabled={
                                   !formDisable ||
-                                  (dataReport.length > 0 ? false : true) ||
-                                  (dataReportStatus !== "Pending" &&
-                                    dataReportStatus !== "Process" &&
-                                    dataReportStatus !== "Completed" &&
-                                    dataReportPartial !== "P")
+                                  (dataReport.length > 0 ? false : true)
                                 }
                               >
                                 <div>
@@ -1099,7 +1123,10 @@ function LabReport() {
                                 disabled={
                                   !formDisable ||
                                   (dataReport.length > 0 ? false : true) ||
-                                  (dataReportStatus !== "Reported" &&
+                                  (dataReportStatus !== "Pending" &&
+                                    dataReportStatus !== "Process" &&
+                                    dataReportStatus !== "Completed" &&
+                                    dataReportStatus !== "Reported" &&
                                     dataReportPartial !== "P")
                                 }
                               >

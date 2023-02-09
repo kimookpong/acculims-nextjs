@@ -44,11 +44,17 @@ export default function handler(req, res) {
     DATE_FORMAT(lab_head.approved_time,'%H:%i:%s'))
     AS approved_date,
 
-  lab_head.reporter_name, 
+  CONCAT(lis_user.pname,lis_user.fname,' ',lis_user.lname) as reporter_name, 
   lab_head.approver_name, 
+
+  concat(
+    DATEDIFF(lab_head.approved_date, lab_head.receive_date), ' ', 
+    TIMEDIFF(lab_head.approved_time ,lab_head.receive_time)) 
+  as timediff,
 
   lab_head.order_note 
   FROM lab_head 
+  LEFT JOIN lis_user ON lab_head.reporter_name = lis_user.user_name 
   LEFT JOIN patient ON lab_head.hn = patient.hn 
   LEFT JOIN kskdepartment ON lab_head.order_department = kskdepartment.depcode 
   LEFT JOIN ovst ON lab_head.vn = ovst.vn 

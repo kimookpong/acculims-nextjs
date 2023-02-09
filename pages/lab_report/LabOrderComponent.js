@@ -60,7 +60,7 @@ const LabOrderComponent = (props) => {
       </>
     );
     let dataType;
-    if (isNotNumber && itemCodeSelect != itemCodeSelect) {
+    if (isNotNumber && itemCodeSelect != 963) {
       dataType = (
         <table
           style={{
@@ -105,23 +105,23 @@ const LabOrderComponent = (props) => {
       dataGraphItem["value"].map((itemValue, index) => {
         if (dataGraphItem["value"][index] !== null) {
           RearrangeData["value"] = [
-            parseFloat(dataGraphItem["value"][index]),
             ...RearrangeData["value"],
+            parseFloat(dataGraphItem["value"][index]),
           ];
 
           RearrangeData["label"] = [
-            dataGraphItem["label"][index],
             ...RearrangeData["label"],
+            dataGraphItem["label"][index],
           ];
 
           RearrangeData["color"] = [
-            index === 0 ? "rgba(5,145,255,1)" : "rgba(5,145,255,0.5)",
             ...RearrangeData["color"],
+            index === 0 ? "rgba(5,145,255,1)" : "rgba(5,145,255,0.5)",
           ];
 
           RearrangeData["point"] = [
-            index !== 0 ? 3 : 5,
             ...RearrangeData["point"],
+            index !== 0 ? 3 : 5,
           ];
         }
       });
