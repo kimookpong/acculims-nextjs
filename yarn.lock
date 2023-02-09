@@ -830,12 +830,17 @@
     "ansi-styles" "^4.1.0"
     "supports-color" "^7.1.0"
 
-"chart.js@^4.1.1", "chart.js@^4.2.0":
+"chart.js@^4.1.1", "chart.js@^4.2.0", "chart.js@>=3.0.0":
   "integrity" "sha512-wbtcV+QKeH0F7gQZaCJEIpsNriFheacouJQTVIjITi3eQA8bTlIBoknz0+dgV79aeKLNMAX+nDslIVE/nJ3rzA=="
   "resolved" "https://registry.npmjs.org/chart.js/-/chart.js-4.2.0.tgz"
   "version" "4.2.0"
   dependencies:
     "@kurkle/color" "^0.3.0"
+
+"chartjs-plugin-datalabels@^2.2.0":
+  "integrity" "sha512-14ZU30lH7n89oq+A4bWaJPnAG8a7ZTk7dKf48YAzMvJjQtjrgg5Dpk9f+LbjCF6bpx3RAGTeL13IXpKQYyRvlw=="
+  "resolved" "https://registry.npmjs.org/chartjs-plugin-datalabels/-/chartjs-plugin-datalabels-2.2.0.tgz"
+  "version" "2.2.0"
 
 "classnames@^2.2.1", "classnames@^2.2.3", "classnames@^2.2.5", "classnames@^2.2.6", "classnames@^2.3.1", "classnames@^2.3.2", "classnames@2.x":
   "integrity" "sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw=="

@@ -32,15 +32,15 @@ export default function handler(req, res) {
   lab_head.report_status, 
 
   concat(
-    DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+    DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.receive_time,'%H:%i:%s'))
     AS receive_date,
   concat(
-    DATE_FORMAT(DATE_ADD(lab_head.report_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+    DATE_FORMAT(DATE_ADD(lab_head.report_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.report_time,'%H:%i:%s'))
     AS report_date,
   concat(
-    DATE_FORMAT(DATE_ADD(lab_head.approved_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+    DATE_FORMAT(DATE_ADD(lab_head.approved_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.approved_time,'%H:%i:%s'))
     AS approved_date,
 

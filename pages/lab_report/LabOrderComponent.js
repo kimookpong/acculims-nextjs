@@ -11,9 +11,11 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Line } from "react-chartjs-2";
 ChartJS.register(
   CategoryScale,
+  ChartDataLabels,
   LinearScale,
   PointElement,
   LineElement,
@@ -28,6 +30,7 @@ const LabOrderComponent = (props) => {
   const [titleInformation, setTitleInformation] = useState("");
   const [information, setInformation] = useState("");
   const [rerunArray, setRerunArray] = useState([0]);
+  const [itemCodeSelect, setItemCodeSelect] = useState();
 
   const changeInput_lab_order_result_manual = (event) => {
     labOrderData(event.target.id, event.target.value);
@@ -41,6 +44,12 @@ const LabOrderComponent = (props) => {
       title: {
         display: false,
       },
+      datalabels: {
+        align: "top",
+        anchor: "center",
+        //offset: 25,
+        padding: -2,
+      },
     },
   };
 
@@ -51,7 +60,7 @@ const LabOrderComponent = (props) => {
       </>
     );
     let dataType;
-    if (isNotNumber) {
+    if (isNotNumber && itemCodeSelect != itemCodeSelect) {
       dataType = (
         <table
           style={{
@@ -74,15 +83,15 @@ const LabOrderComponent = (props) => {
             </tr>
           </thead>
           <tbody>
-            {dataGraphItem.map((itemGraph) => {
-              if (itemGraph["value"] !== null) {
+            {dataGraphItem["value"].map((itemGraph, index) => {
+              if (dataGraphItem["value"][index] !== null) {
                 return (
-                  <tr key={itemGraph["value"]}>
+                  <tr key={dataGraphItem["value"][index]}>
                     <td style={{ border: "1px solid #f0f0f0" }}>
-                      {itemGraph["label"]}
+                      {dataGraphItem["label"][index]}
                     </td>
                     <td style={{ border: "1px solid #f0f0f0" }}>
-                      {itemGraph["value"]}
+                      {dataGraphItem["value"][index]}
                     </td>
                   </tr>
                 );
@@ -92,19 +101,41 @@ const LabOrderComponent = (props) => {
         </table>
       );
     } else {
-      let dataRearange = {};
-      dataGraphItem.map((graphItem) => {
-        if (graphItem["value"] !== null) {
-          dataRearange[graphItem["label"]] = parseFloat(graphItem["value"]);
+      let RearrangeData = { value: [], label: [], color: [], point: [] };
+      dataGraphItem["value"].map((itemValue, index) => {
+        if (dataGraphItem["value"][index] !== null) {
+          RearrangeData["value"] = [
+            parseFloat(dataGraphItem["value"][index]),
+            ...RearrangeData["value"],
+          ];
+
+          RearrangeData["label"] = [
+            dataGraphItem["label"][index],
+            ...RearrangeData["label"],
+          ];
+
+          RearrangeData["color"] = [
+            index === 0 ? "rgba(5,145,255,1)" : "rgba(5,145,255,0.5)",
+            ...RearrangeData["color"],
+          ];
+
+          RearrangeData["point"] = [
+            index !== 0 ? 3 : 5,
+            ...RearrangeData["point"],
+          ];
         }
       });
+
       let dataGraph = {
+        labels: RearrangeData["label"],
         datasets: [
           {
             label: lab_items_name,
-            data: dataRearange,
-            borderColor: "rgb(5,145,255)",
-            backgroundColor: "rgba(5,145,255,0.5)",
+            data: RearrangeData["value"],
+            borderColor: "rgba(5,145,255,0.5)",
+            pointBorderColor: RearrangeData["color"],
+            pointBackgroundColor: RearrangeData["color"],
+            pointRadius: RearrangeData["point"],
           },
         ],
       };
@@ -114,46 +145,33 @@ const LabOrderComponent = (props) => {
   };
 
   const replaceHistory = (data) => {
-    let dataRaw = [];
+    let dataRawValue = [];
+    let dataRawLabel = [];
     if (data["lab_order_result" !== null]) {
-      dataRaw = [
-        {
-          value: data["lab_order_result"],
-          label: data["order_date_time"],
-        },
-        {
-          value: null,
-          label: null,
-        },
-        {
-          value: null,
-          label: null,
-        },
-        {
-          value: null,
-          label: null,
-        },
-        {
-          value: null,
-          label: null,
-        },
+      dataRawValue = [
+        data["lab_order_result"]
+          ? data["lab_order_result"].replace(/,/g, "")
+          : null,
+        null,
+        null,
+        null,
+        null,
       ];
+      dataRawLabel = [data["order_date_time"], null, null, null, null];
     } else {
       for (let i = 0; i < 5; i++) {
         if (!!data[i]) {
-          dataRaw[i] = {
-            value: data[i]["lab_order_result"],
-            label: data[i]["order_date_time"],
-          };
+          dataRawValue[i] = data[i]["lab_order_result"]
+            ? data[i]["lab_order_result"].replace(/,/g, "")
+            : null;
+          dataRawLabel[i] = data[i]["order_date_time"];
         } else {
-          dataRaw[i] = {
-            value: null,
-            label: null,
-          };
+          dataRawValue[i] = null;
+          dataRawLabel[i] = null;
         }
       }
     }
-    return dataRaw;
+    return { value: dataRawValue, label: dataRawLabel };
   };
 
   const warningModalBox = (record) => {
@@ -291,28 +309,18 @@ const LabOrderComponent = (props) => {
                   if (!!item["history"]) {
                     arrayHistory = replaceHistory(item["history"]);
                   } else {
-                    arrayHistory = [
-                      {
-                        value: data["lab_order_result"],
-                        label: data["order_date_time"],
-                      },
-                      {
-                        value: null,
-                        label: null,
-                      },
-                      {
-                        value: null,
-                        label: null,
-                      },
-                      {
-                        value: null,
-                        label: null,
-                      },
-                      {
-                        value: null,
-                        label: null,
-                      },
-                    ];
+                    arrayHistory = {
+                      value: [
+                        data["lab_order_result"]
+                          ? data["lab_order_result"].replace(/,/g, "")
+                          : null,
+                        null,
+                        null,
+                        null,
+                        null,
+                      ],
+                      label: [data["order_date_time"], null, null, null, null],
+                    };
                   }
                   if (
                     index === 0 ||
@@ -350,24 +358,39 @@ const LabOrderComponent = (props) => {
                             cursor: "pointer",
                           }}
                           onMouseOver={() => {
+                            setItemCodeSelect(item["lab_items_code"]);
+                            let currentHistory = {
+                              value: item["lab_order_result_manual"]
+                                ? item["lab_order_result_manual"].replace(
+                                    /,/g,
+                                    ""
+                                  )
+                                : item["lab_order_result_instrument"]
+                                ? item["lab_order_result_instrument"].replace(
+                                    /,/g,
+                                    ""
+                                  )
+                                : null,
+                              label: item["order_date_time"],
+                            };
                             openGraph(
                               item["lab_items_name"],
-                              [
-                                {
-                                  value: item["lab_order_result_manual"]
-                                    ? item["lab_order_result_manual"]
-                                    : item["lab_order_result_instrument"],
-                                  label: item["order_date_time"],
-                                },
-                                ...arrayHistory,
-                              ],
-                              isNaN(item["lab_order_result_manual"]) ||
-                                isNaN(item["lab_order_result_instrument"]) ||
-                                isNaN(arrayHistory[0]["value"]) ||
-                                isNaN(arrayHistory[1]["value"]) ||
-                                isNaN(arrayHistory[2]["value"]) ||
-                                isNaN(arrayHistory[3]["value"]) ||
-                                isNaN(arrayHistory[4]["value"])
+                              {
+                                value: [
+                                  currentHistory["value"],
+                                  ...arrayHistory["value"],
+                                ],
+                                label: [
+                                  currentHistory["label"],
+                                  ...arrayHistory["label"],
+                                ],
+                              },
+                              isNaN(currentHistory["value"]) ||
+                                isNaN(arrayHistory["value"][0]) ||
+                                isNaN(arrayHistory["value"][1]) ||
+                                isNaN(arrayHistory["value"][2]) ||
+                                isNaN(arrayHistory["value"][3]) ||
+                                isNaN(arrayHistory["value"][4])
                             );
                           }}
                         >
@@ -452,28 +475,28 @@ const LabOrderComponent = (props) => {
                           {item["lab_items_normal_value"]}
                         </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
-                          <TT title={arrayHistory[0]["label"]}>
-                            {arrayHistory[0]["value"]}
+                          <TT title={arrayHistory["label"][0]}>
+                            {arrayHistory["value"][0]}
                           </TT>
                         </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
-                          <TT title={arrayHistory[1]["label"]}>
-                            {arrayHistory[1]["value"]}
+                          <TT title={arrayHistory["label"][1]}>
+                            {arrayHistory["value"][1]}
                           </TT>
                         </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
-                          <TT title={arrayHistory[2]["label"]}>
-                            {arrayHistory[2]["value"]}
+                          <TT title={arrayHistory["label"][2]}>
+                            {arrayHistory["value"][2]}
                           </TT>
                         </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
-                          <TT title={arrayHistory[3]["label"]}>
-                            {arrayHistory[3]["value"]}
+                          <TT title={arrayHistory["label"][3]}>
+                            {arrayHistory["value"][3]}
                           </TT>
                         </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
-                          <TT title={arrayHistory[4]["label"]}>
-                            {arrayHistory[4]["value"]}
+                          <TT title={arrayHistory["label"][4]}>
+                            {arrayHistory["value"][4]}
                           </TT>
                         </td>
                       </tr>

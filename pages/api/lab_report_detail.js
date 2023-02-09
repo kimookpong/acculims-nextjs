@@ -23,7 +23,7 @@ export default function handler(req, res) {
   lab_order.lab_items_sub_group_code as sub_code,
   lab_head.hn,
   concat(
-    DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+    DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.order_time,'%H:%i'))
     AS order_date_time,
     
@@ -49,7 +49,7 @@ export default function handler(req, res) {
       lab_order.lab_items_code,
       lab_order.lab_order_result,
       concat(
-        DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%Y-%m-%d'), ' ',
+        DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
         DATE_FORMAT(lab_head.order_time,'%H:%i'))
         AS order_date_time
       FROM lab_order
@@ -58,7 +58,7 @@ export default function handler(req, res) {
       AND lab_order.lab_items_code = '${items["lab_items_code"]}'
       AND lab_head.hn = '${items["hn"]}'
       AND lab_order.lab_order_result <> ''
-      ORDER BY order_date_time DESC
+      ORDER BY lab_head.order_date DESC
       LIMIT 5;
       `;
       queryResult = queryResult + query2;
