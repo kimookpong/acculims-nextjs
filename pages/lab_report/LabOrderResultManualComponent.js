@@ -9,7 +9,7 @@ const LabOrderResultManualComponent = (props) => {
     props;
 
   //find min and max
-  let rangevalue = item["lab_items_normal_value"];
+  let rangevalue = !!item ? item["lab_items_normal_value"] : null;
   if (!!rangevalue) {
     if (rangevalue.includes("-")) {
       minValue = parseFloat(rangevalue.split("-")[0]);
@@ -22,12 +22,16 @@ const LabOrderResultManualComponent = (props) => {
   }
 
   const [itemFlag, setItemFlag] = useState(
-    item["flag"] === "H" ? (
-      <b style={{ color: "red" }}>{item["flag"]}</b>
-    ) : item["flag"] === "L" ? (
-      <b style={{ color: "blue" }}>{item["flag"]}</b>
+    !!item ? (
+      item["flag"] === "H" ? (
+        <b style={{ color: "red" }}>{item["flag"]}</b>
+      ) : item["flag"] === "L" ? (
+        <b style={{ color: "blue" }}>{item["flag"]}</b>
+      ) : (
+        <>{item["flag"]}</>
+      )
     ) : (
-      <>{item["flag"]}</>
+      <></>
     )
   );
 
@@ -80,25 +84,27 @@ const LabOrderResultManualComponent = (props) => {
   return (
     <>
       <td style={{ border: "1px solid #f0f0f0" }}>
-        {reportStatus === "Pending" ||
-        reportStatus === "Process" ||
-        reportStatus === "Completed" ? (
-          <Input
-            defaultValue={item["lab_order_result_manual"]}
-            onBlur={changeInput_lab_order_result_manual_realtime}
-            onChange={checkHighLow}
-            id={item["lab_items_code"]}
-            key={item["lab_order_number"] + item["lab_items_code"]}
-          />
-        ) : (
-          <Input
-            defaultValue={item["lab_order_result_manual"]}
-            onChange={changeInput_lab_order_result_manual}
-            id={item["lab_items_code"]}
-            key={item["lab_order_number"] + item["lab_items_code"]}
-            disabled={formDisable}
-          />
-        )}
+        {!!item ? (
+          reportStatus === "Pending" ||
+          reportStatus === "Process" ||
+          reportStatus === "Completed" ? (
+            <Input
+              defaultValue={item["lab_order_result_manual"]}
+              onBlur={changeInput_lab_order_result_manual_realtime}
+              onChange={checkHighLow}
+              id={item["lab_items_code"]}
+              key={item["lab_order_number"] + item["lab_items_code"]}
+            />
+          ) : (
+            <Input
+              defaultValue={item["lab_order_result_manual"]}
+              onChange={changeInput_lab_order_result_manual}
+              id={item["lab_items_code"]}
+              key={item["lab_order_number"] + item["lab_items_code"]}
+              disabled={formDisable}
+            />
+          )
+        ) : null}
       </td>
       <td
         style={{
@@ -106,7 +112,7 @@ const LabOrderResultManualComponent = (props) => {
           border: "1px solid #f0f0f0",
         }}
       >
-        {itemFlag}
+        {!!item ? itemFlag : null}
       </td>
     </>
   );
