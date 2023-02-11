@@ -48,7 +48,7 @@ export default function handler(req, res) {
   lab_head.approver_name, 
 
   concat(
-    DATEDIFF(lab_head.approved_date, lab_head.receive_date), ' ', 
+    DATEDIFF(lab_head.approved_date, lab_head.receive_date), '.', 
     TIMEDIFF(lab_head.approved_time ,lab_head.receive_time)) 
   as timediff,
 

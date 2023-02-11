@@ -21,11 +21,9 @@ export default function handler(req, res) {
   lab_items.lab_items_unit,
   lab_items.lab_items_normal_value,
   lab_order.lab_items_sub_group_code as sub_code,
-
-  lab_items.normal_value_min_male as min_male,
-  lab_items.normal_value_max_male as max_male,
-  lab_items.normal_value_min_female as min_female,
-  lab_items.normal_value_max_female as max_female,
+  lab_items.alert_critical_value,
+  if(patient.sex = 1,lab_items.normal_value_min_male, lab_items.normal_value_min_female ) AS normal_value_min, 
+  if(patient.sex = 1,lab_items.normal_value_max_male, lab_items.normal_value_max_female ) AS normal_value_max,
 
   lab_head.hn,
   concat(
@@ -40,6 +38,7 @@ export default function handler(req, res) {
   FROM lab_order
   LEFT JOIN lab_items ON lab_order.lab_items_code = lab_items.lab_items_code
   LEFT JOIN lab_head ON lab_order.lab_order_number = lab_head.lab_order_number
+  LEFT JOIN patient ON lab_head.hn = patient.hn 
   WHERE lab_order.lab_order_number = '${id}' 
   ORDER BY group_code,sub_code DESC`;
 

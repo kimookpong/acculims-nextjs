@@ -72,6 +72,12 @@ export default function handler(req, res) {
     DATE_FORMAT(DATE_ADD(lab_head.receive_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.receive_time,'%H:%i:%s'))
     AS time_receive_report,
+
+  concat(
+    DATE_FORMAT(lab_head.receive_date,'%Y-%m-%d'), ' ',
+    DATE_FORMAT(lab_head.receive_time,'%H:%i:%s')
+  ) AS receive_date_raw,
+
   concat(
     DATE_FORMAT(DATE_ADD(lab_head.approved_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.approved_time,'%H:%i:%s'))

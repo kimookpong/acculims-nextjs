@@ -135,6 +135,7 @@ import LabOrderActionComponent from "./LabOrderActionComponent";
 
 import { useSession } from "next-auth/react";
 import LoginComponent from "../layout/LoginComponent";
+import TimeCounter from "./TImeCounter";
 
 const API_server = "";
 const API_post_list = API_server + "/api/lab_report";
@@ -282,9 +283,16 @@ function LabReport() {
   const [dataItemGroup, setDataItemGroup] = useState([]);
   const [dataItemGroupSelect, setDataItemGroupSelect] = useState("All");
   const [labOrderUpdate, setLabOrderUpdate] = useState([]);
-  const inputLabOrderUpdate = (lab_items_code, lab_order_result_manual) => {
+  const inputLabOrderUpdate = (
+    lab_items_code,
+    lab_order_result_manual,
+    flag
+  ) => {
     let newData = labOrderUpdate;
-    newData[lab_items_code] = lab_order_result_manual;
+    newData[lab_items_code] = {
+      lab_order_result_manual: lab_order_result_manual,
+      flag: flag,
+    };
     setLabOrderUpdate(newData);
   };
   const changeItemGroupSelect = (event) => {
@@ -306,7 +314,8 @@ function LabReport() {
         dataToUpdate.push({
           lab_order_number: selectedRadioKeys.join(),
           lab_items_code: index,
-          lab_order_result_manual: item,
+          lab_order_result_manual: item.lab_order_result_manual,
+          flag: item.flag,
         });
       });
       if (dataToUpdate.length > 0) {
@@ -330,7 +339,9 @@ function LabReport() {
       }
     }
   };
-  const [dataReportStatus, setDataReportStatus] = useState([]);
+  const [dataReportStatus, setDataReportStatus] = useState(
+    <span style={{ color: "#f2f2f2" }}>Status</span>
+  );
   const [dataReportPartial, setDataReportPartial] = useState("");
   const [statusList, setStatusList] = useState("All");
   const [dataCountReport, setDataCountReport] = useState({
@@ -420,6 +431,7 @@ function LabReport() {
   const setStatusListonClick = (id) => {
     setStatusList(id);
     setSelectedRadioKeys([]);
+    setDataReportStatus(<span style={{ color: "#f2f2f2" }}>Status</span>);
     setDataReport([]);
     setDetail(<Empty description={false} />);
     setDetailNote(<Empty description={false} />);
@@ -458,7 +470,7 @@ function LabReport() {
       setDetailNote(<Empty description={false} />);
       setDataReport([]);
       setLoading(true);
-      setDataReportStatus(null);
+      setDataReportStatus(<span style={{ color: "#f2f2f2" }}>Status</span>);
       setDataReportPartial("");
 
       const filter = {
@@ -582,17 +594,10 @@ function LabReport() {
   const calculateDiff = (raw_data) => {
     let raw = raw_data.split(",");
     if (parseInt(raw[0])) {
-      return raw[0] + " วัน";
+      return raw[0] + "." + raw[1];
+    } else {
+      return raw[1];
     }
-    let time_raw = raw[1].split(":");
-    if (parseInt(time_raw[0])) {
-      return (
-        parseInt(time_raw[0]) + " ชั่วโมง " + parseInt(time_raw[1]) + " นาที"
-      );
-    } else if (parseInt(time_raw[1])) {
-      return parseInt(time_raw[1]) + " นาที";
-    }
-    return parseInt(time_raw[2]) + " วินาที";
   };
 
   const columns = [
@@ -614,6 +619,25 @@ function LabReport() {
       dataIndex: "h_status",
       key: "h_status",
       width: 85,
+    },
+    {
+      title: "เวลาที่รอ",
+      dataIndex: "timediff",
+      key: "timediff",
+      render: (_, record) => (
+        <>
+          {record.h_status === "Approved" ? (
+            record.timediff ? (
+              calculateDiff(record.timediff)
+            ) : (
+              "--:--:--"
+            )
+          ) : (
+            <TimeCounter recieveDate={record.receive_date_raw} />
+          )}
+        </>
+      ),
+      width: 100,
     },
     {
       title: "HN",
@@ -654,13 +678,7 @@ function LabReport() {
       render: (text) => <>{text ? text : "-"}</>,
       width: 150,
     },
-    {
-      title: "ระยะเวลาดำเนินการ",
-      dataIndex: "timediff",
-      key: "timediff",
-      render: (text) => <>{text ? calculateDiff(text) : "-"}</>,
-      width: 150,
-    },
+
     {
       title: "ห้อง",
       dataIndex: "department",
@@ -1022,6 +1040,8 @@ function LabReport() {
                         labOrderData={inputLabOrderUpdate}
                         dataItemGroupSelect={dataItemGroupSelect}
                         checkRerun={checkRerun}
+                        reportStatus={dataReportStatus}
+                        labOrderNumber={selectedRadioKeys.join()}
                       />
                     </Col>
                     <Col span={24}>
@@ -1067,7 +1087,9 @@ function LabReport() {
                                 }}
                                 disabled={
                                   !formDisable ||
-                                  (dataReport.length > 0 ? false : true)
+                                  (dataReport.length > 0 ? false : true) ||
+                                  (dataReportStatus !== "Reported" &&
+                                    dataReportStatus !== "Approved")
                                 }
                               >
                                 <div>

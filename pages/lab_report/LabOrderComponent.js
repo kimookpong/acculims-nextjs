@@ -1,6 +1,20 @@
-import { Empty, Input, Popover, Checkbox, Tooltip as TT } from "antd";
-import { LineChartOutlined, WarningOutlined } from "@ant-design/icons";
+import {
+  Row,
+  Col,
+  Modal,
+  Empty,
+  Input,
+  Popover,
+  Checkbox,
+  Tooltip as TT,
+} from "antd";
+import {
+  LineChartOutlined,
+  WarningOutlined,
+  PrinterOutlined,
+} from "@ant-design/icons";
 import { useState } from "react";
+import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,6 +27,8 @@ import {
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Line } from "react-chartjs-2";
+import LabOrderCriticalComponent from "./LabOrderCriticalComponent";
+import LabOrderResultManualComponent from "./LabOrderResultManualComponent";
 ChartJS.register(
   CategoryScale,
   ChartDataLabels,
@@ -24,16 +40,51 @@ ChartJS.register(
   Legend
 );
 
+const { TextArea } = Input;
+
 const LabOrderComponent = (props) => {
-  const { data, formDisable, labOrderData, dataItemGroupSelect, checkRerun } =
-    props;
+  const {
+    data,
+    formDisable,
+    labOrderData,
+    dataItemGroupSelect,
+    checkRerun,
+    reportStatus,
+    labOrderNumber,
+  } = props;
   const [titleInformation, setTitleInformation] = useState("");
   const [information, setInformation] = useState("");
   const [rerunArray, setRerunArray] = useState([0]);
   const [itemCodeSelect, setItemCodeSelect] = useState();
 
+  const changeInput_lab_order_result_manual_realtime = (event) => {
+    if (event.target.value !== null) {
+      return axios
+        .post("/api/lab_report_update_realtime", {
+          lab_order_number: labOrderNumber,
+          lab_items_code: event.target.id,
+          lab_order_result_manual: event.target.value,
+        })
+        .then(function (response) {
+          console.log(response.data);
+        });
+    }
+  };
   const changeInput_lab_order_result_manual = (event) => {
     labOrderData(event.target.id, event.target.value);
+  };
+
+  const actionDeltaCheck = () => {
+    Modal.confirm({
+      centered: true,
+      title: "บันทึกข้อมูล ค่าวิกฤติ",
+      icon: <WarningOutlined />,
+      width: 730,
+      content: <LabOrderCriticalComponent />,
+      onOk() {
+        // actionControl(action);
+      },
+    });
   };
   const optionsGraph = {
     responsive: true,
@@ -415,16 +466,40 @@ const LabOrderComponent = (props) => {
                         <td style={{ border: "1px solid #f0f0f0" }}>
                           {item["lab_order_result_instrument"]}
                         </td>
-                        <td style={{ border: "1px solid #f0f0f0" }}>
-                          <Input
-                            defaultValue={item["lab_order_result_manual"]}
-                            onChange={changeInput_lab_order_result_manual}
-                            id={item["lab_items_code"]}
-                            key={
-                              item["lab_order_number"] + item["lab_items_code"]
-                            }
-                            disabled={formDisable}
-                          />
+                        <LabOrderResultManualComponent
+                          item={item}
+                          reportStatus={reportStatus}
+                          formDisable={formDisable}
+                          labOrderData={labOrderData}
+                          labOrderNumber={labOrderNumber}
+                        />
+                        {/* <td style={{ border: "1px solid #f0f0f0" }}>
+                          {reportStatus === "Pending" ||
+                          reportStatus === "Process" ||
+                          reportStatus === "Completed" ? (
+                            <Input
+                              defaultValue={item["lab_order_result_manual"]}
+                              onBlur={
+                                changeInput_lab_order_result_manual_realtime
+                              }
+                              id={item["lab_items_code"]}
+                              key={
+                                item["lab_order_number"] +
+                                item["lab_items_code"]
+                              }
+                            />
+                          ) : (
+                            <Input
+                              defaultValue={item["lab_order_result_manual"]}
+                              onChange={changeInput_lab_order_result_manual}
+                              id={item["lab_items_code"]}
+                              key={
+                                item["lab_order_number"] +
+                                item["lab_items_code"]
+                              }
+                              disabled={formDisable}
+                            />
+                          )}
                         </td>
                         <td
                           style={{
@@ -439,12 +514,12 @@ const LabOrderComponent = (props) => {
                           ) : (
                             <>{item["flag"]}</>
                           )}
-                        </td>
+                        </td> */}
                         <td
                           style={{ border: "1px solid #f0f0f0", color: "red" }}
                         >
-                          {item["lab_order_result_rerun"] ? (
-                            <WarningOutlined onClick={warningModalBox} />
+                          {item["alert_critical_value"] === "Y" ? (
+                            <WarningOutlined onClick={actionDeltaCheck} />
                           ) : null}
                         </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
