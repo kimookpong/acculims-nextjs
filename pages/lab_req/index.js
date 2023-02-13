@@ -605,7 +605,7 @@ function LabReq() {
       width: 150,
     },
     {
-      title: "ห้อง",
+      title: "แผนก",
       dataIndex: "department",
       key: "department",
       width: 70,

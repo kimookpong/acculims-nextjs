@@ -41,6 +41,11 @@ const LabOrderResultManualComponent = (props) => {
         lab_order_number: labOrderNumber,
         lab_items_code: event.target.id,
         lab_order_result_manual: event.target.value,
+        lab_order_result: !!event.target.value
+          ? event.target.value
+          : !!item["lab_order_result_instrument"]
+          ? item["lab_order_result_instrument"]
+          : "",
         flag: checkHighLow(event),
       })
       .then(function (response) {

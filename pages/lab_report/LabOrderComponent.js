@@ -1,19 +1,14 @@
 import {
-  Row,
-  Col,
   Modal,
+  message,
   Empty,
   Input,
   Popover,
   Checkbox,
   Tooltip as TT,
 } from "antd";
-import {
-  LineChartOutlined,
-  WarningOutlined,
-  PrinterOutlined,
-} from "@ant-design/icons";
-import { useState } from "react";
+import { LineChartOutlined, WarningOutlined } from "@ant-design/icons";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Chart as ChartJS,
@@ -40,8 +35,6 @@ ChartJS.register(
   Legend
 );
 
-const { TextArea } = Input;
-
 const LabOrderComponent = (props) => {
   const {
     data,
@@ -51,38 +44,153 @@ const LabOrderComponent = (props) => {
     checkRerun,
     reportStatus,
     labOrderNumber,
+    reloadReport,
   } = props;
+
+  const [messageApi, messageContext] = message.useMessage();
+
   const [titleInformation, setTitleInformation] = useState("");
   const [information, setInformation] = useState("");
-  const [rerunArray, setRerunArray] = useState([0]);
+  const [rerunArray, setRerunArray] = useState([]);
   const [itemCodeSelect, setItemCodeSelect] = useState();
+  const [dataCriticalAccept, setCriticalAccept] = useState();
 
-  const changeInput_lab_order_result_manual_realtime = (event) => {
-    if (event.target.value !== null) {
+  useEffect(() => {
+    let dataRaw = rerunArray;
+    if (checkRerun) {
+      if (!!data && data.length > 0) {
+        data.map((item, index) => {
+          if (!!item["lab_order_result_rerun"]) {
+            dataRaw = [...dataRaw, item["lab_items_code"]];
+          }
+        });
+      }
+      rerunAction(dataRaw);
+      setRerunArray(dataRaw);
+    } else {
+      rerunAction([]);
+      setRerunArray([]);
+    }
+  }, [checkRerun]);
+
+  const checkCriticalValue = (itemCheckCritical) => {
+    if (itemCheckCritical["alert_critical_value"] === "Y") {
+      if (!!itemCheckCritical["lab_order_result_manual"]) {
+        if (
+          parseFloat(itemCheckCritical["lab_order_result_manual"]) >
+            parseFloat(itemCheckCritical["critical_range_max"]) ||
+          parseFloat(itemCheckCritical["lab_order_result_manual"]) <
+            parseFloat(itemCheckCritical["critical_range_min"])
+        ) {
+          return (
+            <WarningOutlined
+              onClick={() => {
+                actionDeltaCheck(itemCheckCritical);
+              }}
+            />
+          );
+        }
+      } else if (!!itemCheckCritical["lab_order_result_instrument"]) {
+        if (
+          parseFloat(itemCheckCritical["lab_order_result_instrument"]) >
+            parseFloat(itemCheckCritical["critical_range_max"]) ||
+          parseFloat(itemCheckCritical["lab_order_result_instrument"]) <
+            parseFloat(itemCheckCritical["critical_range_min"])
+        ) {
+          return (
+            <WarningOutlined
+              onClick={() => {
+                actionDeltaCheck(itemCheckCritical);
+              }}
+            />
+          );
+        }
+      }
+    } else {
+      return;
+    }
+  };
+
+  const rerunAction = (rerunDataArray) => {
+    let rerunArrayData = [];
+    data.map((itemCheck, index) => {
+      if (rerunDataArray.includes(itemCheck["lab_items_code"])) {
+        rerunArrayData = [
+          ...rerunArrayData,
+          {
+            lab_items_code: itemCheck["lab_items_code"],
+            lab_order_result: !!itemCheck["lab_order_result_manual"]
+              ? itemCheck["lab_order_result_manual"]
+              : !!itemCheck["lab_order_result_rerun"]
+              ? itemCheck["lab_order_result_rerun"]
+              : !!itemCheck["lab_order_result_instrument"]
+              ? itemCheck["lab_order_result_instrument"]
+              : "",
+            check_rerun: "R",
+          },
+        ];
+      } else {
+        rerunArrayData = [
+          ...rerunArrayData,
+          {
+            lab_items_code: itemCheck["lab_items_code"],
+            lab_order_result: !!itemCheck["lab_order_result_manual"]
+              ? itemCheck["lab_order_result_manual"]
+              : !!itemCheck["lab_order_result_instrument"]
+              ? itemCheck["lab_order_result_instrument"]
+              : "",
+            check_rerun: "",
+          },
+        ];
+      }
+    });
+
+    console.log(rerunArrayData);
+    return axios
+      .post("/api/lab_report_update_rerun", {
+        lab_order_number: labOrderNumber,
+        data: rerunArrayData,
+      })
+      .then(function (response) {
+        console.log(response.data);
+      });
+  };
+
+  const dataCriticalForm = (dataForm) => {
+    setCriticalAccept(dataForm);
+  };
+  const dataAcceptForm = () => {
+    if (!!dataCriticalAccept) {
       return axios
-        .post("/api/lab_report_update_realtime", {
-          lab_order_number: labOrderNumber,
-          lab_items_code: event.target.id,
-          lab_order_result_manual: event.target.value,
+        .post("/api/add_lis_critical", {
+          data: dataCriticalAccept,
         })
         .then(function (response) {
           console.log(response.data);
+          // reloadReport();
         });
+    } else {
+      messageApi.open({
+        type: "error",
+        content: "กรุณากรอกข้อมูลให้ครบถ้วน",
+      });
     }
   };
-  const changeInput_lab_order_result_manual = (event) => {
-    labOrderData(event.target.id, event.target.value);
-  };
 
-  const actionDeltaCheck = () => {
+  const actionDeltaCheck = (dataItem) => {
     Modal.confirm({
       centered: true,
       title: "บันทึกข้อมูล ค่าวิกฤติ",
       icon: <WarningOutlined />,
       width: 730,
-      content: <LabOrderCriticalComponent />,
+      content: (
+        <LabOrderCriticalComponent
+          dataItem={dataItem}
+          dataCriticalForm={dataCriticalForm}
+        />
+      ),
       onOk() {
-        // actionControl(action);
+        dataAcceptForm();
       },
     });
   };
@@ -98,7 +206,6 @@ const LabOrderComponent = (props) => {
       datalabels: {
         align: "top",
         anchor: "center",
-        //offset: 25,
         padding: -2,
       },
     },
@@ -227,20 +334,21 @@ const LabOrderComponent = (props) => {
 
   const warningModalBox = (record) => {
     if (record.target.checked) {
-      console.log("add");
+      rerunAction([...rerunArray, record.target.lab_items_code]);
       setRerunArray([...rerunArray, record.target.lab_items_code]);
     } else {
-      console.log("remove");
+      rerunAction(
+        rerunArray.filter((items, i) => items !== record.target.lab_items_code)
+      );
       setRerunArray(
         rerunArray.filter((items, i) => items !== record.target.lab_items_code)
       );
     }
-
-    console.log(rerunArray);
   };
 
   return (
     <div>
+      {messageContext}
       <table
         style={{
           display: "block",
@@ -379,7 +487,10 @@ const LabOrderComponent = (props) => {
                   ) {
                     if (data[index].sub_code !== null) {
                       text = (
-                        <tr style={{ borderTop: "1px solid #f0f0f0" }}>
+                        <tr
+                          key={index + "_header"}
+                          style={{ borderTop: "1px solid #f0f0f0" }}
+                        >
                           <td
                             style={{
                               padding: "8px 8px",
@@ -401,7 +512,7 @@ const LabOrderComponent = (props) => {
                   return (
                     <>
                       {text}
-                      <tr>
+                      <tr key={index}>
                         <td
                           style={{
                             padding: "8px 8px",
@@ -473,54 +584,12 @@ const LabOrderComponent = (props) => {
                           labOrderData={labOrderData}
                           labOrderNumber={labOrderNumber}
                         />
-                        {/* <td style={{ border: "1px solid #f0f0f0" }}>
-                          {reportStatus === "Pending" ||
-                          reportStatus === "Process" ||
-                          reportStatus === "Completed" ? (
-                            <Input
-                              defaultValue={item["lab_order_result_manual"]}
-                              onBlur={
-                                changeInput_lab_order_result_manual_realtime
-                              }
-                              id={item["lab_items_code"]}
-                              key={
-                                item["lab_order_number"] +
-                                item["lab_items_code"]
-                              }
-                            />
-                          ) : (
-                            <Input
-                              defaultValue={item["lab_order_result_manual"]}
-                              onChange={changeInput_lab_order_result_manual}
-                              id={item["lab_items_code"]}
-                              key={
-                                item["lab_order_number"] +
-                                item["lab_items_code"]
-                              }
-                              disabled={formDisable}
-                            />
-                          )}
-                        </td>
-                        <td
-                          style={{
-                            textAlign: "center",
-                            border: "1px solid #f0f0f0",
-                          }}
-                        >
-                          {item["flag"] === "H" ? (
-                            <b style={{ color: "red" }}>{item["flag"]}</b>
-                          ) : item["flag"] === "L" ? (
-                            <b style={{ color: "blue" }}>{item["flag"]}</b>
-                          ) : (
-                            <>{item["flag"]}</>
-                          )}
-                        </td> */}
                         <td
                           style={{ border: "1px solid #f0f0f0", color: "red" }}
                         >
-                          {item["alert_critical_value"] === "Y" ? (
-                            <WarningOutlined onClick={actionDeltaCheck} />
-                          ) : null}
+                          {!!item["lis_critical"]
+                            ? null
+                            : checkCriticalValue(item)}
                         </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
                           {item["lab_order_result_rerun"]}
@@ -531,14 +600,20 @@ const LabOrderComponent = (props) => {
                               item["lab_order_number"] + item["lab_items_code"]
                             }
                             lab_items_code={item["lab_items_code"]}
+                            lab_order_result_instrument={
+                              item["lab_order_result_instrument"]
+                            }
+                            lab_order_result_manual={
+                              item["lab_order_result_manual"]
+                            }
                             lab_order_result_rerun={
                               item["lab_order_result_rerun"]
                             }
-                            // checked={
-                            //   (checkRerun &&
-                            //     !!item["lab_order_result_rerun"]) ||
-                            //   rerunArray.includes(item["lab_items_code"])
-                            // }
+                            checked={
+                              rerunArray.includes(item["lab_items_code"]) ||
+                              (rerunArray.length === 0 &&
+                                item["check_rerun"] === "R")
+                            }
                             disabled={!item["lab_order_result_rerun"]}
                             onChange={warningModalBox}
                           />

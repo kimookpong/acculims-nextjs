@@ -11,13 +11,15 @@ connection.connect(function (err) {
 
 export default function handler(req, res) {
   const lab_order_number = req.body.lab_order_number;
-  const lab_items_code = req.body.lab_items_code;
-  const lab_order_result_manual = req.body.lab_order_result_manual;
-  const lab_order_result = req.body.lab_order_result;
-  const flag = req.body.flag;
-  let queryArray = `UPDATE lab_order 
-  SET lab_order_result_manual = '${lab_order_result_manual}', flag = '${flag}', lab_order_result = '${lab_order_result}'
-  WHERE lab_order_number = '${lab_order_number}' AND lab_items_code = ${lab_items_code};`;
+
+  let queryArray = ``;
+  req.body.data.map((item) => {
+    queryArray =
+      queryArray +
+      `UPDATE lab_order 
+  SET lab_order_result = '${item.lab_order_result}', check_rerun = '${item.check_rerun}' 
+  WHERE lab_order_number = '${lab_order_number}' AND lab_items_code = ${item.lab_items_code};`;
+  });
 
   connection.query(queryArray, function (err, rows, fields) {
     if (err) {

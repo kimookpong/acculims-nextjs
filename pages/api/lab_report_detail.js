@@ -25,7 +25,14 @@ export default function handler(req, res) {
   if(patient.sex = 1,lab_items.normal_value_min_male, lab_items.normal_value_min_female ) AS normal_value_min, 
   if(patient.sex = 1,lab_items.normal_value_max_male, lab_items.normal_value_max_female ) AS normal_value_max,
 
+  if(patient.sex = 1,lab_items.critical_range_min_male, lab_items.critical_range_min_female ) AS critical_range_min, 
+  if(patient.sex = 1,lab_items.critical_range_max_male, lab_items.critical_range_max_female ) AS critical_range_max,
+
   lab_head.hn,
+  concat(patient.pname, '', patient.fname, ' ', patient.lname) AS patient_name,
+  kskdepartment.department as department,
+
+
   concat(
     DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d-%m-%Y'), ' ',
     DATE_FORMAT(lab_head.order_time,'%H:%i'))
@@ -33,11 +40,13 @@ export default function handler(req, res) {
     
   (SELECT lab_items_sub_group_name FROM lab_items_sub_group WHERE sub_code = lab_items_sub_group_code) AS lab_items_sub_group_name,
   (SELECT lab_items_group_code FROM lab_items_sub_group WHERE sub_code = lab_items_sub_group_code) AS group_code,
-  (SELECT lab_items_group_name FROM lab_items_group  WHERE  lab_items_group_code = group_code) AS group_name
+  (SELECT lab_items_group_name FROM lab_items_group  WHERE  lab_items_group_code = group_code) AS group_name,
+  (SELECT lis_critical.lab_order_number FROM lis_critical  WHERE  lis_critical.lab_order_number = lab_order.lab_order_number) AS lis_critical
 
   FROM lab_order
   LEFT JOIN lab_items ON lab_order.lab_items_code = lab_items.lab_items_code
   LEFT JOIN lab_head ON lab_order.lab_order_number = lab_head.lab_order_number
+  LEFT JOIN kskdepartment ON lab_head.ward = kskdepartment.depcode
   LEFT JOIN patient ON lab_head.hn = patient.hn 
   WHERE lab_order.lab_order_number = '${id}' 
   ORDER BY group_code,sub_code DESC`;

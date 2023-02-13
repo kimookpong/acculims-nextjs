@@ -167,6 +167,7 @@ function LabReport() {
   const { data: session } = useSession();
 
   const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKeyDetail, setRefreshKeyDetail] = useState(0);
   let dataRejectReason = [];
   const onAddRejectForm = (newItem) => {
     dataRejectReason = newItem;
@@ -244,7 +245,6 @@ function LabReport() {
         id: order_number,
       })
       .then(function (response) {
-        console.log(response.data.lab_head[0]);
         Modal.info({
           centered: true,
           width: 730,
@@ -544,8 +544,6 @@ function LabReport() {
             content: response.data.alert,
           });
           dataSubmitForm = [];
-
-          console.log("print status ", checkPrint);
           if (checkPrint && response.data.result === true) {
             showPrint(order_number.join());
           }
@@ -680,7 +678,7 @@ function LabReport() {
     },
 
     {
-      title: "ห้อง",
+      title: "แผนก",
       dataIndex: "department",
       key: "department",
       width: 70,
@@ -694,6 +692,10 @@ function LabReport() {
     onChange: (selectedRowKeys, selectedRows) => {
       rowSelectFunc(selectedRows[0]);
     },
+  };
+
+  const reloadReport = () => {
+    loadReport(selectedRadioKeys.join());
   };
 
   const rowSelectFunc = (record) => {
@@ -1042,6 +1044,7 @@ function LabReport() {
                         checkRerun={checkRerun}
                         reportStatus={dataReportStatus}
                         labOrderNumber={selectedRadioKeys.join()}
+                        reloadReport={reloadReport}
                       />
                     </Col>
                     <Col span={24}>
