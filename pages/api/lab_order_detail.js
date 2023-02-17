@@ -44,8 +44,7 @@ export default function handler(req, res) {
     DATE_FORMAT(lab_head.approved_time,'%H:%i:%s'))
     AS approved_date,
 
-  CONCAT(lis_user.pname,lis_user.fname,' ',lis_user.lname) as reporter_name, 
-  lab_head.approver_name, 
+  (SELECT CONCAT(lis_user.pname,lis_user.fname,' ',lis_user.lname)  FROM lis_user WHERE lab_head.reporter_name = lis_user.user_name) AS reporter_name,
 
   concat(
     DATEDIFF(lab_head.approved_date, lab_head.receive_date), '.', 
@@ -54,7 +53,6 @@ export default function handler(req, res) {
 
   lab_head.order_note 
   FROM lab_head 
-  LEFT JOIN lis_user ON lab_head.reporter_name = lis_user.user_name 
   LEFT JOIN patient ON lab_head.hn = patient.hn 
   LEFT JOIN kskdepartment ON lab_head.order_department = kskdepartment.depcode 
   LEFT JOIN ovst ON lab_head.vn = ovst.vn 
@@ -62,7 +60,8 @@ export default function handler(req, res) {
   LEFT JOIN lab_order ON lab_head.lab_order_number = lab_order.lab_order_number 
   LEFT JOIN doctor ON lab_head.doctor_code = doctor.code 
   LEFT JOIN ward ON lab_head.ward = ward.ward 
-  WHERE lab_head.lab_order_number = '${id}'`;
+  WHERE lab_head.lab_order_number = '${id}' 
+  GROUP BY lab_head.lab_order_number`;
 
   let query_item = `SELECT lab_order.lab_order_number,lab_order.specimen_code,
   lab_specimen_items.specimen_name
