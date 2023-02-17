@@ -63,14 +63,13 @@ export default function handler(req, res) {
   WHERE lab_head.lab_order_number = '${id}' 
   GROUP BY lab_head.lab_order_number`;
 
-  let query_item = `SELECT lab_order.lab_order_number,lab_order.specimen_code,
+  let query_item = `SELECT lab_order.lab_order_number,lab_specimen_items.specimen_code,
   lab_specimen_items.specimen_name
-  FROM lab_order 
-  LEFT JOIN lab_specimen_items ON lab_order.specimen_code = lab_specimen_items.specimen_code 
+  FROM lab_specimen_items 
+  LEFT JOIN lab_order ON lab_order.specimen_code = lab_specimen_items.specimen_code 
   WHERE lab_order.lab_order_number = '${id}' 
   AND lab_order.specimen_code <> '' 
-  AND lab_specimen_items.specimen_name <> '' 
-  GROUP BY lab_specimen_items.specimen_name;`;
+  AND lab_specimen_items.specimen_name <> '';`;
 
   query_item =
     query_item +
