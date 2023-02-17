@@ -62,8 +62,7 @@ export default function handler(req, res) {
   LEFT JOIN lab_order ON lab_head.lab_order_number = lab_order.lab_order_number 
   LEFT JOIN doctor ON lab_head.doctor_code = doctor.code 
   LEFT JOIN ward ON lab_head.ward = ward.ward 
-  WHERE lab_head.lab_order_number = '${id}' 
-  GROUP BY lab_head.lab_order_number`;
+  WHERE lab_head.lab_order_number = '${id}'`;
 
   let query_item = `SELECT lab_order.lab_order_number,lab_order.specimen_code,
   lab_specimen_items.specimen_name
