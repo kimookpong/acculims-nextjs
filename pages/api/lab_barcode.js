@@ -26,7 +26,7 @@ export default function handler(req, res) {
     lab_head.hn, 
     lab_head.department as department,
     lab_head.form_name as form_name,
-    lab_order.lab_items_name_ref as lab_items_name,
+
     DATE_FORMAT(DATE_ADD(patient.birthday, INTERVAL 543 YEAR),'%d/%m/%Y') as birthday, 
     concat(
       DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d/%m/%Y'), ' ',
@@ -50,7 +50,7 @@ export default function handler(req, res) {
     lab_head.hn, 
     lab_head.department as department,
     lab_head.form_name as form_name,
-    lab_order.lab_items_name_ref as lab_items_name,
+
     DATE_FORMAT(DATE_ADD(patient.birthday, INTERVAL 543 YEAR),'%d/%m/%Y') as birthday, 
     concat(
       DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d/%m/%Y'), ' ',
@@ -72,7 +72,7 @@ export default function handler(req, res) {
     lab_head.hn, 
     lab_head.department as department,
     lab_head.form_name as form_name,
-    lab_order.lab_items_name_ref as lab_items_name,
+
     DATE_FORMAT(DATE_ADD(patient.birthday, INTERVAL 543 YEAR),'%d/%m/%Y') as birthday, 
     concat(
       DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d/%m/%Y'), ' ',
@@ -95,7 +95,7 @@ export default function handler(req, res) {
     lab_head.hn, 
     lab_head.department as department,
     lab_head.form_name as form_name,
-    lab_order.lab_items_name_ref as lab_items_name,
+
     DATE_FORMAT(DATE_ADD(patient.birthday, INTERVAL 543 YEAR),'%d/%m/%Y') as birthday, 
     concat(
       DATE_FORMAT(DATE_ADD(lab_head.order_date, INTERVAL 543 YEAR),'%d/%m/%Y'), ' ',
