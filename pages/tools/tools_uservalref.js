@@ -1,7 +1,8 @@
 import styles from '../../styles/Home.module.css'
 import { React, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { Button } from 'antd';
+import { Spin, Space, Card, Form, Button, Input } from "antd";
+import { BankOutlined } from "@ant-design/icons";
 
 function ToolsUservalref(){
     const [fname, setname] = useState('');
@@ -12,7 +13,7 @@ function ToolsUservalref(){
     const [user_type, settype] = useState('');
 
     async function sendValue(value) {
-        axios.post('/api/add_user',
+        axios.post('http://localhost:3000/api/add_user',
         {fname:fname, lname:lname, job_id:job_id, user_name:user_name, password:password, user_type:user_type})
             .then(response => {
             console.log(response.data);
@@ -22,39 +23,66 @@ function ToolsUservalref(){
         );
     }
 
+    const dataTitle = {
+        title: (
+          <>
+            <BankOutlined/> จัดการข้อมูลผู้ใช้
+          </>
+        ),
+      };
+
     return(
-        <div className={styles.grid}>
-            <h1>User Information</h1>
-            <p className={styles.card}>
-                <a>ชื่อ: </a>
-                <br></br>
-                <a>นามสกุล: </a>
-                <br></br>
-                <a>เลขที่ใบประกอบ: </a>
-                <br></br>
-                <a>Username: </a>
-                <br></br>
-                <a>Password: </a>
-                <br></br>
-                <a>User Type: </a>
-                <br></br>
-            </p>
-            <p className={styles.card}>
-                <input type="text" value={fname} onChange={e => setname(e.target.value)}/>
-                <br></br>
-                <input type="text" value={lname} onChange={e => setsurname(e.target.value)}/>
-                <br></br>
-                <input type="text" value={job_id} onChange={e => setlcid(e.target.value)}/>
-                <br></br>
-                <input type="text" value={user_name} onChange={e => setusername(e.target.value)}/>
-                <br></br>
-                <input type="text" value={password} onChange={e => setpassword(e.target.value)}/>
-                <br></br>
-                <input type="text" value={user_type} onChange={e => settype(e.target.value)}/>
-                <br></br>
-                <Button type="primary" shape="round" onClick = {sendValue}>Save</Button>
-            </p>
-        </div>
+        <Card title={dataTitle.title} headStyle={{ color: "#002140" }}>
+          <Form
+            name="basic"
+            labelCol={{
+              span: 6,
+            }}
+            wrapperCol={{
+              span: 18,
+            }}
+            autoComplete="off"
+          >
+            <div>
+              <Form.Item label="ชื่อ:">
+                <Input onChange={(e) => setname(e.target.value)} value={fname} />
+              </Form.Item>
+              <Form.Item label="นามสกุล:">
+                <Input
+                  onChange={(e) => setsurname(e.target.value)}
+                  value={lname}
+                />
+              </Form.Item>
+              <Form.Item label="เลขที่ใบประกอบ:">
+                <Input
+                  onChange={(e) => setlcid(e.target.value)}
+                  value={job_id}
+                />
+              </Form.Item>
+              <Form.Item label="Username:">
+                <Input onChange={(e) => setusername(e.target.value)} value={user_name} />
+              </Form.Item>
+              <Form.Item label="Password:">
+                <Input onChange={(e) => setpassword(e.target.value)} value={password} />
+              </Form.Item>
+              <Form.Item label="User Type:">
+                <Input onChange={(e) => settype(e.target.value)} value={user_type} />
+              </Form.Item>
+              <Form.Item
+                wrapperCol={{
+                  offset: 6,
+                  span: 18,
+                }}
+              >
+                <Space wrap>
+                  <Button type="primary" shape="round" onClick={sendValue}>
+                    Save
+                  </Button>
+                </Space>
+              </Form.Item>
+            </div>
+          </Form>
+      </Card>
     )
 }
 

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { DatePicker, Table, Input, Button, Space} from 'antd';
+import ReactToPrint from "react-to-print";
 
 const LabReject = () => {
+    const componentRef = useRef();
+
     const onChangedDateStart = (date, dateString) => { setdatestart(dateString); }
     const onChangedDateStop = (date, dateString) => { setdatestop(dateString); }
     const [date_start, setdatestart] = useState('2022-09-01');
@@ -123,14 +126,27 @@ const LabReject = () => {
         <a>From: </a><DatePicker onChange={onChangedDateStart}/>
         <a> To: </a><DatePicker onChange={onChangedDateStop}/>
         <a> </a>
-        <a>HN: </a>
+        <a>Lab Order Number: </a>
         <input type="text" value={lab_order_number} onChange={e => setlabordernumber(e.target.value)}/>
         <br></br>
         <br></br>
         <Button type="primary" shape="round" onClick = {sendValue}>Reload</Button>
         <a> </a>
-        <Button shape="round" onClick = {sendValue}>Print</Button>
-        <Table dataSource={data} rowKey={'lab_order_number'} columns={columns}/>
+        <ReactToPrint
+            trigger={() => {
+            return <Button shape="round">Print</Button>;
+            }}
+            content={() => componentRef.current}
+        />
+        <div ref={componentRef}>
+            <Table
+            dataSource={data}
+            rowKey={"lab_order_number"}
+            columns={columns}
+            size="small"
+            scroll={{ x: 1500, }}
+            />
+        </div>
       </div>
     )
 }
