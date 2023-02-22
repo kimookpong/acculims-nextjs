@@ -1,9 +1,9 @@
 import { React, useEffect, useState } from "react";
-import { Input, Col, Row, Select, Checkbox } from "antd";
+import { Input, Button, Form, Col, Row, Select, Checkbox } from "antd";
 const { TextArea } = Input;
 
 const LabOrderActionComponent = (props) => {
-  const { getFormData, doctorList, orderNumber, action } = props;
+  const { getFormData, orderNumber, action } = props;
   const [formCode, setFormCode] = useState("");
   const [formComment, setFormComment] = useState("");
   const [formPartial, setFormPartial] = useState(false);
@@ -33,60 +33,46 @@ const LabOrderActionComponent = (props) => {
   }, [formCode, formComment, formPartial, formLab, formPrint]);
 
   return (
-    <Row>
-      <Col span={24}>
-        <table style={{ width: "100%" }}>
-          <tbody>
-            <tr>
-              <td style={{ width: "30%" }}>เลขที่สั่ง : </td>
-              <td>{orderNumber}</td>
-            </tr>
-            <tr>
-              <td style={{ width: "30%" }}>รหัส : </td>
-              <td>
-                <Input onChange={inputFormCode} />
-              </td>
-            </tr>
-            <tr>
-              <td style={{ width: "30%" }}>Comment : </td>
-              <td>
-                <TextArea
-                  onChange={inputFormComment}
-                  rows={4}
-                  style={{
-                    resize: "none",
-                  }}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        {action === "approve" ? (
-          <table style={{ width: "100%" }}>
-            <tbody>
-              <tr>
-                <td style={{ width: "50%" }}>ปล่อยผลบางส่วน</td>
-                <td>
-                  <Checkbox onChange={inputFormPartial} />
-                </td>
-              </tr>
-              <tr>
-                <td>HbA1C,MALB</td>
-                <td>
-                  <Checkbox onChange={inputFormLab} />
-                </td>
-              </tr>
-              <tr>
-                <td>Print</td>
-                <td>
-                  <Checkbox onChange={inputFormPrint} />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        ) : null}
-      </Col>
-    </Row>
+    <>
+      <Form.Item label="เลขที่สั่ง" style={{ marginBottom: "5px" }}>
+        {orderNumber}
+      </Form.Item>
+      <Form.Item
+        label="รหัส"
+        name="username"
+        rules={[
+          {
+            required: true,
+            message: "กรุณากรอกรหัส",
+          },
+        ]}
+        style={{ marginBottom: "5px" }}
+      >
+        <Input onChange={inputFormCode} autoFocus={true} />
+      </Form.Item>
+      <Form.Item label="Comment" style={{ marginBottom: "5px" }}>
+        <TextArea
+          onChange={inputFormComment}
+          rows={4}
+          style={{
+            resize: "none",
+          }}
+        />
+      </Form.Item>
+      {action === "approve" ? (
+        <>
+          <Form.Item label="ปล่อยผลบางส่วน" style={{ marginBottom: "5px" }}>
+            <Checkbox onChange={inputFormPartial} />
+          </Form.Item>
+          <Form.Item label="HbA1C,MALB" style={{ marginBottom: "5px" }}>
+            <Checkbox onChange={inputFormLab} />
+          </Form.Item>
+          <Form.Item label="Print" style={{ marginBottom: "5px" }}>
+            <Checkbox onChange={inputFormPrint} />
+          </Form.Item>
+        </>
+      ) : null}
+    </>
   );
 };
 

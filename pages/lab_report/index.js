@@ -202,40 +202,52 @@ function LabReport() {
     };
     setCheckPrint(formPrintData);
   };
+  const validateFormAction = (action) => {
+    if (dataSubmitForm.formCode !== "") {
+      actionControl(action);
+    }
+  };
   const showConfirm = (action) => {
-    return axios.get(API_lis_user).then(function (responseDoctor) {
-      Modal.confirm({
-        centered: true,
-        title:
-          action === "report" ? "ยืนยันรายงานผล LAB?" : "ยืนยันรับรองผล LAB?",
-        content: (
+    return Modal.confirm({
+      centered: true,
+      title:
+        action === "report" ? "ยืนยันรายงานผล LAB?" : "ยืนยันรับรองผล LAB?",
+      content: (
+        <Form
+          name="basic"
+          labelCol={{
+            span: 8,
+          }}
+          wrapperCol={{
+            span: 16,
+          }}
+          autoComplete="off"
+        >
           <LabOrderActionComponent
             action={action}
             orderNumber={selectedRadioKeys}
             getFormData={getFormData}
-            doctorList={responseDoctor.data}
           />
-        ),
-        // footer: (
-        //   <div className="ant-modal-confirm-btns">
-        //     <Button key="back" onClick={closeModal}>
-        //       ยกเลิก
-        //     </Button>
-        //     <Button
-        //       key="submit"
-        //       type="primary"
-        //       onClick={() => {
-        //         return actionControl(action);
-        //       }}
-        //     >
-        //       ยืนยัน
-        //     </Button>
-        //   </div>
-        // ),
-        onOk() {
-          actionControl(action);
-        },
-      });
+
+          <div className="ant-modal-confirm-btns">
+            <Button key="back" onClick={closeModal}>
+              ยกเลิก
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={() => validateFormAction(action)}
+              onPressEnter={() => validateFormAction(action)}
+            >
+              ยืนยัน
+            </Button>
+          </div>
+        </Form>
+      ),
+      footer: <></>,
+      // onOk() {
+      //   actionControl(action);
+      // },
     });
   };
 
@@ -303,6 +315,9 @@ function LabReport() {
     if (action === "edit") {
       setFormDisable(false);
       setLoading(true);
+    } else if (action === "cancel") {
+      setFormDisable(true);
+      setLoading(false);
     } else if (action === "report") {
       showConfirm(action);
     } else if (action === "approve") {
@@ -539,16 +554,24 @@ function LabReport() {
           form: dataSubmitForm,
         })
         .then(function (response) {
-          messageApi.open({
-            type: response.data.result === true ? "success" : "error",
-            content: response.data.alert,
-          });
-          dataSubmitForm = [];
-          if (checkPrint && response.data.result === true) {
-            showPrint(order_number.join());
-          }
+          if (response.data.result === true) {
+            closeModal();
+            messageApi.open({
+              type: "success",
+              content: response.data.alert,
+            });
+            dataSubmitForm = [];
+            if (checkPrint && response.data.result === true) {
+              showPrint(order_number.join());
+            }
 
-          setRefreshKey((oldKey) => oldKey + 1);
+            setRefreshKey((oldKey) => oldKey + 1);
+          } else {
+            messageApi.open({
+              type: "error",
+              content: response.data.alert,
+            });
+          }
         });
     }
   };
@@ -1079,6 +1102,7 @@ function LabReport() {
                             </div>
                             <div style={{ padding: 5 }}>
                               <Button
+                                danger={!formDisable ? true : false}
                                 style={{
                                   padding: 10,
                                   cursor: "pointer",
@@ -1086,10 +1110,13 @@ function LabReport() {
                                   minWidth: 100,
                                 }}
                                 onClick={() => {
-                                  clickActionForm("edit");
+                                  if (!formDisable) {
+                                    clickActionForm("cancel");
+                                  } else {
+                                    clickActionForm("edit");
+                                  }
                                 }}
                                 disabled={
-                                  !formDisable ||
                                   (dataReport.length > 0 ? false : true) ||
                                   (dataReportStatus !== "Reported" &&
                                     dataReportStatus !== "Approved")
@@ -1102,7 +1129,9 @@ function LabReport() {
                                     }}
                                   />
                                 </div>
-                                <div>แก้ไขผล</div>
+                                <div>
+                                  {formDisable ? "แก้ไขผล" : "ยกเลิกแก้ไข"}
+                                </div>
                               </Button>
                             </div>
                             <div style={{ padding: 5 }}>
