@@ -1,5 +1,11 @@
-import dbconnect from "./dbconnect";
-const connection = dbconnect();
+const mysql = require('mysql2');
+
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    pass: process.env.DB_PASS,
+    database: process.env.DB_DATABASE
+});
 
 connection.connect(function(err) {
     if (err) {
@@ -10,14 +16,15 @@ connection.connect(function(err) {
   });
 
 export default function handler(req, res) {
-  const username = req.body.username;
+  const username = req.body.user_name;
   const password = req.body.password;
   const pname = req.body.pname;
   const fname = req.body.fname;
-  const job_id = req.body.job_id;
   const lname = req.body.lname;
+  const user_type = req.body.user_type;
+  const jobid = req.body.job_id;
 
-  const query = `INSERT INTO lis_user (user_name, password, pname, fname, lname, job_id) VALUES (${username},${password},${pname},${fname},${lname},${job_id})`;
+  const query = `INSERT INTO lis_user (user_name,password,pname,fname,lname,user_type,job_id) VALUES ('${username}','${password}','${pname}','${fname}','${lname}','${user_type}','${jobid}')`;
   connection.query(query, function(err, result) {
       if (err) {
       console.error(err);
