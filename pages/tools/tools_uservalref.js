@@ -12,10 +12,11 @@ function ToolsUservalref(){
   const [user_name, setusername] = useState('');
   const [password, setpassword] = useState('');
   const [user_type, settype] = useState('');
+  const [user_id, setuserid] = useState('');
   const [data, setData] = useState();
   const componentRef = useRef();
 
-    async function sendValue(value) {
+    async function addUser(value) {
         axios.post('http://localhost:3000/api/add_user',
         {pname:pname, fname:fname, lname:lname, job_id:job_id, user_name:user_name, password:password, user_type:user_type})
             .then(response => {
@@ -28,6 +29,16 @@ function ToolsUservalref(){
 
     async function loadUser(value) {
       axios.get('http://localhost:3000/api/get_lis_user',)
+          .then(response => {
+          console.log(response.data);
+          setData(response.data);
+          })
+          .catch(error => { console.error(error); }
+      );
+    }
+
+    async function delUser(value) {
+      axios.post('http://localhost:3000/api/delete_user', {user_id:user_id})
           .then(response => {
           console.log(response.data);
           setData(response.data);
@@ -136,14 +147,9 @@ function ToolsUservalref(){
               <Form.Item label="User Type:">
                 <Input onChange={(e) => settype(e.target.value)} value={user_type} />
               </Form.Item>
-              <Form.Item
-                wrapperCol={{
-                  offset: 6,
-                  span: 18,
-                }}
-              >
+              <Form.Item wrapperCol={{ offset: 6, span: 18, }}>
                 <Space wrap>
-                  <Button type="primary" shape="round" onClick={sendValue}>
+                  <Button type="primary" shape="round" onClick={addUser}>
                     Save
                   </Button>
                   <Button type="primary" shape="round" onClick={loadUser}>
@@ -151,18 +157,22 @@ function ToolsUservalref(){
                   </Button>
                 </Space>
               </Form.Item>
-
               <div ref={componentRef}>
-        <Table
-          dataSource={data}
-          rowKey={"lab_order_number"}
-          columns={columns}
-          size="small"
-          scroll={{ x: 1500, }}
-        />
-      </div>
-
+                <Table
+                  dataSource={data}
+                  rowKey={"lab_order_number"}
+                  columns={columns}
+                  size="small"
+                  scroll={{ x: 1500, }}
+                />
+              </div>
             </div>
+            <Form.Item wrapperCol={{ offset: 6, span: 18, }}>
+              <Form.Item label="Delete ID:">
+                <Input onChange={(e) => setuserid(e.target.value)} value={user_id} />
+                <Button type="primary" shape="round" onClick={delUser}>Delete</Button>
+              </Form.Item>
+            </Form.Item>
           </Form>
       </Card>
     )
