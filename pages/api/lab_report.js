@@ -27,7 +27,7 @@ export default function handler(req, res) {
   } else if (department === "IPD") {
     cond = cond + ` AND lab_head.department = '${department}' `;
   }
-  if (text === null) {
+  if (!!text) {
   } else {
     if (type === 1) {
       cond = cond + ` AND lab_head.lab_order_number LIKE '%${text}%' `;
@@ -45,7 +45,7 @@ export default function handler(req, res) {
     cond = cond + ` AND lab_head.form_name LIKE '%${form_name}%' `;
   }
 
-  if (address === null) {
+  if (address === "") {
   } else {
     cond = cond + ` AND patient.informaddr LIKE '%${address}%' `;
   }
@@ -99,7 +99,9 @@ export default function handler(req, res) {
   ${cond} 
   AND lab_head.receive_status <> 'Delete'
   GROUP BY lab_head.lab_order_number
-  ORDER BY order_date_time DESC`;
+  ORDER BY order_date_time DESC;`;
+
+  console.log(query);
 
   connection.query(query, function (err, rows, fields) {
     if (err) {

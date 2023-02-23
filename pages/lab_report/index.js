@@ -367,18 +367,18 @@ function LabReport() {
     Reported: 0,
     Approved: 0,
   });
-  const [detail, setDetail] = useState(null);
-  const [detailNote, setDetailNote] = useState(null);
+  const [detail, setDetail] = useState("");
+  const [detailNote, setDetailNote] = useState("");
 
   const [sStartDate, setSStartDate] = useState(beforeDate.format(dateFormat));
   const [sEndDate, setSEndDate] = useState(currDate.format(dateFormat));
   const [sType, setSType] = useState(1);
-  const [sInput, setSInput] = useState(null);
+  const [sInput, setSInput] = useState("");
   const [sWork, setSWork] = useState(1);
   const [sWorkType, setSWorkType] = useState("All");
   const [sWorkTypeList, setSWorkTypeList] = useState([]);
   const [sDepart, setSDepart] = useState("ALL");
-  const [sAddress, setSAddress] = useState(null);
+  const [sAddress, setSAddress] = useState("");
 
   const handleDatePickerChangeStart = (christDate) => {
     if (!!christDate) {
