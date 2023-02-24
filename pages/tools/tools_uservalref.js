@@ -17,7 +17,7 @@ function ToolsUservalref(){
   const componentRef = useRef();
 
     async function addUser(value) {
-        axios.post('http://localhost:3000/api/add_user',
+        axios.post('/api/add_user',
         {pname:pname, fname:fname, lname:lname, job_id:job_id, user_name:user_name, password:password, user_type:user_type})
             .then(response => {
             console.log(response.data);
@@ -28,7 +28,7 @@ function ToolsUservalref(){
     }
 
     async function loadUser(value) {
-      axios.get('http://localhost:3000/api/get_lis_user',)
+      axios.get('/api/get_lis_user',)
           .then(response => {
           console.log(response.data);
           setData(response.data);
@@ -38,7 +38,7 @@ function ToolsUservalref(){
     }
 
     async function delUser(value) {
-      axios.post('http://localhost:3000/api/delete_user', {user_id:user_id})
+      axios.post('/api/delete_user', {user_id:user_id})
           .then(response => {
           console.log(response.data);
           setData(response.data);
@@ -157,6 +157,14 @@ function ToolsUservalref(){
                   </Button>
                 </Space>
               </Form.Item>
+              
+              <Form.Item label="Delete ID:">
+                <Input onChange={(e) => setuserid(e.target.value)} value={user_id} />
+              </Form.Item>
+              <Form.Item wrapperCol={{ offset: 6, span: 18, }}>
+                <Button type="primary" shape="round" onClick={delUser}>Delete</Button>
+              </Form.Item>
+            
               <div ref={componentRef}>
                 <Table
                   dataSource={data}
@@ -167,12 +175,6 @@ function ToolsUservalref(){
                 />
               </div>
             </div>
-            <Form.Item wrapperCol={{ offset: 6, span: 18, }}>
-              <Form.Item label="Delete ID:">
-                <Input onChange={(e) => setuserid(e.target.value)} value={user_id} />
-                <Button type="primary" shape="round" onClick={delUser}>Delete</Button>
-              </Form.Item>
-            </Form.Item>
           </Form>
       </Card>
     )
