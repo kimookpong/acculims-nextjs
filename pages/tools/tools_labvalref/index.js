@@ -18,24 +18,44 @@ import {
   Modal,
   Empty,
 } from "antd";
+import { FormOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import FormComponent from "./FormComponent";
 const { Content } = Layout;
 
 const ToolsLabvalref = () => {
-  const [lab_group, setlabgroup] = useState();
+  const [lab_group, setlabgroup] = useState("All");
+
   const [lab_name, setlabname] = useState();
   const [data, setData] = useState();
-  const [dropdowndata, setDropDownData] = useState();
+  const [dropdowndata, setDropDownData] = useState([]);
+  const [labSpecimen, setLabSpecimen] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
 
   const [messageApi, messageContext] = message.useMessage();
 
   const onChange = (value) => {
-    console.log(`selected ${value}`);
-
     setlabgroup(value);
   };
-  const onSearch = (value) => {
-    console.log("search:", value);
+  const validateFormAction = () => {};
+  const closeModal = () => {
+    Modal.destroyAll();
+  };
+
+  const showModal = (data) => {
+    Modal.confirm({
+      centered: true,
+      width: 730,
+      title: "แบบฟอร์มจัดการข้อมูล LAB",
+      icon: <FormOutlined />,
+      content: (
+        <FormComponent
+          dataForm={data}
+          dropdowndata={dropdowndata}
+          labSpecimen={labSpecimen}
+        />
+      ),
+      footer: <></>,
+    });
   };
 
   const columns = [
@@ -92,35 +112,29 @@ const ToolsLabvalref = () => {
   ];
 
   async function sendLabItemGroup() {
-    return axios
-      .post("/api/get_lab_items_group")
-      .then((response) => {
-        console.log(response.data);
-        setDropDownData((oldArray) => [
-          { label: "All", value: "All" },
-          ...response.data,
-        ]);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    return axios.post("/api/get_lab_items_group").then((response) => {
+      setDropDownData(response.data);
+    });
+  }
+
+  async function sendLabSpecimen() {
+    return axios.post("/api/get_lab_specimen_items").then((response) => {
+      setLabSpecimen(response.data);
+    });
   }
 
   async function sendValue() {
     setLoadingData(true);
-    console.log(lab_name);
     return axios
       .post("/api/get_lab_items", { lab_group: lab_group, lab_name: lab_name })
       .then((response) => {
         setData(response.data);
         setLoadingData(false);
-      })
-      .catch((error) => {
-        console.error(error);
       });
   }
   useEffect(() => {
     sendLabItemGroup();
+    sendLabSpecimen();
   }, []);
   useEffect(() => {
     sendValue();
@@ -140,9 +154,6 @@ const ToolsLabvalref = () => {
       .then((response) => {
         console.log(response.data);
         setData(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
       });
   }
 
@@ -173,7 +184,11 @@ const ToolsLabvalref = () => {
                             .toLowerCase()
                             .includes(input.toLowerCase())
                         }
-                        options={dropdowndata}
+                        value={lab_group}
+                        options={[
+                          { label: "All", value: "All" },
+                          ...dropdowndata,
+                        ]}
                       />
                     </Form.Item>
                   </Col>
@@ -197,11 +212,50 @@ const ToolsLabvalref = () => {
               <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล" size="large">
                 <Table
                   dataSource={data}
-                  rowKey={"lab_order_number"}
+                  rowKey={"lab_items_code"}
                   columns={columns}
                   size="small"
+                  onRow={(record, rowIndex) => {
+                    return {
+                      onClick: (event) => {
+                        showModal(record);
+                        // loadDetail(record);
+                        // clickSelectRow(record.order_number);
+                      }, // click row
+                    };
+                  }}
                 />
               </Spin>
+            </Col>
+            <Col span={24}>
+              <Card className="backgroundGreen" style={{ marginTop: "10px" }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ display: "inline-flex" }}>
+                    <div style={{ padding: 5 }}>
+                      <Button
+                        style={{
+                          padding: 10,
+                          cursor: "pointer",
+                          height: "auto",
+                          minWidth: 100,
+                        }}
+                        onClick={() => {
+                          showModal(null);
+                        }}
+                      >
+                        <div>
+                          <PlusCircleOutlined
+                            style={{
+                              fontSize: 40,
+                            }}
+                          />
+                        </div>
+                        <div>Add Item</div>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </Col>
           </Row>
         </Content>

@@ -1,5 +1,11 @@
-import dbconnect from "./dbconnect";
-const connection = dbconnect();
+const mysql = require('mysql2');
+
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    pass: process.env.DB_PASS,
+    database: process.env.DB_DATABASE
+});
 
 connection.connect(function(err) {
   if (err) {
@@ -16,7 +22,7 @@ export default function handler(req, res) {
   
   let cond = ``;  
   if(date_start != undefined && date_stop != undefined){cond = cond + `date BETWEEN '${date_start}' AND '${date_stop}'`}
-  if(lab_order_number !== undefined && lab_order_number !== ''){ cond = cond + ` AND hn = '${lab_order_number}'`;}
+  if(lab_order_number !== undefined && lab_order_number !== ''){ cond = cond + ` AND lab_order_number = '${lab_order_number}'`;}
 
   let query = `SELECT * FROM lis_order_reject WHERE ${cond}`;
   console.log('QUERY = ',query)

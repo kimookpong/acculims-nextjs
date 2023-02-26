@@ -1,8 +1,10 @@
-import { React, useEffect, useState } from "react";
+import { React, useEffect, useState, useRef } from "react";
 import { Input, Button, Form, Col, Row, Select, Checkbox } from "antd";
 const { TextArea } = Input;
 
 const LabOrderActionComponent = (props) => {
+  const inputRef = useRef(null);
+
   const { getFormData, orderNumber, action } = props;
   const [formCode, setFormCode] = useState("");
   const [formComment, setFormComment] = useState("");
@@ -27,6 +29,11 @@ const LabOrderActionComponent = (props) => {
   const actionFormReturn = () => {
     return getFormData(formCode, formComment, formPartial, formLab, formPrint);
   };
+  useEffect(() => {
+    inputRef.current.focus({
+      cursor: "start",
+    });
+  }, []);
 
   useEffect(() => {
     actionFormReturn();
@@ -48,7 +55,7 @@ const LabOrderActionComponent = (props) => {
         ]}
         style={{ marginBottom: "5px" }}
       >
-        <Input onChange={inputFormCode} autoFocus={true} />
+        <Input onChange={inputFormCode} autoFocus={true} ref={inputRef} />
       </Form.Item>
       <Form.Item label="Comment" style={{ marginBottom: "5px" }}>
         <TextArea

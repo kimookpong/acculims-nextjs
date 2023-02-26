@@ -10,14 +10,15 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
-  const user_id = req.body.user_id;
-
-  const query = `DELETE FROM lis_user WHERE id_user = '${user_id}'`;
-  connection.query(query, function (err, result) {
+  const query = `SELECT 
+  specimen_code AS value, 
+  specimen_name AS label 
+  FROM lab_specimen_items`;
+  connection.query(query, function (err, rows, fields) {
     if (err) {
       console.error(err);
       return;
     }
-    console.log(result);
+    res.status(200).json(rows);
   });
 }
