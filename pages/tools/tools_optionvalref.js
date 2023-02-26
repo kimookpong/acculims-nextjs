@@ -18,7 +18,7 @@ function ToolsOptionvalref(){
     const [val_3text, setval3t] = useState('');
 
     async function sendValue(value) {
-        axios.post('/api/add_lab_ref_plt', {val_2:val_2})
+        axios.post('/api/add_lab_ref_plt', {val_1:val_1, val_3:val_3})
             .then(response => {
             console.log(response.data);
             setData(response.data);
