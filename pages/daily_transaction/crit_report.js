@@ -259,33 +259,37 @@ const CritReport = () => {
         wrapperCol={{ span: 18 }}
         autoComplete="off"
       >
-      <Form.Item label="From:">
-        <DatePicker onChange={onChangedDateStart} />
-        <a> To </a>
-        <DatePicker onChange={onChangedDateStop} />
-      </Form.Item>
-      <Form.Item label="HN:">
-        <Input onChange={(e) => sethn(e.target.value)} value={hn} />
-      </Form.Item>
-      <Form.Item label="ชื่อ-สกุล:">
-        <Input onChange={(e) => setpname(e.target.value)} value={patient_name} />
-      </Form.Item>
-      <Form.Item label="ชื่อผู้โทร:">
-        <Input onChange={(e) => setcall(e.target.value)} value={call_name} />
-      </Form.Item>
-      <Form.Item label="ชื่อผู้รับสาย:">
-        <Input onChange={(e) => settake(e.target.value)} value={take_name} />
-      </Form.Item>
-      <Button type="primary" shape="round" onClick={sendValue}>
-        Reload
-      </Button>
-      <a> </a>
-      <ReactToPrint
-        trigger={() => {
-          return <Button shape="round">Print</Button>;
-        }}
-        content={() => componentRef.current}
-      />
+    
+      <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
+        <Form.Item label="From:">
+          <DatePicker onChange={onChangedDateStart} />
+          <a> To </a>
+          <DatePicker onChange={onChangedDateStop} />
+        </Form.Item>
+        <Form.Item label="HN:">
+          <Input onChange={(e) => sethn(e.target.value)} value={hn} />
+        </Form.Item>
+        <Form.Item label="ชื่อ-สกุล:">
+          <Input onChange={(e) => setpname(e.target.value)} value={patient_name} />
+        </Form.Item>
+        <Form.Item label="ชื่อผู้โทร:">
+          <Input onChange={(e) => setcall(e.target.value)} value={call_name} />
+        </Form.Item>
+        <Form.Item label="ชื่อผู้รับสาย:">
+          <Input onChange={(e) => settake(e.target.value)} value={take_name} />
+        </Form.Item>
+        <Button type="primary" shape="round" onClick={sendValue}>
+          Reload
+        </Button>
+        <a> </a>
+        <ReactToPrint
+          trigger={() => {
+            return <Button shape="round">Print</Button>;
+          }}
+          content={() => componentRef.current}
+        />
+      </Card>
+
       </Form>
       <div ref={componentRef}>
         <Table

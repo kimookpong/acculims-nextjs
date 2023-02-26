@@ -135,87 +135,127 @@ const onChangedDateStop = (date) => {
 const [date_start, setdatestart] = useState("2022-09-26");
 const [date_stop, setdatestop] = useState("3023-01-01");
 const [data, setData] = useState();
+const [count, setCount] = useState(0);
+let columns = [];
 
-const columns = [
+if(count == 0){
+  columns = [
   {
-    title: "order_date",
+    title: "วันที่ส่งตรวจ",
     dataIndex: "order_date",
     key: "order_date",
   },
   {
-    title: "order_time",
+    title: "เวลาที่ส่งตรวจ",
     dataIndex: "order_time",
     key: "order_time",
   },
   {
-    title: "hn",
+    title: "HN",
     dataIndex: "hn",
     key: "hn",
   },
   {
-    title: "pname",
+    title: "คำนำหน้าชื่อ",
     dataIndex: "pname",
     key: "pname",
   },
   {
-    title: "fname",
+    title: "ชื่อ",
     dataIndex: "fname",
     key: "fname",
   },
   {
-    title: "lname",
+    title: "สกุล",
     dataIndex: "lname",
     key: "lname",
   },
   {
-    title: "birthday",
+    title: "วันเกิด",
     dataIndex: "birthday",
     key: "birthday",
   },
   {
-    title: "department",
+    title: "หน่วย",
     dataIndex: "department",
     key: "department",
   },
   {
-    title: "receive_time",
+    title: "เวลาที่รับ",
     dataIndex: "receive_time",
     key: "receive_time",
   },
   {
-    title: "approved_time",
+    title: "รับรองผล",
     dataIndex: "approved_time",
     key: "approved_time",
   },
   {
-    title: "form_name",
+    title: "Laboratory",
     dataIndex: "form_name",
     key: "form_name",
   },
   {
-    title: "lab_items_name_ref",
+    title: "Testing",
     dataIndex: "lab_items_name_ref",
     key: "lab_items_name_ref",
   },
   {
-    title: "lab_order_result",
+    title: "Value",
     dataIndex: "lab_order_result",
     key: "lab_order_result",
   },
   {
-    title: "reporter_name",
+    title: "ชื่อผู้รายงาน",
     dataIndex: "reporter_name",
     key: "reporter_name",
   },
   {
-    title: "approve_staff",
+    title: "ชื่อผู้ยืนยันผล",
     dataIndex: "approve_staff",
     key: "approve_staff",
-  },
+  }
 ];
+} else if(count == 1){
+  columns = [
+    {
+      title: "Laboratory Name",
+      dataIndex: "form_name",
+      key: "form_name",
+    },
+    {
+      title: "Laboratory Testing",
+      dataIndex: "lab_items_name_ref",
+      key: "lab_items_name_ref",
+    },
+    {
+      title: "Testing Count",
+      dataIndex: "COUNT(t2.lab_items_name_ref)",
+      key: "COUNT(t2.lab_items_name_ref)",
+    },
+  ];
+} else if(count == 2){
+  columns = [
+    {
+      title: "Laboratory Name",
+      dataIndex: "form_name",
+      key: "form_name",
+    },
+    {
+      title: "Laboratory Testing",
+      dataIndex: "lab_items_name_ref",
+      key: "lab_items_name_ref",
+    },
+    {
+      title: "Testing Count",
+      dataIndex: "COUNT(t2.lab_items_name_ref)",
+      key: "COUNT(t2.lab_items_name_ref)",
+    },
+  ];
+}
 
 async function loadWorksheet(value) {
-  console.log(date_start, date_stop);
+  setCount(0);
   setLoadingData(true);
   return axios.post("/api/report_worksheet", { date_start: date_start, date_stop: date_stop})
     .then((response) => {
@@ -223,13 +263,11 @@ async function loadWorksheet(value) {
       setData(response.data);
       setLoadingData(false);
     })
-    .catch((error) => {
-      console.error(error);
-    });
+    .catch((error) => { console.error(error); });
 }
 
-async function loadTurnaroundtime(value) {
-  console.log(date_start, date_stop);
+async function loadWorkload(value) {
+  setCount(1);
   setLoadingData(true);
   return axios.post("/api/report_workload", { date_start: date_start, date_stop: date_stop, })
     .then((response) => {
@@ -237,23 +275,19 @@ async function loadTurnaroundtime(value) {
       setData(response.data);
       setLoadingData(false);
     })
-    .catch((error) => {
-      console.error(error);
-    });
+    .catch((error) => { console.error(error); });
 }
 
-async function loadWorkload(value) {
-  console.log(date_start, date_stop);
+async function loadTurnaroundtime(value) {
+  setCount(2);
   setLoadingData(true);
-  return axios.post("/api/get_report_log", { date_start: date_start, date_stop: date_stop, })
+  return axios.post("/api/report_worktat", { date_start: date_start, date_stop: date_stop, })
     .then((response) => {
       console.log(response.data);
       setData(response.data);
       setLoadingData(false);
     })
-    .catch((error) => {
-      console.error(error);
-    });
+    .catch((error) => { console.error(error); });
 }
 
 return (
@@ -301,9 +335,9 @@ return (
                       <Col xs={24} lg={4}>
                         <Button shape="round" type="primary" onClick={loadWorksheet}>Display Work Sheet Report</Button>
                         <a> </a>
-                        <Button shape="round" onClick={loadTurnaroundtime}>Display Workload Report</Button>
+                        <Button shape="round" onClick={loadWorkload}>Display Workload Report</Button>
                         <a> </a>
-                        <Button shape="round" onClick={loadWorkload}>Display Turn around time Report</Button>
+                        <Button shape="round" onClick={loadTurnaroundtime}>Display Turn around time Report</Button>
                       </Col>
                     </Row>
                   </Card>
