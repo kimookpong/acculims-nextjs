@@ -82,6 +82,11 @@ const MenuItem = () => {
       <DesktopOutlined />
     ),
     getItem(
+      <Link href="/tools/tools_static_report">Static Report</Link>,
+      "tools_logvalref",
+      <DesktopOutlined />
+    ),
+    getItem(
       <Link href="/about/about">เกี่ยวกับ AccuLIMS</Link>,
       "about",
       <NotificationOutlined />
