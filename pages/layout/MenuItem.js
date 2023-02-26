@@ -82,8 +82,8 @@ const MenuItem = () => {
       <DesktopOutlined />
     ),
     getItem(
-      <Link href="/tools/tools_static_report">Static Report</Link>,
-      "tools_static_report",
+      <Link href="/tools/tools_statistic_report">Statistic Report</Link>,
+      "tools_statistic_report",
       <DesktopOutlined />
     ),
     getItem(
