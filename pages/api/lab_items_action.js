@@ -135,7 +135,93 @@ export default function handler(req, res) {
 
     query = query + ` WHERE lab_items_code = ${lab_items_code};`;
   } else {
-    query = `SELECT * FROM lis_user;`;
+    query = `INSERT INTO lab_items (
+      lab_items_group,
+      lab_items_name,
+      display_order,
+      lab_items_unit,
+      lab_items_normal_value,
+      lab_items_default_value,
+      service_price,
+      specimen_code,
+      normal_value_min_male,
+      normal_value_max_male,
+      normal_value_min_female,
+      normal_value_max_female,
+      critical_range_min_male,
+      critical_range_max_male,
+      critical_range_min_female,
+      critical_range_max_female,
+      critical_value,
+      possible_value,
+      delta_percent_ref,
+      digit_num,
+      wait_hour,
+      show_in_barcode
+      ) VALUES (
+        ${values.lab_items_group},
+        '${values.lab_items_name}',
+        ${values.display_order !== null ? values.display_order : 1},
+        '${values.lab_items_unit !== null ? values.lab_items_unit : ""}',
+        '${
+          values.lab_items_normal_value !== null
+            ? values.lab_items_normal_value
+            : ""
+        }',
+        '${
+          values.lab_items_default_value !== null
+            ? values.lab_items_default_value
+            : ""
+        }',
+        '${values.service_price !== null ? values.service_price : ""}',
+        ${values.specimen_code !== null ? values.specimen_code : null},
+        '${
+          values.normal_value_min_male !== null
+            ? values.normal_value_min_male
+            : ""
+        }',
+        '${
+          values.normal_value_max_male !== null
+            ? values.normal_value_max_male
+            : ""
+        }',
+        '${
+          values.normal_value_min_female !== null
+            ? values.normal_value_min_female
+            : ""
+        }',
+        '${
+          values.normal_value_max_female !== null
+            ? values.normal_value_max_female
+            : ""
+        }',
+        ${
+          values.critical_range_min_male !== null
+            ? values.critical_range_min_male
+            : null
+        },
+        ${
+          values.critical_range_max_male !== null
+            ? values.critical_range_max_male
+            : null
+        },
+        ${
+          values.critical_range_min_female !== null
+            ? values.critical_range_min_female
+            : null
+        },
+        ${
+          values.critical_range_max_female !== null
+            ? values.critical_range_max_female
+            : null
+        },
+        '${values.critical_value !== null ? values.critical_value : ""}',
+        '${values.possible_value !== null ? values.possible_value : ""}',
+        ${values.delta_percent_ref !== null ? values.delta_percent_ref : null},
+        '${values.digit_num !== null ? values.digit_num : ""}',
+        ${values.wait_hour !== null ? values.wait_hour : 0},
+        ${values.show_in_barcode === true ? 1 : 0}
+      )`;
   }
 
   connection.query(query, function (err, rows, fields) {

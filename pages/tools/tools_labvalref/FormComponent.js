@@ -13,7 +13,7 @@ import { React, useEffect, useState, useRef } from "react";
 import axios from "axios";
 const { TextArea } = Input;
 const FormComponent = (props) => {
-  const { dataForm, dropdowndata, labSpecimen } = props;
+  const { dataForm, dropdowndata, labSpecimen, reloadList } = props;
   const [fields, setFields] = useState([
     {
       name: ["lab_items_group"],
@@ -119,6 +119,8 @@ const FormComponent = (props) => {
         })
         .then((response) => {
           console.log(response.data);
+          reloadList();
+          closeModal();
         });
     } else {
       return axios
@@ -128,6 +130,8 @@ const FormComponent = (props) => {
         })
         .then((response) => {
           console.log(response.data);
+          reloadList();
+          closeModal();
         });
     }
   };

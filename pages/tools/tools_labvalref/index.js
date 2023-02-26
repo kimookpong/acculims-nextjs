@@ -39,6 +39,10 @@ const ToolsLabvalref = () => {
     Modal.destroyAll();
   };
 
+  const reloadList = () => {
+    sendValue();
+  };
+
   const showModal = (data) => {
     Modal.confirm({
       centered: true,
@@ -50,6 +54,7 @@ const ToolsLabvalref = () => {
           dataForm={data}
           dropdowndata={dropdowndata}
           labSpecimen={labSpecimen}
+          reloadList={reloadList}
         />
       ),
       footer: <></>,
@@ -110,7 +115,7 @@ const ToolsLabvalref = () => {
   ];
 
   async function sendLabItemGroup() {
-    return axios.post("/api/get_lab_items_group").then((response) => {
+    return axios.post("/api/get_lab_items_group_code").then((response) => {
       setDropDownData(response.data);
     });
   }
