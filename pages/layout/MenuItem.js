@@ -83,7 +83,7 @@ const MenuItem = () => {
     ),
     getItem(
       <Link href="/tools/tools_static_report">Static Report</Link>,
-      "tools_logvalref",
+      "tools_static_report",
       <DesktopOutlined />
     ),
     getItem(
