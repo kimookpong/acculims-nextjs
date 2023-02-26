@@ -17,26 +17,21 @@ export default function handler(req, res) {
   date_stop = "2023-02-01";
 
   let cond = ``;
-<<<<<<< HEAD
+
   if (date_start != undefined && date_stop != undefined) {
     cond =
       cond +
       `WHERE t1.order_date BETWEEN '${date_start}' AND '${date_stop}' 
-=======
-  if(date_start != undefined && date_stop != undefined){cond = cond + `WHERE t2.laborder_date BETWEEN '${date_start}' AND '${date_stop}'
->>>>>>> 5ead82537f1021fbb75a82d93a13a5c833dcdfbf
+
   AND (t1.form_name = 'HEMATOLOGY'
   OR t1.form_name = 'URINE ANALYSIS'
   OR t1.form_name = 'CHEMISTRY'
   OR t1.form_name = 'BLOOD  BANK'
   OR t1.form_name = 'IMMONOLOGY'
   OR t1.form_name = 'MICROBIOLOGY'
-<<<<<<< HEAD
+
   OR t1.form_name = 'MICROSCOPY')`;
   }
-=======
-  OR t1.form_name = 'MICROSCOPY') GROUP BY t2.lab_items_name_ref`}
->>>>>>> 5ead82537f1021fbb75a82d93a13a5c833dcdfbf
 
   const query = `SELECT t1.form_name, t2.lab_items_name_ref, COUNT(t2.lab_items_name_ref) 
   FROM lab_head AS t1 
