@@ -135,7 +135,9 @@ export default function handler(req, res) {
 
     query = query + ` WHERE lab_items_code = ${lab_items_code};`;
   } else {
-    query = `INSERT INTO lab_items (
+    query = `
+    INSERT INTO lab_items (
+      lab_items_code,
       lab_items_group,
       lab_items_name,
       display_order,
@@ -159,6 +161,7 @@ export default function handler(req, res) {
       wait_hour,
       show_in_barcode
       ) VALUES (
+        (SELECT MAX( lab_items_code) +1 FROM lab_items find_max),
         ${values.lab_items_group},
         '${values.lab_items_name}',
         ${values.display_order !== null ? values.display_order : 1},
@@ -223,7 +226,7 @@ export default function handler(req, res) {
         ${values.show_in_barcode === true ? 1 : 0}
       )`;
   }
-
+  console.log(query);
   connection.query(query, function (err, rows, fields) {
     if (err) {
       console.error("ERROR = ", err);
