@@ -10,6 +10,13 @@ import {
   NotificationOutlined,
   BankOutlined,
   PoweroffOutlined,
+  UserOutlined,
+  SettingOutlined,
+  LineChartOutlined,
+  WarningOutlined,
+  AlertOutlined,
+  SnippetsOutlined,
+  FundOutlined,
 } from "@ant-design/icons";
 import { Menu, Layout } from "antd";
 import Link from "next/link";
@@ -42,12 +49,12 @@ const MenuItem = () => {
     getItem(
       <Link href="/daily_transaction/crit_report">รายงานค่าวิกฤติ</Link>,
       "crit_report",
-      <DesktopOutlined />
+      <WarningOutlined />
     ),
     getItem(
       <Link href="/daily_transaction/lab_reject">ปฎิเสธสิ่งส่งตรวจ</Link>,
       "lab_reject",
-      <DesktopOutlined />
+      <AlertOutlined />
     ),
     getItem(
       <Link href="/tools/tools_hosvalref">จัดการข้อมูลโรงพยาบาล</Link>,
@@ -57,7 +64,7 @@ const MenuItem = () => {
     getItem(
       <Link href="/tools/tools_labvalref">จัดการข้อมูลรายการ LAB</Link>,
       "tools_labvalref",
-      <DesktopOutlined />
+      <SnippetsOutlined />
     ),
     getItem(
       <Link href="/tools/tools_hisvalref">
@@ -69,22 +76,22 @@ const MenuItem = () => {
     getItem(
       <Link href="/tools/tools_uservalref">จัดการข้อมูลผู้ใช้งาน</Link>,
       "tools_uservalref",
-      <DesktopOutlined />
+      <UserOutlined />
     ),
     getItem(
       <Link href="/tools/tools_optionvalref">Option</Link>,
       "tools_optionvalref",
-      <DesktopOutlined />
+      <SettingOutlined />
     ),
     getItem(
       <Link href="/tools/tools_logvalref">Approved Log</Link>,
       "tools_logvalref",
-      <DesktopOutlined />
+      <FundOutlined />
     ),
     getItem(
       <Link href="/tools/tools_statistic_report">Statistic Report</Link>,
       "tools_statistic_report",
-      <DesktopOutlined />
+      <LineChartOutlined />
     ),
     getItem(
       <Link href="/about/about">เกี่ยวกับ AccuLIMS</Link>,
