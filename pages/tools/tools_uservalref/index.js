@@ -206,7 +206,7 @@ function ToolsUservalref() {
                   rowKey={"lab_order_number"}
                   columns={columns}
                   size="small"
-                  scroll={{ x: 1500 }}
+                  // scroll={{ x: 1500 }}
                   onRow={(record, rowIndex) => {
                     return {
                       onClick: (event) => {
