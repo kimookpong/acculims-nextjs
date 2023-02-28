@@ -52,7 +52,7 @@ function ToolsUservalref() {
     Modal.confirm({
       centered: true,
       width: 730,
-      title: "แบบฟอร์มจัดการข้อมูล LAB",
+      title: "แบบฟอร์มจัดการผู้ใช้งาน",
       icon: <FormOutlined />,
       content: <FormComponent dataForm={data} reloadList={reloadList} />,
       footer: <></>,
