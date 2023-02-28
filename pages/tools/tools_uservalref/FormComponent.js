@@ -44,7 +44,17 @@ const FormComponent = (props) => {
       value: !!dataForm ? dataForm.password : null,
     },
   ]);
-
+  const deleteUser = () => {
+    console.log(dataForm.id_user);
+    return axios
+      .post("/api/delete_user", {
+        user_id: dataForm.id_user,
+      })
+      .then((response) => {
+        reloadList();
+        closeModal();
+      });
+  };
   const onFinish = (values) => {
     if (!!dataForm) {
       return axios
@@ -203,6 +213,13 @@ const FormComponent = (props) => {
         <Button key="back" onClick={closeModal}>
           ยกเลิก
         </Button>
+        {!!dataForm ? (
+          <Button danger onClick={deleteUser}>
+            ลบ
+          </Button>
+        ) : (
+          <></>
+        )}
         <Button type="primary" htmlType="submit">
           ยืนยัน
         </Button>
