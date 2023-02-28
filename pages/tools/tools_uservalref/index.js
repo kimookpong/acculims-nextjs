@@ -103,13 +103,13 @@ function ToolsUservalref() {
   }
 
   const columns = [
-    {
-      title: "User ID",
-      dataIndex: "id_user",
-      key: "id_user",
-      ellipsis: true,
-      width: 100,
-    },
+    // {
+    //   title: "User ID",
+    //   dataIndex: "id_user",
+    //   key: "id_user",
+    //   ellipsis: true,
+    //   width: 100,
+    // },
     {
       title: "Username",
       dataIndex: "user_name",
@@ -242,7 +242,7 @@ function ToolsUservalref() {
                             }}
                           />
                         </div>
-                        <div>Add Item</div>
+                        <div>Add User</div>
                       </Button>
                     </div>
                   </div>
