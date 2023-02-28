@@ -142,6 +142,7 @@ const ToolsLabvalref = () => {
   useEffect(() => {
     sendValue();
   }, [lab_group, lab_name]);
+
   async function addValue(value) {
     axios
       .post("/api/add_lab_ref", {

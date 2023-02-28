@@ -10,7 +10,15 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
-  const query = `SELECT * FROM lis_user;`;
+  const findText = req.body.findText;
+
+  let query = `SELECT * FROM lis_user`;
+
+  if (!!findText) {
+    query =
+      query +
+      ` WHERE fname like '%${findText}%' OR lname like '%${findText}%' OR user_name like '%${findText}%' `;
+  }
   console.log(query);
   connection.query(query, function (err, rows, fields) {
     if (err) {
