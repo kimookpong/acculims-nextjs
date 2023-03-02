@@ -3,7 +3,7 @@ import dbconnect from "./dbconnect";
 export default function handler(req, res) {
   let lab_head;
   const id = req.body.id;
-  const query = `SELECT lab_head.department as department, 
+  let query = `SELECT lab_head.department as department, 
   lab_head.lab_order_number as lab_order_number, 
   lab_head.hn, 
   concat(patient.pname,' ',patient.fname,' ',patient.lname) AS name, 
@@ -52,9 +52,11 @@ export default function handler(req, res) {
   LEFT JOIN doctor ON lab_head.doctor_code = doctor.code 
   LEFT JOIN ward ON lab_head.ward = ward.ward 
   WHERE lab_head.lab_order_number = '${id}' 
-  GROUP BY lab_head.lab_order_number`;
+  GROUP BY lab_head.lab_order_number;`;
 
-  let query_item = `SELECT lab_order.lab_order_number,lab_specimen_items.specimen_code,
+  query =
+    query +
+    `SELECT lab_order.lab_order_number,lab_specimen_items.specimen_code,
   lab_specimen_items.specimen_name
   FROM lab_specimen_items 
   LEFT JOIN lab_order ON lab_order.specimen_code = lab_specimen_items.specimen_code 
@@ -62,8 +64,8 @@ export default function handler(req, res) {
   AND lab_order.specimen_code <> '' 
   AND lab_specimen_items.specimen_name <> '';`;
 
-  query_item =
-    query_item +
+  query =
+    query +
     `SELECT lab_order.lab_order_number,lab_items_sub_group.lab_items_sub_group_name as lab_profile
   FROM lab_order 
   LEFT JOIN lab_items_sub_group ON lab_order.lab_items_sub_group_code = lab_items_sub_group.lab_items_sub_group_code 
@@ -72,8 +74,8 @@ export default function handler(req, res) {
   AND lab_order.single_profile = 'p'
   GROUP BY lab_order.lab_items_sub_group_code ;`;
 
-  query_item =
-    query_item +
+  query =
+    query +
     `SELECT lab_order.lab_order_number,lab_items.lab_items_name
   FROM lab_order
   LEFT JOIN lab_items ON lab_order.lab_items_code = lab_items.lab_items_code
@@ -94,10 +96,10 @@ export default function handler(req, res) {
         return;
       }
       res.status(200).json({
-        lab_head: lab_head,
-        lab_order: rows2[0],
-        lab_profile: rows2[1],
-        lab_single: rows2[2],
+        lab_head: rows[0],
+        lab_order: rows[1],
+        lab_profile: rows[2],
+        lab_single: rows[3],
       });
       connection.end((err) => {
         if (err) {
