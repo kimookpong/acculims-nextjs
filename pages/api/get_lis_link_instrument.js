@@ -12,6 +12,7 @@ connection.connect(function (err) {
 export default function handler(req, res) {
   const query = "SELECT * FROM lis_link_instrument";
   connection.query(query, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

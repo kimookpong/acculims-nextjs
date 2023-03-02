@@ -153,6 +153,7 @@ export default function handler(req, res) {
   );
 
   connection.query(query, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

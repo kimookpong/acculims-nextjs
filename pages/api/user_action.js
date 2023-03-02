@@ -35,6 +35,7 @@ export default function handler(req, res) {
     query = `INSERT INTO lis_user (user_name,password,pname,fname,lname,user_type,job_id) VALUES ('${username}','${password}','${pname}','${fname}','${lname}','${user_type}','${jobid}')`;
   }
   connection.query(query, function (err, result) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

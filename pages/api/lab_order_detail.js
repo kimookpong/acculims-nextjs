@@ -96,6 +96,7 @@ export default function handler(req, res) {
     }
     lab_head = rows;
     connection.query(query_item, function (err2, rows2, fields) {
+      connection.end();
       if (err2) {
         console.error(err2);
         return;

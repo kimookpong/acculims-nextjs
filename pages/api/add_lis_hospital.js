@@ -26,6 +26,7 @@ export default function handler(req, res) {
   hospital_department_lab = '${dept}'
   WHERE id_hospital = '1'`;
   connection.query(query, function (err, result) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

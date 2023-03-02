@@ -14,6 +14,7 @@ export default function handler(req, res) {
 
   const query = `DELETE FROM lis_user WHERE id_user = ${user_id}`;
   connection.query(query, function (err, result) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

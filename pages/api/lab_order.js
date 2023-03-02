@@ -84,6 +84,7 @@ export default function handler(req, res) {
   GROUP BY lab_head.lab_order_number`;
 
   connection.query(query, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

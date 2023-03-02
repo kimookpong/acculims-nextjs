@@ -28,6 +28,7 @@ export default function handler(req, res) {
   console.log("query = ", query);
 
   connection.query(query, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

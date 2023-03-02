@@ -22,6 +22,7 @@ export default function handler(req, res) {
   });
 
   connection.query(queryArray, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

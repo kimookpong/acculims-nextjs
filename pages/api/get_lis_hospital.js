@@ -12,6 +12,7 @@ connection.connect(function (err) {
 export default function handler(req, res) {
   const query = `SELECT hospital_name_th, hospital_name_en, address, phone, hospital_department_lab FROM lis_hospital WHERE id_hospital = '1'`;
   connection.query(query, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

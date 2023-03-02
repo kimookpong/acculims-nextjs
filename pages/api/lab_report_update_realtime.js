@@ -20,6 +20,7 @@ export default function handler(req, res) {
   WHERE lab_order_number = '${lab_order_number}' AND lab_items_code = ${lab_items_code};`;
 
   connection.query(queryArray, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

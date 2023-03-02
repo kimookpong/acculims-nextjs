@@ -42,6 +42,7 @@ export default function handler(req, res) {
       '${data.date_save}'
     );`;
   connection.query(query, function (err, result) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

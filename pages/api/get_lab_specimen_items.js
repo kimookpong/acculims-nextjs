@@ -15,6 +15,7 @@ export default function handler(req, res) {
   specimen_name AS label 
   FROM lab_specimen_items`;
   connection.query(query, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

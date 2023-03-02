@@ -22,6 +22,7 @@ export default function handler(req, res) {
   WHERE user_name = '${username}'
   AND password = '${password}'`;
   connection.query(query, function (err, rows, fields) {
+    connection.end();
     if (err) {
       console.error(err);
       return;

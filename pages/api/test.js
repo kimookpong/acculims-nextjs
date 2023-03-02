@@ -10,5 +10,6 @@ connection.connect(function (err) {
 });
 
 export default function handler(req, res) {
+  connection.end();
   res.status(200).json("ok");
 }
