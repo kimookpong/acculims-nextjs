@@ -233,14 +233,6 @@ export default function handler(req, res) {
         return;
       }
       res.status(200).json({ rows: rows, query: query, values: values });
-
-      connection.end((err) => {
-        if (err) {
-          console.error("Error closing database connection:", err);
-        } else {
-          console.log("Connection closed.");
-        }
-      });
     });
   });
 }
