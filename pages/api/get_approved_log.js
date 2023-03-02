@@ -1,32 +1,10 @@
-const mysql = require("mysql2");
-
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  pass: process.env.DB_PASS,
-  database: process.env.DB_DATABASE,
-});
-
-connection.connect(function (err) {
-  if (err) {
-    console.error("Error connecting to database: " + err.stack);
-    return;
-  }
-  console.log("Connected to database as id " + connection.threadId);
-});
+import dbconnect from "./dbconnect";
 
 export default function handler(req, res) {
   let date_start = req.body.date_start;
   let date_stop = req.body.date_stop;
-
-  console.log(date_start);
-  console.log(date_stop);
-
   let date_kstart = date_start.split("-");
   let date_kstop = date_stop.split("-");
-
-  console.log(date_kstart);
-  console.log(date_kstop);
 
   date_start =
     date_kstart[0] +
@@ -48,12 +26,27 @@ export default function handler(req, res) {
   const query = `SELECT * FROM approved_log ${cond}`;
   console.log("query = ", query);
 
-  connection.query(query, function (err, rows, fields) {
-    connection.end();
+  const connection = dbconnect();
+  connection.connect(function (err) {
     if (err) {
-      console.error(err);
+      console.error("Error connecting to database: " + err.stack);
       return;
     }
-    res.status(200).json(rows);
+    console.log("Connected to database as id " + connection.threadId);
+
+    connection.query(query, function (err, rows, fields) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      res.status(200).json(rows);
+      connection.end((err) => {
+        if (err) {
+          console.error("Error closing database connection:", err);
+        } else {
+          console.log("Connection closed.");
+        }
+      });
+    });
   });
 }

@@ -79,7 +79,6 @@ export default function handler(req, res) {
     });
 
     connection.query(queryResult, function (err2, rows2, fields) {
-      connection.end();
       if (err2) {
         console.error(err2);
         return;

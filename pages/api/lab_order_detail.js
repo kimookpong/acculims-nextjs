@@ -1,13 +1,4 @@
 import dbconnect from "./dbconnect";
-const connection = dbconnect();
-
-connection.connect(function (err) {
-  if (err) {
-    console.error("Error connecting to database: " + err.stack);
-    return;
-  }
-  console.log("Connected to database as id " + connection.threadId);
-});
 
 export default function handler(req, res) {
   let lab_head;
@@ -89,16 +80,17 @@ export default function handler(req, res) {
   WHERE lab_order.lab_order_number = '${id}'
   AND lab_order.single_profile = 's';`;
 
-  connection.query(query, function (err, rows, fields) {
+  const connection = dbconnect();
+  connection.connect(function (err) {
     if (err) {
-      console.error(err);
+      console.error("Error connecting to database: " + err.stack);
       return;
     }
-    lab_head = rows;
-    connection.query(query_item, function (err2, rows2, fields) {
-      connection.end();
-      if (err2) {
-        console.error(err2);
+    console.log("Connected to database as id " + connection.threadId);
+
+    connection.query(query, function (err, rows, fields) {
+      if (err) {
+        console.error(err);
         return;
       }
       res.status(200).json({
@@ -106,6 +98,13 @@ export default function handler(req, res) {
         lab_order: rows2[0],
         lab_profile: rows2[1],
         lab_single: rows2[2],
+      });
+      connection.end((err) => {
+        if (err) {
+          console.error("Error closing database connection:", err);
+        } else {
+          console.log("Connection closed.");
+        }
       });
     });
   });

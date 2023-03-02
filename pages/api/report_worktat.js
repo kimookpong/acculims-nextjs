@@ -1,19 +1,4 @@
-const mysql = require("mysql2");
-
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  pass: process.env.DB_PASS,
-  database: process.env.DB_DATABASE,
-});
-
-connection.connect(function (err) {
-  if (err) {
-    console.error("Error connecting to database: " + err.stack);
-    return;
-  }
-  console.log("Connected to database as id " + connection.threadId);
-});
+import dbconnect from "./dbconnect";
 
 export default function handler(req, res) {
   let date_start = req.body.date_start;
@@ -41,12 +26,27 @@ export default function handler(req, res) {
   INNER JOIN lab_order AS t2 ON t1.lab_order_number = t2.lab_order_number
   ${cond} ORDER by t1.form_name`;
 
-  connection.query(query, function (err, rows, fields) {
-    connection.end();
+  const connection = dbconnect();
+  connection.connect(function (err) {
     if (err) {
-      console.error(err);
+      console.error("Error connecting to database: " + err.stack);
       return;
     }
-    res.status(200).json(rows);
+    console.log("Connected to database as id " + connection.threadId);
+
+    connection.query(query, function (err, rows, fields) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      res.status(200).json(rows);
+      connection.end((err) => {
+        if (err) {
+          console.error("Error closing database connection:", err);
+        } else {
+          console.log("Connection closed.");
+        }
+      });
+    });
   });
 }
