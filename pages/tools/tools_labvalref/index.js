@@ -219,6 +219,7 @@ const ToolsLabvalref = () => {
                   rowKey={"lab_items_code"}
                   columns={columns}
                   size="small"
+                  bordered
                   onRow={(record, rowIndex) => {
                     return {
                       onClick: (event) => {

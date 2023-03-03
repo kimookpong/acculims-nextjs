@@ -108,6 +108,22 @@ export default function handler(req, res) {
     AND lab_order.lab_items_code = '600'
     GROUP BY lab_head.lab_order_number;`;
   }
+  query =
+    query +
+    `SELECT 
+  lab_order_number as id,
+  lab_items_name_ref as value
+  FROM lab_order 
+  WHERE lab_order_number in (${id})
+  ${seperate ? "AND lab_items_code <> '600'" : ""} ;
+
+  SELECT 
+  lab_order_number as id,
+  lab_items_name_ref as value
+  FROM lab_order 
+  WHERE lab_order_number in (${id})
+  AND lab_items_code = '600';
+  `;
 
   connection.query(
     `SELECT 

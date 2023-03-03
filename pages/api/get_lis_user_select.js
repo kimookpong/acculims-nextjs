@@ -1,23 +1,10 @@
 import dbconnect from "./dbconnect";
 
 export default function handler(req, res) {
-  const date_start = req.body.date_start;
-  const date_stop = req.body.date_stop;
-  const lab_order_number = req.body.lab_order_number;
-
-  let cond = ``;
-  if (date_start != undefined && date_stop != undefined) {
-    cond = cond + `WHERE date >= '${date_start}' AND date <= '${date_stop}'`;
-  }
-  if (lab_order_number !== undefined && lab_order_number !== "") {
-    cond = cond + ` AND lab_order_number like '%${lab_order_number}%' `;
-  }
-
   let query = `SELECT 
-  *
-  FROM lis_order_reject ${cond} ORDER BY date DESC`;
-
-  console.log(query);
+  CONCAT(pname,fname,' ',lname) as label,
+  CONCAT(pname,fname,' ',lname)  as value 
+  FROM lis_user`;
 
   const connection = dbconnect();
   connection.connect(function (err) {

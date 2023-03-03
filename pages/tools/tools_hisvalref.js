@@ -112,9 +112,11 @@ const ToolsHisvalref = () => {
             <Col span={24}>
               <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล" size="large">
                 <Table
+                  bordered
                   dataSource={data}
                   rowKey={"id_link_instrument"}
                   columns={columns}
+                  size="small"
                 />
               </Spin>
             </Col>

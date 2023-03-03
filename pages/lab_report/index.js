@@ -1001,6 +1001,7 @@ function LabReport() {
                       }
                       return false;
                     })}
+                    bordered
                     rowKey={"order_number"}
                     size="small"
                     scroll={{

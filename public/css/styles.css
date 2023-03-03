@@ -95,3 +95,16 @@ th.ant-table-cell {
 :where(.css-dev-only-do-not-override-1n7nwfa).ant-radio-wrapper {
     margin-inline-end: 0px;
 }
+
+
+.rmdp-container {
+    width: 100%;
+  }
+
+
+ table.table-general,
+.table-general th,
+.table-general td {
+    border: 1px solid #f0f0f0;
+    border-collapse: collapse;
+  }

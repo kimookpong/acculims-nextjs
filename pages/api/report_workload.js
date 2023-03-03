@@ -4,30 +4,28 @@ export default function handler(req, res) {
   let date_start = req.body.date_start;
   let date_stop = req.body.date_stop;
 
-  date_start = "2022-09-01";
-  date_stop = "2023-02-01";
-
   let cond = ``;
-
   if (date_start != undefined && date_stop != undefined) {
     cond =
-      cond +
-      `WHERE t1.order_date BETWEEN '${date_start}' AND '${date_stop}' 
-
-  AND (t1.form_name = 'HEMATOLOGY'
-  OR t1.form_name = 'URINE ANALYSIS'
-  OR t1.form_name = 'CHEMISTRY'
-  OR t1.form_name = 'BLOOD  BANK'
-  OR t1.form_name = 'IMMONOLOGY'
-  OR t1.form_name = 'MICROBIOLOGY'
-
-  OR t1.form_name = 'MICROSCOPY')`;
+      cond + `WHERE t1.order_date BETWEEN '${date_start}' AND '${date_stop}'  `;
   }
 
-  const query = `SELECT t1.form_name, t2.lab_items_name_ref, COUNT(t2.lab_items_name_ref) 
-  FROM lab_head AS t1 
-  INNER JOIN lab_order AS t2 ON t1.lab_order_number = t2.lab_order_number
-  ${cond} ORDER by t1.form_name`;
+  const query = `SELECT 
+  t1.form_name, 
+  count(t1.form_name) as total,
+  AVG(TIMESTAMPDIFF(SECOND, CONCAT(t1.receive_date,' ',t1.receive_time), CONCAT(t1.approved_date,' ',t1.approved_time))) as datediff
+  
+  FROM lab_head AS t1
+  ${cond} AND t1.report_status = 'Approved'
+  GROUP BY t1.form_name
+  ORDER BY total DESC
+`;
+
+  console.log(query);
+
+  // t2.lab_items_name_ref,
+  // COUNT(t2.lab_items_name_ref),
+  //GROUP BY t2.lab_items_name_ref
 
   const connection = dbconnect();
   connection.connect(function (err) {

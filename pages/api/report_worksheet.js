@@ -4,9 +4,6 @@ export default function handler(req, res) {
   let date_start = req.body.date_start;
   let date_stop = req.body.date_stop;
 
-  date_start = "2022-09-01";
-  date_stop = "2023-02-01";
-
   let cond = ``;
   if (date_start != undefined && date_stop != undefined) {
     cond =
@@ -29,6 +26,8 @@ export default function handler(req, res) {
   INNER JOIN lab_order AS t2 ON t1.lab_order_number = t2.lab_order_number
   INNER JOIN patient AS t3 ON t1.hn = t3.hn 
   ${cond} ORDER by t1.form_name`;
+
+  console.log(query);
 
   const connection = dbconnect();
   connection.connect(function (err) {

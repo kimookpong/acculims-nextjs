@@ -18,6 +18,7 @@ import {
   Col,
   Card,
   Form,
+  Radio,
 } from "antd";
 
 // THAI DATEPICKER
@@ -122,255 +123,348 @@ import ExportExcel from "../layout/ExportExcel";
 import dayjs from "dayjs";
 const { Content } = Layout;
 const dateFormat = "YYYY-MM-DD";
+const currDate = dayjs();
+const beforeDate = currDate.subtract(3, "month");
 
 const ToolsStatreport = () => {
-const [loadingData, setLoadingData] = useState(false);
-const customizeRenderEmpty = () => <Empty description={false}/>;
-const onChangedDateStart = (date) => {
-  if (!!date) { setdatestart(dayjs(date).format(dateFormat)); }
-};
-const onChangedDateStop = (date) => {
-  if (!!date) { setdatestop(dayjs(date).format(dateFormat)); }
-};
-const [date_start, setdatestart] = useState("2022-09-26");
-const [date_stop, setdatestop] = useState("3023-01-01");
-const [data, setData] = useState();
-const [count, setCount] = useState(0);
-let columns = [];
+  const [loadingData, setLoadingData] = useState(false);
+  const customizeRenderEmpty = () => <Empty description={false} />;
+  const onChangedDateStart = (date) => {
+    if (!!date) {
+      setdatestart(dayjs(date).format(dateFormat));
+    }
+  };
+  const onChangedDateStop = (date) => {
+    if (!!date) {
+      setdatestop(dayjs(date).format(dateFormat));
+    }
+  };
+  const [type, setType] = useState(1);
+  const [date_start, setdatestart] = useState(beforeDate.format(dateFormat));
+  const [date_stop, setdatestop] = useState(currDate.format(dateFormat));
+  const [data, setData] = useState();
+  const [count, setCount] = useState(0);
+  let columns = [];
 
-if(count == 0){
-  columns = [
-  {
-    title: "วันที่ส่งตรวจ",
-    dataIndex: "order_date",
-    key: "order_date",
-  },
-  {
-    title: "เวลาที่ส่งตรวจ",
-    dataIndex: "order_time",
-    key: "order_time",
-  },
-  {
-    title: "HN",
-    dataIndex: "hn",
-    key: "hn",
-  },
-  {
-    title: "คำนำหน้าชื่อ",
-    dataIndex: "pname",
-    key: "pname",
-  },
-  {
-    title: "ชื่อ",
-    dataIndex: "fname",
-    key: "fname",
-  },
-  {
-    title: "สกุล",
-    dataIndex: "lname",
-    key: "lname",
-  },
-  {
-    title: "วันเกิด",
-    dataIndex: "birthday",
-    key: "birthday",
-  },
-  {
-    title: "หน่วย",
-    dataIndex: "department",
-    key: "department",
-  },
-  {
-    title: "เวลาที่รับ",
-    dataIndex: "receive_time",
-    key: "receive_time",
-  },
-  {
-    title: "รับรองผล",
-    dataIndex: "approved_time",
-    key: "approved_time",
-  },
-  {
-    title: "Laboratory",
-    dataIndex: "form_name",
-    key: "form_name",
-  },
-  {
-    title: "Testing",
-    dataIndex: "lab_items_name_ref",
-    key: "lab_items_name_ref",
-  },
-  {
-    title: "Value",
-    dataIndex: "lab_order_result",
-    key: "lab_order_result",
-  },
-  {
-    title: "ชื่อผู้รายงาน",
-    dataIndex: "reporter_name",
-    key: "reporter_name",
-  },
-  {
-    title: "ชื่อผู้ยืนยันผล",
-    dataIndex: "approve_staff",
-    key: "approve_staff",
+  if (count == 0) {
+    columns = [
+      {
+        title: "วันที่ส่งตรวจ",
+        dataIndex: "order_date",
+        key: "order_date",
+      },
+      {
+        title: "เวลาที่ส่งตรวจ",
+        dataIndex: "order_time",
+        key: "order_time",
+      },
+      {
+        title: "HN",
+        dataIndex: "hn",
+        key: "hn",
+      },
+      {
+        title: "คำนำหน้าชื่อ",
+        dataIndex: "pname",
+        key: "pname",
+      },
+      {
+        title: "ชื่อ",
+        dataIndex: "fname",
+        key: "fname",
+      },
+      {
+        title: "สกุล",
+        dataIndex: "lname",
+        key: "lname",
+      },
+      {
+        title: "วันเกิด",
+        dataIndex: "birthday",
+        key: "birthday",
+      },
+      {
+        title: "หน่วย",
+        dataIndex: "department",
+        key: "department",
+      },
+      {
+        title: "เวลาที่รับ",
+        dataIndex: "receive_time",
+        key: "receive_time",
+      },
+      {
+        title: "รับรองผล",
+        dataIndex: "approved_time",
+        key: "approved_time",
+      },
+      {
+        title: "Laboratory",
+        dataIndex: "form_name",
+        key: "form_name",
+      },
+      {
+        title: "Testing",
+        dataIndex: "lab_items_name_ref",
+        key: "lab_items_name_ref",
+      },
+      {
+        title: "Value",
+        dataIndex: "lab_order_result",
+        key: "lab_order_result",
+      },
+      {
+        title: "ชื่อผู้รายงาน",
+        dataIndex: "reporter_name",
+        key: "reporter_name",
+      },
+      {
+        title: "ชื่อผู้ยืนยันผล",
+        dataIndex: "approve_staff",
+        key: "approve_staff",
+      },
+    ];
+  } else if (count == 1) {
+    columns = [
+      {
+        title: "Lab Form",
+        dataIndex: "form_name",
+        key: "form_name",
+      },
+      {
+        title: "Turn around time (Average)",
+        dataIndex: "datediff",
+        key: "datediff",
+        render: (text) => datediffFormat(text),
+      },
+      {
+        title: "จำนวนใบรับแลป",
+        dataIndex: "total",
+        key: "total",
+      },
+    ];
+  } else if (count == 2) {
+    columns = [
+      {
+        title: "Lab Form",
+        dataIndex: "form_name",
+        key: "form_name",
+      },
+      {
+        title: "Turn around time (Average)",
+        dataIndex: "datediff",
+        key: "datediff",
+        render: (text) => datediffFormat(text),
+      },
+      {
+        title: "จำนวนใบรับแลป",
+        dataIndex: "total",
+        key: "total",
+      },
+    ];
   }
-];
-} else if(count == 1){
-  columns = [
-    {
-      title: "Laboratory Name",
-      dataIndex: "form_name",
-      key: "form_name",
-    },
-    {
-      title: "Laboratory Testing",
-      dataIndex: "lab_items_name_ref",
-      key: "lab_items_name_ref",
-    },
-    {
-      title: "Testing Count",
-      dataIndex: "COUNT(t2.lab_items_name_ref)",
-      key: "COUNT(t2.lab_items_name_ref)",
-    },
-  ];
-} else if(count == 2){
-  columns = [
-    {
-      title: "Laboratory Name",
-      dataIndex: "form_name",
-      key: "form_name",
-    },
-    {
-      title: "Laboratory Testing",
-      dataIndex: "lab_items_name_ref",
-      key: "lab_items_name_ref",
-    },
-    {
-      title: "Testing Count",
-      dataIndex: "COUNT(t2.lab_items_name_ref)",
-      key: "COUNT(t2.lab_items_name_ref)",
-    },
-  ];
-}
 
-async function loadWorksheet(value) {
-  setCount(0);
-  setLoadingData(true);
-  return axios.post("/api/report_worksheet", { date_start: date_start, date_stop: date_stop})
-    .then((response) => {
-      console.log(response.data);
-      setData(response.data);
-      setLoadingData(false);
-    })
-    .catch((error) => { console.error(error); });
-}
+  const datediffFormat = (raw) => {
+    const seconds = Math.floor(raw);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
 
-async function loadWorkload(value) {
-  setCount(1);
-  setLoadingData(true);
-  return axios.post("/api/report_workload", { date_start: date_start, date_stop: date_stop, })
-    .then((response) => {
-      console.log(response.data);
-      setData(response.data);
-      setLoadingData(false);
-    })
-    .catch((error) => { console.error(error); });
-}
+    let display = "";
+    if (days) {
+      display =
+        days +
+        "." +
+        (hours % 24).toString().padStart(2, "0") +
+        ":" +
+        (minutes % 60).toString().padStart(2, "0") +
+        ":" +
+        (seconds % 60).toString().padStart(2, "0");
+    } else {
+      display =
+        (hours % 24).toString().padStart(2, "0") +
+        ":" +
+        (minutes % 60).toString().padStart(2, "0") +
+        ":" +
+        (seconds % 60).toString().padStart(2, "0");
+    }
 
-async function loadTurnaroundtime(value) {
-  setCount(2);
-  setLoadingData(true);
-  return axios.post("/api/report_worktat", { date_start: date_start, date_stop: date_stop, })
-    .then((response) => {
-      console.log(response.data);
-      setData(response.data);
-      setLoadingData(false);
-    })
-    .catch((error) => { console.error(error); });
-}
+    return display;
+  };
+  useEffect(() => {
+    loadData();
+  }, [date_start, date_stop, type]);
 
-return (
-  <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
-    <Layout style={{ background: "white" }}>
-      <Content>
-        <Row>
-          <Col xs={24} lg={24}>
-            <Content style={{ marginRight: "10px" }}>
-              <Row>
-                <Col xs={24} lg={3} className="iconMenu">
-                  <h1 style={{ margin: "auto 0" }}>Statistic Report</h1>
-                </Col>
-                <Col xs={24} lg={21}>
-                  <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
-                    <Row gutter={24}>
-                      <Col xs={12} lg={10}>
-                        <Form.Item
-                          label="เริ่มต้น :"
-                          style={{ marginBottom: 5, marginTop: 5 }}
-                        >
-                          <DatePicker
-                            calendar={thai}
-                            locale={thai_th}
-                            format="DD-MM-YYYY"
-                            onChange={onChangedDateStart}
-                            inputClass="datepicker-input"
+  async function loadData() {
+    if (type === 1) {
+      loadWorksheet();
+    }
+    if (type === 2) {
+      loadWorkload();
+    }
+    if (type === 3) {
+      loadTurnaroundtime();
+    }
+  }
+
+  async function loadWorksheet(value) {
+    setCount(0);
+    setLoadingData(true);
+    return axios
+      .post("/api/report_worksheet", {
+        date_start: date_start,
+        date_stop: date_stop,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setData(response.data);
+        setLoadingData(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  async function loadWorkload(value) {
+    setCount(1);
+    setLoadingData(true);
+    return axios
+      .post("/api/report_workload", {
+        date_start: date_start,
+        date_stop: date_stop,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setData(response.data);
+        setLoadingData(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  async function loadTurnaroundtime(value) {
+    setCount(2);
+    setLoadingData(true);
+    return axios
+      .post("/api/report_worktat", {
+        date_start: date_start,
+        date_stop: date_stop,
+      })
+      .then((response) => {
+        console.log(response.data);
+        setData(response.data);
+        setLoadingData(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  return (
+    <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
+      <Layout style={{ background: "white" }}>
+        <Content>
+          <Row>
+            <Col xs={24} lg={24}>
+              <Content style={{ marginRight: "10px" }}>
+                <Row>
+                  <Col xs={24} lg={3} className="iconMenu">
+                    <h1 style={{ margin: "auto 0" }}>Statistic Report</h1>
+                  </Col>
+                  <Col xs={24} lg={21}>
+                    <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
+                      <Row gutter={24}>
+                        <Col xs={12} lg={12}>
+                          <Form.Item
+                            label="เริ่มต้น :"
+                            style={{ marginBottom: 5, marginTop: 5 }}
+                          >
+                            <DatePicker
+                              calendar={thai}
+                              locale={thai_th}
+                              value={dayjs(date_start, dateFormat)
+                                .add(543, "year")
+                                .format("DD-MM-YYYY")}
+                              format="DD-MM-YYYY"
+                              onChange={onChangedDateStart}
+                              inputClass="datepicker-input"
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={12} lg={12}>
+                          <Form.Item
+                            label="สิ้นสุด :"
+                            style={{ marginBottom: 5, marginTop: 5 }}
+                          >
+                            <DatePicker
+                              calendar={thai}
+                              locale={thai_th}
+                              value={dayjs(date_stop, dateFormat)
+                                .add(543, "year")
+                                .format("DD-MM-YYYY")}
+                              format="DD-MM-YYYY"
+                              onChange={onChangedDateStop}
+                              inputClass="datepicker-input"
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} lg={24}>
+                          <Form.Item
+                            style={{ marginBottom: 5, marginTop: 5 }}
+                            label="เลือกรายงาน :"
+                          >
+                            <Radio.Group
+                              onChange={(e) => setType(e.target.value)}
+                              value={type}
+                            >
+                              <Radio value={1}>Work Sheet Report</Radio>
+                              <Radio value={2}>Workload Report</Radio>
+                              <Radio value={3}>Turn around time Report</Radio>
+                            </Radio.Group>
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </Col>
+                </Row>
+              </Content>
+              <Content style={{ marginRight: "10px", marginTop: "10px" }}>
+                <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล">
+                  <Table
+                    dataSource={data}
+                    rowKey={"lab_order_number"}
+                    columns={columns}
+                    size="small"
+                    bordered
+                  />
+                </Spin>
+              </Content>
+              <Row style={{ marginRight: "10px" }}>
+                <Col span={24}>
+                  <Card
+                    className="backgroundGreen"
+                    style={{ marginTop: "10px" }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ display: "inline-flex" }}>
+                        <div style={{ padding: 5 }}>
+                          <ExportExcel
+                            excelData={data}
+                            fileName={"Export Work Sheet"}
                           />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={12} lg={10}>
-                        <Form.Item
-                          label="สิ้นสุด :"
-                          style={{ marginBottom: 5, marginTop: 5 }}
-                        >
-                          <DatePicker
-                            calendar={thai}
-                            locale={thai_th}
-                            format="DD-MM-YYYY"
-                            onChange={onChangedDateStop}
-                            inputClass="datepicker-input"
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} lg={4}>
-                        <Button shape="round" type="primary" onClick={loadWorksheet}>Display Work Sheet Report</Button>
-                        <a> </a>
-                        <Button shape="round" onClick={loadWorkload}>Display Workload Report</Button>
-                        <a> </a>
-                        <Button shape="round" onClick={loadTurnaroundtime}>Display Turn around time Report</Button>
-                      </Col>
-                    </Row>
+                        </div>
+                      </div>
+                    </div>
                   </Card>
                 </Col>
               </Row>
-            </Content>
-            <Content style={{ marginRight: "10px", marginTop: "10px" }}>
-              <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล">
-                <Table dataSource={data} rowKey={"lab_order_number"} columns={columns} size="small" scroll={{ x: 1500, }}/>
-              </Spin>
-            </Content>
-            <Row style={{ marginRight: "10px" }}>
-              <Col span={24}>
-                <Card
-                  className="backgroundGreen"
-                  style={{ marginTop: "10px" }}
-                >
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ display: "inline-flex" }}>
-                      <div style={{ padding: 5 }}>
-                        <a>Export to:</a>
-                        <ExportExcel excelData={data} fileName={"Export Work Sheet"}/>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Content>
-    </Layout>
-  </ConfigProvider>
-);};
+            </Col>
+          </Row>
+        </Content>
+      </Layout>
+    </ConfigProvider>
+  );
+};
 
 export default ToolsStatreport;

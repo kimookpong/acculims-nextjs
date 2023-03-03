@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import thTH from "antd/locale/th_TH";
 import {
@@ -19,7 +19,9 @@ import {
   Card,
   Form,
   Input,
+  message,
 } from "antd";
+const { Content } = Layout;
 
 // THAI DATEPICKER
 import DatePicker from "react-multi-date-picker";
@@ -121,11 +123,18 @@ const thai_th = {
 import styles from "../../styles/Home.module.css";
 import ReactToPrint from "react-to-print";
 import dayjs from "dayjs";
+import TableGeneral from "../layout/TableGeneral";
+
+const dateFormat = "YYYY-MM-DD";
+const currDate = dayjs();
+const beforeDate = currDate.subtract(3, "month");
 
 const CritReport = () => {
   const componentRef = useRef();
-  const dateFormat = "YYYY-MM-DD";
-  
+  const customizeRenderEmpty = () => <Empty description={false} />;
+  const [messageApi, messageContext] = message.useMessage();
+  const [loadingData, setLoadingData] = useState(false);
+
   const onChangedDateStart = (date) => {
     if (!!date) {
       setdatestart(dayjs(date).format(dateFormat));
@@ -137,8 +146,8 @@ const CritReport = () => {
     }
   };
 
-  const [date_start, setdatestart] = useState("2022-09-01");
-  const [date_stop, setdatestop] = useState("2023-02-01");
+  const [date_start, setdatestart] = useState(beforeDate.format(dateFormat));
+  const [date_stop, setdatestop] = useState(currDate.format(dateFormat));
   const [hn, sethn] = useState();
   const [patient_name, setpname] = useState();
   const [call_name, setcall] = useState();
@@ -147,92 +156,100 @@ const CritReport = () => {
 
   const columns = [
     {
-        title: "วันที่",
-        dataIndex: "date_save",
-        key: "date_save",
-        ellipsis: true,
-        width: 100,
+      title: "วันที่",
+      dataIndex: "date_save",
+      key: "date_save",
+      ellipsis: true,
+      render: (text) => (
+        <>{dayjs(text).add(543, "year").format("DD-MM-YYYY")}</>
+      ),
+      width: 90,
     },
     {
-        title: "เวลา",
-        dataIndex: "time_call",
-        key: "time_call",
-        ellipsis: true,
-        width: 100,
+      title: "เวลา",
+      dataIndex: "time_call",
+      key: "time_call",
+      ellipsis: true,
+      width: 100,
     },
     {
-        title: "ผู้โทร",
-        dataIndex: "call_name",
-        key: "call_name",
-        ellipsis: true,
-        width: 100,
+      title: "ผู้โทร",
+      dataIndex: "call_name",
+      key: "call_name",
+      ellipsis: true,
+      width: 100,
     },
     {
-        title: "หน่วยงาน",
-        dataIndex: "position",
-        key: "position",
-        ellipsis: true,
-        width: 120,
+      title: "หน่วยงาน",
+      dataIndex: "position",
+      key: "position",
+      ellipsis: true,
+      width: 120,
     },
     {
-        title: "HN",
-        dataIndex: "hn",
-        key: "hn",
-        ellipsis: true,
-        width: 100,
+      title: "HN",
+      dataIndex: "hn",
+      key: "hn",
+      ellipsis: true,
+      width: 100,
     },
     {
-        title: "ชื่อ-สกุล",
-        dataIndex: "patient_name",
-        key: "patient_name",
-        ellipsis: true,
-        width: 200,
+      title: "ชื่อ-สกุล",
+      dataIndex: "patient_name",
+      key: "patient_name",
+      ellipsis: true,
+      width: 160,
     },
     {
-        title: "เพิ่ม LAB",
-        dataIndex: "test_name",
-        key: "test_name",
-        ellipsis: true,
-        width: 100,
+      title: "เพิ่ม LAB",
+      dataIndex: "test_name",
+      key: "test_name",
+      ellipsis: true,
+      width: 100,
     },
     {
-        title: "ยกเลิก LAB",
-        dataIndex: "",
-        key: "",
-        ellipsis: true,
-        width: 120,
+      title: "ยกเลิก LAB",
+      dataIndex: "",
+      key: "",
+      ellipsis: true,
+      width: 120,
     },
     {
-        title: "ค่าวิกฤติ",
-        dataIndex: "critical_ref",
-        key: "critical_ref",
-        ellipsis: true,
-        width: 200,
+      title: "ค่าวิกฤติ",
+      dataIndex: "critical_ref",
+      key: "critical_ref",
+      ellipsis: true,
+      width: 200,
     },
     {
-        title: "ผล LAB",
-        dataIndex: "result",
-        key: "result",
-        ellipsis: true,
-        width: 200,
+      title: "ผล LAB",
+      dataIndex: "result",
+      key: "result",
+      ellipsis: true,
+      width: 200,
     },
     {
-        title: "เวลา",
-        dataIndex: "time_take",
-        key: "time_take",
-        ellipsis: true,
-        width: 100,
+      title: "เวลา",
+      dataIndex: "time_take",
+      key: "time_take",
+      ellipsis: true,
+      width: 100,
     },
     {
-        title: "ผู้รับโทรศัพท์",
-        dataIndex: "take_name",
-        key: "take_name",
-        ellipsis: true,
-        width: 200,
+      title: "ผู้รับโทรศัพท์",
+      dataIndex: "take_name",
+      key: "take_name",
+      ellipsis: true,
+      width: 160,
     },
   ];
 
-  async function sendValue(value) {
+  useEffect(() => {
+    sendValue();
+  }, [date_start, date_stop, hn, patient_name, call_name, take_name]);
+
+  async function sendValue() {
+    setLoadingData(true);
     axios
       .post("/api/get_lis_critical", {
         date_start: date_start,
@@ -245,6 +262,7 @@ const CritReport = () => {
       .then((response) => {
         console.log(response.data);
         setData(response.data);
+        setLoadingData(false);
       })
       .catch((error) => {
         console.error(error);
@@ -252,55 +270,164 @@ const CritReport = () => {
   }
 
   return (
-    <div>
-      <Form
-        name="basic"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
-        autoComplete="off"
-      >
-    
-      <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
-        <Form.Item label="From:">
-          <DatePicker onChange={onChangedDateStart} />
-          <a> To </a>
-          <DatePicker onChange={onChangedDateStop} />
-        </Form.Item>
-        <Form.Item label="HN:">
-          <Input onChange={(e) => sethn(e.target.value)} value={hn} />
-        </Form.Item>
-        <Form.Item label="ชื่อ-สกุล:">
-          <Input onChange={(e) => setpname(e.target.value)} value={patient_name} />
-        </Form.Item>
-        <Form.Item label="ชื่อผู้โทร:">
-          <Input onChange={(e) => setcall(e.target.value)} value={call_name} />
-        </Form.Item>
-        <Form.Item label="ชื่อผู้รับสาย:">
-          <Input onChange={(e) => settake(e.target.value)} value={take_name} />
-        </Form.Item>
-        <Button type="primary" shape="round" onClick={sendValue}>
-          Reload
-        </Button>
-        <a> </a>
-        <ReactToPrint
-          trigger={() => {
-            return <Button shape="round">Print</Button>;
-          }}
-          content={() => componentRef.current}
-        />
-      </Card>
-
-      </Form>
-      <div ref={componentRef}>
-        <Table
-          dataSource={data}
-          rowKey={"lab_order_number"}
-          columns={columns}
-          size="small"
-          scroll={{ x: 1500, }}
-        />
-      </div>
-    </div>
+    <ConfigProvider renderEmpty={customizeRenderEmpty}>
+      {messageContext}
+      <Layout style={{ background: "white" }}>
+        <Content>
+          <Row>
+            <Col xs={24} lg={3} className="iconMenu">
+              <h1 style={{ margin: "auto 0" }}>รายงานค่าวิกฤติ</h1>
+            </Col>
+            <Col xs={24} lg={21}>
+              <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
+                <Row gutter={24}>
+                  <Col lg={8}>
+                    <Form.Item
+                      style={{ marginBottom: 5, marginTop: 5 }}
+                      label="เริ่มต้น :"
+                    >
+                      <DatePicker
+                        calendar={thai}
+                        locale={thai_th}
+                        value={dayjs(date_start, dateFormat)
+                          .add(543, "year")
+                          .format("DD-MM-YYYY")}
+                        format="DD-MM-YYYY"
+                        onChange={onChangedDateStart}
+                        inputClass="datepicker-input"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col lg={8}>
+                    <Form.Item
+                      style={{ marginBottom: 5, marginTop: 5 }}
+                      label="ถึง :"
+                    >
+                      <DatePicker
+                        calendar={thai}
+                        locale={thai_th}
+                        value={dayjs(date_stop, dateFormat)
+                          .add(543, "year")
+                          .format("DD-MM-YYYY")}
+                        format="DD-MM-YYYY"
+                        onChange={onChangedDateStop}
+                        inputClass="datepicker-input"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col lg={8}>
+                    <Form.Item
+                      style={{ marginBottom: 5, marginTop: 5 }}
+                      label="HN :"
+                    >
+                      <Input
+                        value={hn}
+                        onChange={(e) => sethn(e.target.value)}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col lg={8}>
+                    <Form.Item
+                      label="ชื่อ-สกุล:"
+                      style={{ marginBottom: 5, marginTop: 5 }}
+                    >
+                      <Input
+                        onChange={(e) => setpname(e.target.value)}
+                        value={patient_name}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col lg={8}>
+                    <Form.Item
+                      label="ชื่อผู้โทร:"
+                      style={{ marginBottom: 5, marginTop: 5 }}
+                    >
+                      <Input
+                        onChange={(e) => setcall(e.target.value)}
+                        value={call_name}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col lg={8}>
+                    <Form.Item
+                      label="ชื่อผู้รับสาย:"
+                      style={{ marginBottom: 5, marginTop: 5 }}
+                    >
+                      <Input
+                        onChange={(e) => settake(e.target.value)}
+                        value={take_name}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+          </Row>
+          <Row style={{ paddingTop: "10px" }}>
+            <Col span={24}>
+              <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล" size="large">
+                <div>
+                  <Table
+                    dataSource={data}
+                    rowKey={"lab_order_number"}
+                    columns={columns}
+                    size="small"
+                    bordered
+                    //scroll={{ x: 1500 }}
+                  />
+                </div>
+              </Spin>
+            </Col>
+            <Col span={24}>
+              <Card className="backgroundGreen" style={{ marginTop: "10px" }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ display: "inline-flex" }}>
+                    <div style={{ padding: 5 }}>
+                      <ReactToPrint
+                        trigger={() => {
+                          return (
+                            <Button
+                              style={{
+                                padding: 10,
+                                cursor: "pointer",
+                                height: "auto",
+                                minWidth: 100,
+                              }}
+                            >
+                              <div>
+                                <PrinterOutlined
+                                  style={{
+                                    fontSize: 40,
+                                  }}
+                                />
+                              </div>
+                              <div>Print</div>
+                            </Button>
+                          );
+                        }}
+                        content={() => componentRef.current}
+                      />
+                      <div style={{ display: "none" }}>
+                        <div ref={componentRef}>
+                          <Table
+                            dataSource={data}
+                            rowKey={"lab_order_number"}
+                            columns={columns}
+                            size="small"
+                            bordered
+                            pagination={false}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </Content>
+      </Layout>
+    </ConfigProvider>
   );
 };
 
