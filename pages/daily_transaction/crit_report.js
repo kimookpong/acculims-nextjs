@@ -123,7 +123,6 @@ const thai_th = {
 import styles from "../../styles/Home.module.css";
 import ReactToPrint from "react-to-print";
 import dayjs from "dayjs";
-import TableGeneral from "../layout/TableGeneral";
 
 const dateFormat = "YYYY-MM-DD";
 const currDate = dayjs();
