@@ -1,13 +1,13 @@
 import dbconnect from "./dbconnect";
-const connection = dbconnect();
+// const connection = dbconnect();
 
-connection.connect(function (err) {
-  if (err) {
-    console.error("Error connecting to database: " + err.stack);
-    return;
-  }
-  console.log("Connected to database as id " + connection.threadId);
-});
+// connection.connect(function (err) {
+//   if (err) {
+//     console.error("Error connecting to database: " + err.stack);
+//     return;
+//   }
+//   console.log("Connected to database as id " + connection.threadId);
+// });
 
 export default function handler(req, res) {
   const id = req.body.id;
@@ -51,15 +51,30 @@ export default function handler(req, res) {
   WHERE lab_order.lab_order_number = '${id}' 
   ORDER BY group_code,sub_code DESC`;
 
-  connection.query(query, function (err, rows, fields) {
+  const connection = dbconnect();
+  connection.connect(function (err) {
     if (err) {
-      console.error(err);
+      console.error("Error connecting to database: " + err.stack);
       return;
     }
-    let query2;
-    let queryResult = ``;
-    rows.map((items) => {
-      query2 = `SELECT
+    connection.query(query, function (err, rows, fields) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+
+      connection.end((err) => {
+        if (err) {
+          console.error("Error closing database connection:", err);
+        } else {
+          console.log("Connection closed.");
+        }
+      });
+
+      let query2;
+      let queryResult = ``;
+      rows.map((items) => {
+        query2 = `SELECT
       lab_order.lab_items_code,
       lab_order.lab_order_result,
       concat(
@@ -75,56 +90,33 @@ export default function handler(req, res) {
       ORDER BY lab_head.order_date DESC
       LIMIT 5;
       `;
-      queryResult = queryResult + query2;
-    });
-
-    connection.query(queryResult, function (err2, rows2, fields) {
-      if (err2) {
-        console.error(err2);
-        return;
-      }
-
-      rows.map((items, index) => {
-        items["history"] = rows2[index] !== null ? rows2[index] : null;
+        queryResult = queryResult + query2;
       });
-      res.status(200).json(rows);
+
+      const connection2 = dbconnect();
+      connection2.connect(function (err) {
+        if (err) {
+          console.error("Error connecting to database: " + err.stack);
+          return;
+        }
+        connection2.query(queryResult, function (err2, rows2, fields) {
+          if (err2) {
+            console.error(err2);
+            return;
+          }
+          connection2.end((err) => {
+            if (err) {
+              console.error("Error closing database connection:", err);
+            } else {
+              console.log("Connection closed.");
+            }
+          });
+          rows.map((items, index) => {
+            items["history"] = rows2[index] !== null ? rows2[index] : null;
+          });
+          res.status(200).json(rows);
+        });
+      });
     });
   });
 }
-
-// import dbconnect from "./dbconnect";
-
-// export default function handler(req, res) {
-//   const lab_order_number = req.body.lab_order_number;
-//   const lab_items_code = req.body.lab_items_code;
-//   const lab_order_result_manual = req.body.lab_order_result_manual;
-//   const lab_order_result = req.body.lab_order_result;
-//   const flag = req.body.flag;
-//   let queryArray = `UPDATE lab_order
-//   SET lab_order_result_manual = '${lab_order_result_manual}', flag = '${flag}', lab_order_result = '${lab_order_result}'
-//   WHERE lab_order_number = '${lab_order_number}' AND lab_items_code = ${lab_items_code};`;
-
-//   const connection = dbconnect();
-//   connection.connect(function (err) {
-//     if (err) {
-//       console.error("Error connecting to database: " + err.stack);
-//       return;
-//     }
-//     console.log("Connected to database as id " + connection.threadId);
-
-//     connection.query(queryArray, function (err, rows, fields) {
-//       if (err) {
-//         console.error(err);
-//         return;
-//       }
-//       res.status(200).json({ result: true });
-//       connection.end((err) => {
-//         if (err) {
-//           console.error("Error closing database connection:", err);
-//         } else {
-//           console.log("Connection closed.");
-//         }
-//       });
-//     });
-//   });
-// }
