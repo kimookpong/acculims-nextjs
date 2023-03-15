@@ -18,7 +18,8 @@ export default function handler(req, res) {
   } else if (department === "IPD") {
     cond = cond + ` AND lab_head.department = '${department}' `;
   }
-  if (text === null) {
+
+  if (text === "") {
   } else {
     if (type === 1) {
       cond = cond + ` AND lab_head.lab_order_number LIKE '%${text}%' `;

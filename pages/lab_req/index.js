@@ -337,7 +337,7 @@ function LabReq() {
   const [sStartDate, setSStartDate] = useState(beforeDate.format(dateFormat));
   const [sEndDate, setSEndDate] = useState(currDate.format(dateFormat));
   const [sType, setSType] = useState(1);
-  const [sInput, setSInput] = useState(null);
+  const [sInput, setSInput] = useState("");
   const [sWork, setSWork] = useState(1);
   const [sWorkType, setSWorkType] = useState("All");
   const [sWorkTypeList, setSWorkTypeList] = useState([]);
