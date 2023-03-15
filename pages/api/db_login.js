@@ -7,7 +7,8 @@ export default function handler(req, res) {
   id_user,
   user_name,
   password,
-  concat(pname,fname,' ',lname) AS name
+  concat(pname,fname,' ',lname) AS name,
+  user_type
   FROM lis_user
   WHERE user_name = '${username}'
   AND password = '${password}'`;
@@ -34,6 +35,7 @@ export default function handler(req, res) {
             id: rows[0]["id_user"],
             name: rows[0]["name"],
             username: rows[0]["user_name"],
+            user_type: rows[0]["user_type"],
           },
         });
       } else {

@@ -25,7 +25,13 @@ import {
 import FormComponent from "./FormComponent";
 const { Content } = Layout;
 
+import { useSession } from "next-auth/react";
+import LoginComponent from "../../layout/LoginComponent";
+import BlankComponent from "../../layout/BlankComponent";
+
 function ToolsUservalref() {
+  const { data: session } = useSession();
+
   const [pname, setpname] = useState("");
   const [fname, setfname] = useState("");
   const [lname, setsurname] = useState("");
@@ -170,6 +176,13 @@ function ToolsUservalref() {
   };
 
   const customizeRenderEmpty = () => <Empty description={false} />;
+
+  if (!session) {
+    return <LoginComponent />;
+  }
+  if (session.user.user_type !== "Admin") {
+    return <BlankComponent />;
+  }
 
   return (
     <ConfigProvider renderEmpty={customizeRenderEmpty}>

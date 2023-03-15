@@ -3,7 +3,12 @@ import { useState, useEffect } from "react";
 import { Spin, Space, Card, Form, Button, Input } from "antd";
 import { BankOutlined } from "@ant-design/icons";
 
+import { useSession } from "next-auth/react";
+import LoginComponent from "../layout/LoginComponent";
+
 const ToolsHosvalref = () => {
+  const { data: session } = useSession();
+
   const [name, setname] = useState("");
   const [nameeng, setnameeng] = useState("");
   const [address, setaddress] = useState("");
@@ -55,6 +60,11 @@ const ToolsHosvalref = () => {
       </>
     ),
   };
+
+  if (!session) {
+    return <LoginComponent />;
+  }
+
   return (
     <Card
       title={dataTitle.title}

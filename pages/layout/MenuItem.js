@@ -109,11 +109,6 @@ const MenuItem = () => {
       : null,
   ];
 
-  // const { data: session } = useSession();
-  // if (!session) {
-  //   return <></>;
-  // }
-
   function handleClick(e) {
     setCurrent(e.key);
   }

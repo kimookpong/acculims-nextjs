@@ -39,7 +39,7 @@ export default function handler(req, res) {
         console.error(err);
         return;
       }
-      res.status(200).json(result);
+      res.status(200).json(rows);
       connection.end((err) => {
         if (err) {
           console.error("Error closing database connection:", err);
