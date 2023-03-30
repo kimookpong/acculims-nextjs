@@ -7,42 +7,46 @@ const { TextArea } = Input;
 const LabOrderCriticalComponent = (props) => {
   const { dataItem, dataCriticalForm, dataOrderNumber } = props;
   console.log(props);
-  let ItemNameAdd = dataOrderNumber
-    .map((item) => item.lab_items_name)
-    .join(", ");
+  let ItemNameAdd = !!dataOrderNumber
+    ? dataOrderNumber.map((item) => item.lab_items_name).join(", ")
+    : "";
+
   let CriticalValue = [];
   let CurrentValue = [];
-  dataOrderNumber.map((items, index) => {
-    CriticalValue = [
-      ...CriticalValue,
-      !!items
-        ? items["lab_items_name"] +
-          "= < " +
-          items["critical_range_min"] +
-          ", > " +
-          items["critical_range_max"]
-        : "",
-    ];
 
-    CurrentValue = [
-      ...CurrentValue,
-      !!items
-        ? !!items["lab_order_result_manual"]
-          ? items["lab_items_name"] + " = " + items["lab_order_result_manual"]
-          : items["lab_items_name"] +
-            " = " +
-            items["lab_order_result_instrument"]
-        : "",
-    ];
-  });
+  if (!!dataOrderNumber) {
+    dataOrderNumber.map((items, index) => {
+      CriticalValue = [
+        ...CriticalValue,
+        !!items
+          ? items["lab_items_name"] +
+            "= < " +
+            items["critical_range_min"] +
+            ", > " +
+            items["critical_range_max"]
+          : "",
+      ];
+
+      CurrentValue = [
+        ...CurrentValue,
+        !!items
+          ? !!items["lab_order_result_manual"]
+            ? items["lab_items_name"] + " = " + items["lab_order_result_manual"]
+            : items["lab_items_name"] +
+              " = " +
+              items["lab_order_result_instrument"]
+          : "",
+      ];
+    });
+  }
 
   const [dataLabItemsNameAdd, SetLabItemsNameAdd] = useState(ItemNameAdd);
   const [dataLabItemsNameRemove, SetLabItemsNameRemove] = useState("");
   const [dataCriticalValue, SetCriticalValue] = useState(
-    CriticalValue.map((item) => item).join(",\n")
+    CriticalValue.length ? CriticalValue.map((item) => item).join(",\n") : ""
   );
   const [dataCurrentValue, SetCurrentValue] = useState(
-    CurrentValue.map((item) => item).join(",\n")
+    CurrentValue.length ? CurrentValue.map((item) => item).join(",\n") : ""
   );
   const [dataDepartment, SetDepartment] = useState(
     !!dataItem ? dataItem["department"] : ""

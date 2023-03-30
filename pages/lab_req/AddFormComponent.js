@@ -148,13 +148,17 @@ const AddFormComponent = (props) => {
             }}
           >
             <Row gutter={24}>
-              {list.map((item, index) => {
-                return (
-                  <Col span={8} key={index}>
-                    <Checkbox value={item.value}>{item.label}</Checkbox>
-                  </Col>
-                );
-              })}
+              {!!list ? (
+                list.map((item, index) => {
+                  return (
+                    <Col span={8} key={index}>
+                      <Checkbox value={item.value}>{item.label}</Checkbox>
+                    </Col>
+                  );
+                })
+              ) : (
+                <></>
+              )}
             </Row>
           </Checkbox.Group>
         </Form.Item>
