@@ -66,6 +66,7 @@ export default function handler(req, res) {
   lab_head.department as department,
   lab_head.receive_status, 
   lab_head.report_status, 
+  (SELECT lis_critical.lab_order_number FROM lis_critical  WHERE  lis_critical.lab_order_number = lab_head.lab_order_number limit 1) AS lis_critical,
   patient.informaddr as address
   FROM lab_head
   LEFT JOIN lab_order ON lab_order.lab_order_number = lab_head.lab_order_number 

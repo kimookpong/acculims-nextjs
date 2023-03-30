@@ -709,6 +709,7 @@ function LabReport() {
   ];
 
   const [selectedRadioKeys, setSelectedRadioKeys] = useState([]);
+  const [dataLab, setDataLab] = useState();
   const rowSelection = {
     type: "radio",
     selectedRowKeys: selectedRadioKeys,
@@ -723,6 +724,7 @@ function LabReport() {
 
   const rowSelectFunc = (record) => {
     setSelectedRadioKeys([record.order_number]);
+    setDataLab(record);
     loadDetail(record);
     loadReport(record);
     setDataReportStatus(record.h_status);
@@ -1069,6 +1071,7 @@ function LabReport() {
                         reportStatus={dataReportStatus}
                         labOrderNumber={selectedRadioKeys.join()}
                         reloadReport={reloadReport}
+                        dataLab={dataLab}
                       />
                     </Col>
                     <Col span={24}>

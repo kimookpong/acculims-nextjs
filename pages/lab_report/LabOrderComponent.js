@@ -45,6 +45,7 @@ const LabOrderComponent = (props) => {
     reportStatus,
     labOrderNumber,
     reloadReport,
+    dataLab,
   } = props;
 
   const [messageApi, messageContext] = message.useMessage();
@@ -54,6 +55,52 @@ const LabOrderComponent = (props) => {
   const [rerunArray, setRerunArray] = useState([]);
   const [itemCodeSelect, setItemCodeSelect] = useState();
   const [dataCriticalAccept, setCriticalAccept] = useState();
+
+  const [dataCriticalOrderNumber, setCriticalOrderNumber] = useState([]);
+  const [formCritical, setFormCritical] = useState();
+
+  // Modal Critical
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModalCritical = () => {
+    setFormCritical(
+      <LabOrderCriticalComponent
+        dataItem={dataLab}
+        dataCriticalForm={dataCriticalForm}
+        dataOrderNumber={criricalValue}
+      />
+    );
+
+    setIsModalOpen(true);
+    console.log(dataCriticalOrderNumber);
+  };
+  const handleOk = () => {
+    dataAcceptForm();
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  let criricalValue = [];
+
+  useEffect(() => {
+    console.log("change critical list", dataCriticalOrderNumber);
+  }, [dataCriticalOrderNumber]);
+  useEffect(() => {
+    setCriticalOrderNumber([]);
+    criricalValue = [];
+    if (!!data && data.length > 0) {
+      data.map((item, index) => {
+        let dataCri = checkCriticalDefault(item);
+        if (!!dataCri) {
+          console.log(index, dataCri);
+          criricalValue = [...criricalValue, dataCri];
+        }
+      });
+    }
+    setCriticalOrderNumber(criricalValue);
+    console.log(criricalValue);
+  }, [data]);
 
   useEffect(() => {
     let dataRaw = rerunArray;
@@ -73,41 +120,115 @@ const LabOrderComponent = (props) => {
     }
   }, [checkRerun]);
 
-  const checkCriticalValue = (itemCheckCritical) => {
-    if (itemCheckCritical["alert_critical_value"] === "Y") {
-      if (!!itemCheckCritical["lab_order_result_manual"]) {
-        if (
-          parseFloat(itemCheckCritical["lab_order_result_manual"]) >
-            parseFloat(itemCheckCritical["critical_range_max"]) ||
-          parseFloat(itemCheckCritical["lab_order_result_manual"]) <
-            parseFloat(itemCheckCritical["critical_range_min"])
-        ) {
-          return (
-            <WarningOutlined
-              onClick={() => {
-                actionDeltaCheck(itemCheckCritical);
-              }}
-            />
-          );
-        }
-      } else if (!!itemCheckCritical["lab_order_result_instrument"]) {
-        if (
-          parseFloat(itemCheckCritical["lab_order_result_instrument"]) >
-            parseFloat(itemCheckCritical["critical_range_max"]) ||
-          parseFloat(itemCheckCritical["lab_order_result_instrument"]) <
-            parseFloat(itemCheckCritical["critical_range_min"])
-        ) {
-          return (
-            <WarningOutlined
-              onClick={() => {
-                actionDeltaCheck(itemCheckCritical);
-              }}
-            />
-          );
+  const checkCritical = (dataCri) => {
+    criricalValue = dataCriticalOrderNumber;
+    let dataDump = [];
+    console.log("check", criricalValue);
+    let found = criricalValue.find((item) => {
+      return item.lab_items_code === parseInt(dataCri.lab_items_code);
+    });
+    if (dataCri.lab_order_result_manual !== "") {
+      if (!!dataCri.critical_range_min || !!dataCri.critical_range_max) {
+        if (!!found) {
+          console.log("found", found, dataCri);
+        } else {
+          dataDump = [
+            ...criricalValue,
+            {
+              lab_items_code: parseInt(dataCri["lab_items_code"]),
+              lab_items_name: dataCri["lab_items_name"],
+              critical_range_min: dataCri["critical_range_min"],
+              critical_range_max: dataCri["critical_range_max"],
+              lab_order_result_manual: dataCri["lab_order_result_manual"],
+              lab_order_result_instrument:
+                dataCri["lab_order_result_instrument"],
+            },
+          ];
+
+          console.log("not found", dataDump);
         }
       }
     } else {
-      return;
+      dataDump = criricalValue.filter(
+        (itemThis) =>
+          parseInt(itemThis.lab_items_code) !== parseInt(dataCri.lab_items_code)
+      );
+      criricalValue = dataDump;
+      console.log("remove");
+    }
+
+    setCriticalOrderNumber(dataDump);
+  };
+
+  const checkCriticalDefault = (itemCheckCritical) => {
+    if (!!itemCheckCritical["lab_order_result_manual"]) {
+      if (
+        parseFloat(itemCheckCritical["lab_order_result_manual"]) >
+          parseFloat(itemCheckCritical["critical_range_max"]) ||
+        parseFloat(itemCheckCritical["lab_order_result_manual"]) <
+          parseFloat(itemCheckCritical["critical_range_min"])
+      ) {
+        return {
+          lab_items_code: itemCheckCritical["lab_items_code"],
+          lab_items_name: itemCheckCritical["lab_items_name"],
+          critical_range_min: itemCheckCritical["critical_range_min"],
+          critical_range_max: itemCheckCritical["critical_range_max"],
+          lab_order_result_manual: itemCheckCritical["lab_order_result_manual"],
+          lab_order_result_instrument:
+            itemCheckCritical["lab_order_result_instrument"],
+        };
+      }
+    } else if (!!itemCheckCritical["lab_order_result_instrument"]) {
+      if (
+        parseFloat(itemCheckCritical["lab_order_result_instrument"]) >
+          parseFloat(itemCheckCritical["critical_range_max"]) ||
+        parseFloat(itemCheckCritical["lab_order_result_instrument"]) <
+          parseFloat(itemCheckCritical["critical_range_min"])
+      ) {
+        return {
+          lab_items_code: itemCheckCritical["lab_items_code"],
+          lab_items_name: itemCheckCritical["lab_items_name"],
+          critical_range_min: itemCheckCritical["critical_range_min"],
+          critical_range_max: itemCheckCritical["critical_range_max"],
+          lab_order_result_manual: itemCheckCritical["lab_order_result_manual"],
+          lab_order_result_instrument:
+            itemCheckCritical["lab_order_result_instrument"],
+        };
+      }
+    }
+  };
+
+  const checkCriticalValue = (itemCheckCritical) => {
+    if (!!itemCheckCritical["lab_order_result_manual"]) {
+      if (
+        parseFloat(itemCheckCritical["lab_order_result_manual"]) >
+          parseFloat(itemCheckCritical["critical_range_max"]) ||
+        parseFloat(itemCheckCritical["lab_order_result_manual"]) <
+          parseFloat(itemCheckCritical["critical_range_min"])
+      ) {
+        return (
+          <WarningOutlined
+            onClick={() => {
+              actionDeltaCheck(itemCheckCritical);
+            }}
+          />
+        );
+      }
+    } else if (!!itemCheckCritical["lab_order_result_instrument"]) {
+      if (
+        parseFloat(itemCheckCritical["lab_order_result_instrument"]) >
+          parseFloat(itemCheckCritical["critical_range_max"]) ||
+        parseFloat(itemCheckCritical["lab_order_result_instrument"]) <
+          parseFloat(itemCheckCritical["critical_range_min"])
+      ) {
+        return (
+          <WarningOutlined
+            onClick={() => {
+              actionDeltaCheck(itemCheckCritical);
+            }}
+          />
+        );
+      }
     }
   };
 
@@ -144,16 +265,14 @@ const LabOrderComponent = (props) => {
         ];
       }
     });
-
-    console.log(rerunArrayData);
-    return axios
-      .post("/api/lab_report_update_rerun", {
-        lab_order_number: labOrderNumber,
-        data: rerunArrayData,
-      })
-      .then(function (response) {
-        console.log(response.data);
-      });
+    if (rerunDataArray.length > 0) {
+      return axios
+        .post("/api/lab_report_update_rerun", {
+          lab_order_number: labOrderNumber,
+          data: rerunArrayData,
+        })
+        .then(function (response) {});
+    }
   };
 
   const dataCriticalForm = (dataForm) => {
@@ -178,6 +297,8 @@ const LabOrderComponent = (props) => {
   };
 
   const actionDeltaCheck = (dataItem) => {
+    //criricalValue = dataCriticalOrderNumber;
+    console.log(dataCriticalOrderNumber);
     Modal.confirm({
       centered: true,
       title: "บันทึกข้อมูล ค่าวิกฤติ",
@@ -187,6 +308,7 @@ const LabOrderComponent = (props) => {
         <LabOrderCriticalComponent
           dataItem={dataItem}
           dataCriticalForm={dataCriticalForm}
+          dataOrderNumber={criricalValue}
         />
       ),
       onOk() {
@@ -349,6 +471,15 @@ const LabOrderComponent = (props) => {
   return (
     <div>
       {messageContext}
+      <Modal
+        title="บันทึกข้อมูล ค่าวิกฤติ"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width="730px"
+      >
+        {formCritical}
+      </Modal>
       <table
         style={{
           display: "block",
@@ -578,19 +709,17 @@ const LabOrderComponent = (props) => {
                           {item["lab_order_result_instrument"]}
                         </td>
                         <LabOrderResultManualComponent
+                          key={item["lab_items_code"]}
                           item={item}
                           reportStatus={reportStatus}
                           formDisable={formDisable}
                           labOrderData={labOrderData}
                           labOrderNumber={labOrderNumber}
+                          checkCritical={checkCritical}
+                          checkCriticalValue={checkCriticalValue}
+                          actionDeltaCheck={actionDeltaCheck}
+                          showModalCritical={showModalCritical}
                         />
-                        <td
-                          style={{ border: "1px solid #f0f0f0", color: "red" }}
-                        >
-                          {!!item["lis_critical"]
-                            ? null
-                            : checkCriticalValue(item)}
-                        </td>
                         <td style={{ border: "1px solid #f0f0f0" }}>
                           {item["lab_order_result_rerun"]}
                         </td>

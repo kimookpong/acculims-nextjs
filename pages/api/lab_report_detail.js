@@ -41,7 +41,7 @@ export default function handler(req, res) {
   (SELECT lab_items_sub_group_name FROM lab_items_sub_group WHERE sub_code = lab_items_sub_group_code) AS lab_items_sub_group_name,
   (SELECT lab_items_group_code FROM lab_items_sub_group WHERE sub_code = lab_items_sub_group_code) AS group_code,
   (SELECT lab_items_group_name FROM lab_items_group  WHERE  lab_items_group_code = group_code) AS group_name,
-  (SELECT lis_critical.lab_order_number FROM lis_critical  WHERE  lis_critical.lab_order_number = lab_order.lab_order_number) AS lis_critical
+  (SELECT lis_critical.lab_order_number FROM lis_critical  WHERE  lis_critical.lab_order_number = lab_order.lab_order_number limit 1) AS lis_critical
 
   FROM lab_order
   LEFT JOIN lab_items ON lab_order.lab_items_code = lab_items.lab_items_code

@@ -122,6 +122,8 @@ import {
   CheckCircleOutlined,
   DeleteOutlined,
   PrinterOutlined,
+  PlusCircleOutlined,
+  FormOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
@@ -132,6 +134,7 @@ import DetailNoteComponent from "./DetailNoteComponent";
 import DetailThingComponent from "./DetailThingComponent";
 import BarcodeComponent from "./BarcodeComponent";
 import CancelComponent from "./CancelComponent";
+import AddFormComponent from "./AddFormComponent";
 
 import { useSession } from "next-auth/react";
 import LoginComponent from "../layout/LoginComponent";
@@ -172,6 +175,20 @@ function LabReq() {
   const [messageApi, messageContext] = message.useMessage();
   const closeModal = () => {
     Modal.destroyAll();
+  };
+
+  const showAddForm = () => {
+    return axios.post("/api/get_lab_items_sub_group").then(function (response) {
+      console.log(response.data);
+      Modal.confirm({
+        centered: true,
+        width: 800,
+        title: "เพิ่มใบรับ LAB",
+        icon: <FormOutlined />,
+        content: <AddFormComponent list={response.data} />,
+        footer: <></>,
+      });
+    });
   };
   const getDoctor = (action) => {
     return axios.get(API_lis_user).then(function (responseDoctor) {
@@ -895,6 +912,28 @@ function LabReq() {
                   >
                     <div style={{ textAlign: "center" }}>
                       <div style={{ display: "inline-flex" }}>
+                        <div style={{ padding: 5 }}>
+                          <Button
+                            style={{
+                              padding: 10,
+                              cursor: "pointer",
+                              height: "auto",
+                              minWidth: 100,
+                            }}
+                            onClick={() => {
+                              showAddForm();
+                            }}
+                          >
+                            <div>
+                              <PlusCircleOutlined
+                                style={{
+                                  fontSize: 40,
+                                }}
+                              />
+                            </div>
+                            <div>เพิ่มใบ LAB</div>
+                          </Button>
+                        </div>
                         <div style={{ padding: 5 }}>
                           <Button
                             style={{

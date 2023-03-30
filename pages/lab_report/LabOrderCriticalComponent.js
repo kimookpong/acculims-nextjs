@@ -5,43 +5,60 @@ const currDate = dayjs();
 
 const { TextArea } = Input;
 const LabOrderCriticalComponent = (props) => {
-  const { dataItem, dataCriticalForm } = props;
-  const currValue = !!dataItem
-    ? !!dataItem["lab_order_result_manual"]
-      ? dataItem["lab_order_result_manual"]
-      : dataItem["lab_order_result_instrument"]
-    : "";
-  const [dataLabItemsNameAdd, SetLabItemsNameAdd] = useState(
-    !!dataItem ? dataItem["lab_items_name"] : ""
-  );
+  const { dataItem, dataCriticalForm, dataOrderNumber } = props;
+  console.log(props);
+  let ItemNameAdd = dataOrderNumber
+    .map((item) => item.lab_items_name)
+    .join(", ");
+  let CriticalValue = [];
+  let CurrentValue = [];
+  dataOrderNumber.map((items, index) => {
+    CriticalValue = [
+      ...CriticalValue,
+      !!items
+        ? items["lab_items_name"] +
+          "= < " +
+          items["critical_range_min"] +
+          ", > " +
+          items["critical_range_max"]
+        : "",
+    ];
+
+    CurrentValue = [
+      ...CurrentValue,
+      !!items
+        ? !!items["lab_order_result_manual"]
+          ? items["lab_items_name"] + " = " + items["lab_order_result_manual"]
+          : items["lab_items_name"] +
+            " = " +
+            items["lab_order_result_instrument"]
+        : "",
+    ];
+  });
+
+  const [dataLabItemsNameAdd, SetLabItemsNameAdd] = useState(ItemNameAdd);
   const [dataLabItemsNameRemove, SetLabItemsNameRemove] = useState("");
   const [dataCriticalValue, SetCriticalValue] = useState(
-    !!dataItem
-      ? dataItem["lab_items_name"] +
-          "= < " +
-          dataItem["critical_range_min"] +
-          ", > " +
-          dataItem["critical_range_max"]
-      : ""
+    CriticalValue.map((item) => item).join(",\n")
   );
   const [dataCurrentValue, SetCurrentValue] = useState(
-    !!dataItem ? dataItem["lab_items_name"] + " = " + currValue : ""
+    CurrentValue.map((item) => item).join(",\n")
   );
   const [dataDepartment, SetDepartment] = useState(
     !!dataItem ? dataItem["department"] : ""
   );
 
-  const [dataTimeCall, SetTimeCall] = useState();
+  const [dataTimeCall, SetTimeCall] = useState(currDate);
   const [dataCallName, SetCallName] = useState("");
-  const [dataTimeTake, SetTimeTake] = useState();
+  const [dataTimeTake, SetTimeTake] = useState(currDate);
   const [dataTakeName, SetTakeName] = useState("");
   useEffect(() => {
     dataCriticalForm({
-      lab_order_number: !!dataItem ? dataItem["lab_order_number"] : "",
+      lab_order_number: !!dataItem ? dataItem["order_number"] : "",
       time_call: dayjs(dataTimeCall).format("HH:mm:ss"),
       position: dataDepartment,
       call_name: dataCallName,
-      hn: !!dataItem ? dataItem["hn"] : "",
+      hn: !!dataItem ? dataItem["HN"] : "",
       patient_name: !!dataItem ? dataItem["patient_name"] : "",
       test_name: dataLabItemsNameAdd,
       cancle: dataLabItemsNameRemove,
@@ -50,6 +67,11 @@ const LabOrderCriticalComponent = (props) => {
       time_take: dayjs(dataTimeTake).format("HH:mm:ss"),
       take_name: dataTakeName,
       date_save: currDate.format("YYYY-MM-DD"),
+      action: !!dataItem
+        ? !!dataItem["lis_critical"]
+          ? "UPDATE"
+          : "INSERT"
+        : "INSERT",
     });
   }, [
     dataItem,
@@ -72,7 +94,7 @@ const LabOrderCriticalComponent = (props) => {
               <tr>
                 <td style={{ width: "27%", textAlign: "right" }}>HN : </td>
                 <td>
-                  <Input value={!!dataItem ? dataItem["hn"] : ""} disabled />
+                  <Input value={!!dataItem ? dataItem["HN"] : ""} disabled />
                 </td>
               </tr>
               <tr>

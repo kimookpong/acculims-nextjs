@@ -1,12 +1,22 @@
 import { Input } from "antd";
 import axios from "axios";
 import { useState } from "react";
+import { LineChartOutlined, WarningOutlined } from "@ant-design/icons";
 
 const LabOrderResultManualComponent = (props) => {
   let minValue = null;
   let maxValue = null;
-  const { item, reportStatus, formDisable, labOrderData, labOrderNumber } =
-    props;
+  const {
+    item,
+    reportStatus,
+    formDisable,
+    labOrderData,
+    labOrderNumber,
+    checkCritical,
+    checkCriticalValue,
+    actionDeltaCheck,
+    showModalCritical,
+  } = props;
 
   //find min and max
   let rangevalue = !!item ? item["lab_items_normal_value"] : null;
@@ -20,7 +30,57 @@ const LabOrderResultManualComponent = (props) => {
       maxValue = parseFloat(rangevalue.split(">")[1]);
     }
   }
-
+  // let itemFlag = !!item ? (
+  //   item["flag"] === "H" ? (
+  //     <b style={{ color: "red" }}>{item["flag"]}</b>
+  //   ) : item["flag"] === "L" ? (
+  //     <b style={{ color: "blue" }}>{item["flag"]}</b>
+  //   ) : (
+  //     <>{item["flag"]}</>
+  //   )
+  // ) : (
+  //   <></>
+  // );
+  // const setItemFlag = (dataFlag) => {
+  //   itemFlag = dataFlag;
+  // };
+  const [itemCri, setItemCri] = useState(
+    !!item ? (
+      !!item["lab_order_result_manual"] ? (
+        parseFloat(item["lab_order_result_manual"]) >
+          parseFloat(item["critical_range_max"]) ||
+        parseFloat(item["lab_order_result_manual"]) <
+          parseFloat(item["critical_range_min"]) ? (
+          <WarningOutlined
+            onClick={() => {
+              //actionDeltaCheck(item);
+              showModalCritical();
+            }}
+          />
+        ) : (
+          <></>
+        )
+      ) : !!item["lab_order_result_instrument"] ? (
+        parseFloat(item["lab_order_result_instrument"]) >
+          parseFloat(item["critical_range_max"]) ||
+        parseFloat(item["lab_order_result_instrument"]) <
+          parseFloat(item["critical_range_min"]) ? (
+          <WarningOutlined
+            onClick={() => {
+              //actionDeltaCheck(item);
+              showModalCritical();
+            }}
+          />
+        ) : (
+          <></>
+        )
+      ) : (
+        <></>
+      )
+    ) : (
+      <></>
+    )
+  );
   const [itemFlag, setItemFlag] = useState(
     !!item ? (
       item["flag"] === "H" ? (
@@ -34,6 +94,43 @@ const LabOrderResultManualComponent = (props) => {
       <></>
     )
   );
+
+  const checkCriticalValueEvent = (event) => {
+    if (!!event.target.value) {
+      if (!!item["critical_range_min"] || !!item["critical_range_max"]) {
+        if (
+          parseFloat(event.target.value) <
+            parseFloat(item["critical_range_min"]) ||
+          parseFloat(event.target.value) >
+            parseFloat(item["critical_range_max"])
+        ) {
+          setItemCri(
+            <WarningOutlined
+              onClick={() => {
+                //actionDeltaCheck(item);
+                showModalCritical();
+              }}
+            />
+          );
+        } else {
+          setItemCri();
+        }
+      } else {
+        setItemCri();
+      }
+    } else {
+      setItemCri();
+    }
+
+    checkCritical({
+      lab_items_code: event.target.id,
+      lab_order_result_manual: event.target.value,
+      lab_order_result_instrument: item["lab_order_result_instrument"],
+      lab_items_name: item["lab_items_name"],
+      critical_range_min: item["critical_range_min"],
+      critical_range_max: item["critical_range_max"],
+    });
+  };
 
   const changeInput_lab_order_result_manual_realtime = (event) => {
     return axios
@@ -57,6 +154,7 @@ const LabOrderResultManualComponent = (props) => {
   };
 
   const checkHighLow = (event) => {
+    checkCriticalValueEvent(event);
     if (!!event.target.value) {
       if (
         item["normal_value_max"] &&
@@ -119,6 +217,7 @@ const LabOrderResultManualComponent = (props) => {
       >
         {!!item ? itemFlag : null}
       </td>
+      <td style={{ border: "1px solid #f0f0f0", color: "red" }}>{itemCri}</td>
     </>
   );
 };

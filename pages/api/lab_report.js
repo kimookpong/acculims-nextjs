@@ -80,6 +80,8 @@ export default function handler(req, res) {
     TIMEDIFF(lab_head.approved_time ,lab_head.receive_time)) 
   as timediff,
 
+  (SELECT lis_critical.lab_order_number FROM lis_critical  WHERE  lis_critical.lab_order_number = lab_head.lab_order_number limit 1) AS lis_critical,
+
   lab_head.department as department,
   lab_head.receive_status, 
   lab_head.report_status, 
