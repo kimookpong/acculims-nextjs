@@ -1,7 +1,7 @@
-import React from 'react';
-import { Responsive, WidthProvider } from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
+import React from "react";
+import { Responsive, WidthProvider } from "react-grid-layout";
+// import "react-grid-layout/css/styles.css";
+// import 'react-resizable/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
