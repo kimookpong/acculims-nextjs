@@ -1,24 +1,27 @@
 import { React, useState } from 'react';
 import axios from 'axios';
 import styles from '../../styles/Home.module.css'
-import { Checkbox, Button } from 'antd';
+import { Checkbox, Space, Card, Form, Button, Input, DatePicker } from "antd";
 
 function ToolsOptionvalref(){
     
-    const onChangeEGFRval = (e) => { console.log(`checked = ${e.target.checked}`); };
-    const onChangeEGFRstage = (e) => { console.log(`checked = ${e.target.checked}`); };
-    const onChangeNCD = (e) => { console.log(`checked = ${e.target.checked}`); };
-    const onChangeAutoPLT = (e) => { console.log(`checked = ${e.target.checked}`); };
+    const CheckboxGroup = Checkbox.Group;
+    const setting = ['eGFR `>` 100 Not state','eGFR No Stage','NCD No Print','Auto Platelet smear']
+    const [checkedList, setCheckedList] = useState();
+    const onChange = (list) => {setCheckedList(list);};
 
-    const [val_1, setval1] = useState('');
-    const [val_2, setval2] = useState('');
-    const [val_3, setval3] = useState('');
-    const [val_1text, setval1t] = useState('');
-    const [val_2text, setval2t] = useState('');
-    const [val_3text, setval3t] = useState('');
+    const [atleast, setAtleast] = useState('');
+    const [atleastPresent, setAtleastPresent] = useState('');
+    const [between, setBetween] = useState('');  
+    const [betweenPresent, setBetweenPresent] = useState('');
+    const [morethan, setMorethan] = useState('');  
+    const [morethanPresent, setMorethanPresent] = useState('');
 
     async function sendValue(value) {
-        axios.post('/api/add_lab_ref_plt', {val_1:val_1, val_3:val_3})
+        axios.post('/api/add_lab_ref_plt', 
+        {atleast:atleast, atleastPresent:atleastPresent, 
+            between:between, betweenPresent:betweenPresent, 
+            morethan:morethan, morethanPresent:morethanPresent})
             .then(response => {
             console.log(response.data);
             setData(response.data);
@@ -27,44 +30,52 @@ function ToolsOptionvalref(){
         );
     }
 
+    const dataTitle = { title: ( <>Option</> ), };
+
     return(
-        <div>
-            <h1>Option page</h1>
-            <p className={styles.card}>
-                <h3>Setting</h3>
-                <Checkbox onChange={onChangeEGFRval}>eGFR `{'>'}` 100 Not state</Checkbox>
-                <br></br>
-                <Checkbox onChange={onChangeEGFRstage}>eGFR No Stage</Checkbox>
-                <br></br>
-                <Checkbox onChange={onChangeNCD}>NCD No Print</Checkbox>
-                <br></br>
-                <Checkbox onChange={onChangeAutoPLT}>Auto Platelet smear</Checkbox>
-                <br></br>
-            </p>
-            <p className={styles.card}>
-                <h3>เซตค่า Platelet</h3>
-                <a>ค่าน้อยกว่า </a>
-                <input type="text" value={val_1} onChange={e => setval1(e.target.value)}/>
-                <br></br>
-                <a>จะแสดงผลว่า </a>
-                <input type="text" value={val_1text} onChange={e => setval1t(e.target.value)}/>
-                <br></br>
-                <a>ค่าอยู่ระหว่าง </a>
-                <input type="text" value={val_2} onChange={e => setval2(e.target.value)}/>
-                <br></br>
-                <a>จะแสดงผลว่า </a>
-                <input type="text" value={val_2text} onChange={e => setval2t(e.target.value)}/>
-                <br></br>
-                <a>ค่ามากกว่า </a>
-                <input type="text" value={val_3} onChange={e => setval3(e.target.value)}/>
-                <br></br>
-                <a>จะแสดงผลว่า </a>
-                <input type="text" value={val_3text} onChange={e => setval3t(e.target.value)}/>
-            </p>
-            <Button type="primary" shape="round"  onClick = {sendValue}>OK</Button>
-            <a> </a>
-            <Button shape="round">Cancel</Button>
-        </div>
+        <Card title={dataTitle.title} headStyle={{ color: "#002140" }}>
+        <Form
+          name="basic"
+          labelCol={{ span: 6, }}
+          wrapperCol={{ span: 18, }}
+          autoComplete="off"
+        >
+          <form>
+            <Form.Item label="Setting:">
+                <CheckboxGroup options={setting} onChange={onChange}/>
+            </Form.Item>
+            <Form.Item>
+                <p>เซ็ตค่า Platelet</p>
+            </Form.Item>
+            <Form.Item label="ค่าน้อยกว่า:">
+              <Input onChange={(e) => setAtleast(e.target.value)} value={atleast}/>
+            </Form.Item>
+            <Form.Item label="จะแสดงผลว่า:">
+              <Input onChange={(e) => setAtleastPresent(e.target.value)} value={atleastPresent}/>
+            </Form.Item>
+            <Form.Item label="ค่าอยู่ระหว่าง:">
+              <Input onChange={(e) => setBetween(e.target.value)} value={between}/>
+            </Form.Item>
+            <Form.Item label="จะแสดงผลว่า:">
+              <Input onChange={(e) => setBetweenPresent(e.target.value)} value={betweenPresent}/>
+            </Form.Item>
+            <Form.Item label="ค่ามากกว่า:">
+              <Input onChange={(e) => setMorethan(e.target.value)} value={morethan}/>
+            </Form.Item>
+            <Form.Item label="จะแสดงผลว่า:">
+              <Input onChange={(e) => setMorethanPresent(e.target.value)} value={morethanPresent}/>
+            </Form.Item>            
+          </form>
+          <form>
+            <Form.Item wrapperCol={{ offset: 6, span: 18, }}>
+              <Space wrap>
+                <Button type="primary" shape="round" onClick={sendValue}>OK</Button>
+                <Button shape="round">Exit</Button>
+              </Space>
+            </Form.Item>
+          </form>
+        </Form>
+    </Card>
     )
 }
 

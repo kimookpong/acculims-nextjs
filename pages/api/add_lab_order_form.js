@@ -25,18 +25,34 @@ export default function handler(req, res) {
   const age = req.body.age;
   //labdetail
   const test = req.body.test;
-  const payment = req.body.payment;
+  const paymentmethod = req.body.payment;
   const cost = req.body.cost;
   const invoice = req.body.invoice;
 
   const query = `INSERT INTO lab_order_form (hn,name,sex,age,test,payment,cost,invoice) 
-  VALUES ('${hn}','${name}','${sex}','${age}','${test}','${payment}','${cost}','${invoice})`;
+  VALUES ('${hn}','${name}','${sex}','${age}','${test}','${paymentmethod}','${cost}','${invoice})`;
   
-  connection.query(query, function(err, result) {
-      if (err) {
-      console.error(err);
+  const connection = dbconnect();
+  connection.connect(function (err) {
+    if (err) {
+      console.error("Error connecting to database: " + err.stack);
       return;
+    }
+    console.log("Connected to database as id " + connection.threadId);
+
+    connection.query(query, function (err, rows, fields) {
+      if (err) {
+        console.error(err);
+        return;
       }
-      console.log(result);
+      res.status(200).json(rows);
+      connection.end((err) => {
+        if (err) {
+          console.error("Error closing database connection:", err);
+        } else {
+          console.log("Connection closed.");
+        }
+      });
+    });
   });
 }

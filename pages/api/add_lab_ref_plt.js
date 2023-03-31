@@ -1,31 +1,51 @@
-import dbconnect from "./dbconnect";
+const mysql = require('mysql2');
 
-export default function handler(req, res) {
-  const val_1 = req.body.val_1;
-  const val_3 = req.body.val_3;
-  const query = `UPDATE lab_items SET lab_items_name = Plt (count) WHERE Plt (count) = ${val_1}`;
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    pass: process.env.DB_PASS,
+    database: process.env.DB_DATABASE
+});
 
-  const connection = dbconnect();
-  connection.connect(function (err) {
+connection.connect(function(err) {
     if (err) {
-      console.error("Error connecting to database: " + err.stack);
+      console.error('Error connecting to database: ' + err.stack);
       return;
     }
-    console.log("Connected to database as id " + connection.threadId);
+    console.log('Connected to database as id ' + connection.threadId);
+});
 
-    connection.query(query, function (err, rows, fields) {
+export default function handler(req,res){
+    const atleast = req.body.atleast;
+    const atleastPresent = req.body.atleastPresent;
+    const between = req.body.between;
+    const betweenPresent = req.body.betweenPresent;
+    const morethan = req.body.morethan;
+    const morethanPresent = req.body.morethanPresent;
+
+    const query = `UPDATE lab_items SET lab_items_name = Plt (count) WHERE Plt (count) = ${atleast}`;
+    const connection = dbconnect();
+    connection.connect(function (err) {
       if (err) {
-        console.error(err);
+        console.error("Error connecting to database: " + err.stack);
         return;
       }
-      res.status(200).json(rows);
-      connection.end((err) => {
+      console.log("Connected to database as id " + connection.threadId);
+  
+      connection.query(query, function (err, rows, fields) {
         if (err) {
-          console.error("Error closing database connection:", err);
-        } else {
-          console.log("Connection closed.");
+          console.error(err);
+          return;
         }
+        res.status(200).json(rows);
+        connection.end((err) => {
+          if (err) {
+            console.error("Error closing database connection:", err);
+          } else {
+            console.log("Connection closed.");
+          }
+        });
       });
     });
-  });
-}
+  }
+  
