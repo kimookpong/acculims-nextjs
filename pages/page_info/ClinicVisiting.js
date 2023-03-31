@@ -129,7 +129,7 @@ function ClinicalVisiting(){
               <Input onChange={(e) => setDiastolic(e.target.value)} value={diastolic}/>
             </Form.Item>            
             <Form.Item label="โรคประจำตัว:">
-              <Input onChange={(e) => setUnderlyingdisease(e.target.value)} value={underlyingdisease}/>
+              <Input onChange={(e) => setUnderlyingDisease(e.target.value)} value={underlyingdisease}/>
             </Form.Item>
             <Form.Item label="การแพ้ยา:">
               <CheckboxGroup options={allergic} onChange={onChange}/>
