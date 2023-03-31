@@ -6,56 +6,70 @@ const currDate = dayjs();
 const { TextArea } = Input;
 const LabOrderCriticalComponent = (props) => {
   const { dataItem, dataCriticalForm, dataOrderNumber } = props;
-  console.log(props);
-  let ItemNameAdd = !!dataOrderNumber
-    ? dataOrderNumber.map((item) => item.lab_items_name).join(", ")
-    : "";
 
-  let CriticalValue = [];
-  let CurrentValue = [];
-
-  if (!!dataOrderNumber) {
-    dataOrderNumber.map((items, index) => {
-      CriticalValue = [
-        ...CriticalValue,
-        !!items
-          ? items["lab_items_name"] +
-            "= < " +
-            items["critical_range_min"] +
-            ", > " +
-            items["critical_range_max"]
-          : "",
-      ];
-
-      CurrentValue = [
-        ...CurrentValue,
-        !!items
-          ? !!items["lab_order_result_manual"]
-            ? items["lab_items_name"] + " = " + items["lab_order_result_manual"]
-            : items["lab_items_name"] +
-              " = " +
-              items["lab_order_result_instrument"]
-          : "",
-      ];
-    });
-  }
-
-  const [dataLabItemsNameAdd, SetLabItemsNameAdd] = useState(ItemNameAdd);
+  const [dataLabItemsNameAdd, SetLabItemsNameAdd] = useState("");
   const [dataLabItemsNameRemove, SetLabItemsNameRemove] = useState("");
-  const [dataCriticalValue, SetCriticalValue] = useState(
-    CriticalValue.length ? CriticalValue.map((item) => item).join(",\n") : ""
-  );
-  const [dataCurrentValue, SetCurrentValue] = useState(
-    CurrentValue.length ? CurrentValue.map((item) => item).join(",\n") : ""
-  );
+  const [dataCriticalValue, SetCriticalValue] = useState();
+  const [dataCurrentValue, SetCurrentValue] = useState();
   const [dataDepartment, SetDepartment] = useState(
     !!dataItem ? dataItem["department"] : ""
   );
-
   const [dataTimeCall, SetTimeCall] = useState(currDate);
   const [dataCallName, SetCallName] = useState("");
   const [dataTimeTake, SetTimeTake] = useState(currDate);
   const [dataTakeName, SetTakeName] = useState("");
+
+  useEffect(() => {
+    console.log("data from", dataOrderNumber, dataItem);
+
+    const refreshDate = dayjs();
+    SetTimeCall(refreshDate);
+    SetTimeTake(refreshDate);
+
+    SetLabItemsNameAdd(
+      !!dataOrderNumber
+        ? dataOrderNumber.map((item) => item.lab_items_name).join(", ")
+        : ""
+    );
+
+    let CriticalValue = [];
+    let CurrentValue = [];
+
+    if (!!dataOrderNumber) {
+      dataOrderNumber.map((items, index) => {
+        CriticalValue = [
+          ...CriticalValue,
+          !!items
+            ? items["lab_items_name"] +
+              "= < " +
+              items["critical_range_min"] +
+              ", > " +
+              items["critical_range_max"]
+            : "",
+        ];
+
+        CurrentValue = [
+          ...CurrentValue,
+          !!items
+            ? !!items["lab_order_result_manual"]
+              ? items["lab_items_name"] +
+                " = " +
+                items["lab_order_result_manual"]
+              : items["lab_items_name"] +
+                " = " +
+                items["lab_order_result_instrument"]
+            : "",
+        ];
+      });
+    }
+
+    SetCriticalValue(
+      CriticalValue.length ? CriticalValue.map((item) => item).join(",\n") : ""
+    );
+    SetCurrentValue(
+      CurrentValue.length ? CurrentValue.map((item) => item).join(",\n") : ""
+    );
+  }, [dataOrderNumber]);
   useEffect(() => {
     dataCriticalForm({
       lab_order_number: !!dataItem ? dataItem["order_number"] : "",

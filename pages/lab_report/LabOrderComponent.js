@@ -59,33 +59,27 @@ const LabOrderComponent = (props) => {
   const [dataCriticalOrderNumber, setCriticalOrderNumber] = useState([]);
   const [formCritical, setFormCritical] = useState();
 
-  // Modal Critical
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModalCritical = () => {
-    setFormCritical(
-      <LabOrderCriticalComponent
-        dataItem={dataLab}
-        dataCriticalForm={dataCriticalForm}
-        dataOrderNumber={criricalValue}
-      />
-    );
-
-    setIsModalOpen(true);
-    console.log(dataCriticalOrderNumber);
-  };
-  const handleOk = () => {
-    dataAcceptForm();
-    setIsModalOpen(false);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+  const [modalAction, setModalAction] = useState(0);
 
   let criricalValue = [];
 
   useEffect(() => {
-    console.log("change critical list", dataCriticalOrderNumber);
-  }, [dataCriticalOrderNumber]);
+    criricalValue = dataCriticalOrderNumber;
+    console.log("change criricalValue", criricalValue, modalAction);
+    if (modalAction === 1) {
+      setFormCritical(
+        <LabOrderCriticalComponent
+          key={dataLab.order_number}
+          dataItem={dataLab}
+          dataCriticalForm={dataCriticalForm}
+          dataOrderNumber={dataCriticalOrderNumber}
+        />
+      );
+
+      setIsModalOpen(true);
+    }
+  }, [dataCriticalOrderNumber, modalAction]);
+
   useEffect(() => {
     setCriticalOrderNumber([]);
     criricalValue = [];
@@ -93,14 +87,29 @@ const LabOrderComponent = (props) => {
       data.map((item, index) => {
         let dataCri = checkCriticalDefault(item);
         if (!!dataCri) {
-          console.log(index, dataCri);
           criricalValue = [...criricalValue, dataCri];
         }
       });
     }
     setCriticalOrderNumber(criricalValue);
-    console.log(criricalValue);
   }, [data]);
+
+  // Modal Critical
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModalCritical = () => {
+    setModalAction(1);
+  };
+  const handleOk = () => {
+    setModalAction(0);
+    dataAcceptForm();
+    setIsModalOpen(false);
+    reloadReport();
+  };
+  const handleCancel = () => {
+    setModalAction(0);
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     let dataRaw = rerunArray;
@@ -121,6 +130,7 @@ const LabOrderComponent = (props) => {
   }, [checkRerun]);
 
   const checkCritical = (dataCri) => {
+    console.log("checkCritical func");
     criricalValue = dataCriticalOrderNumber;
     let dataDump = [];
     console.log("check", criricalValue);
@@ -130,7 +140,20 @@ const LabOrderComponent = (props) => {
     if (dataCri.lab_order_result_manual !== "") {
       if (!!dataCri.critical_range_min || !!dataCri.critical_range_max) {
         if (!!found) {
-          console.log("found", found, dataCri);
+          dataDump = criricalValue.map((itemThis) => {
+            if (
+              parseInt(itemThis.lab_items_code) ===
+              parseInt(dataCri.lab_items_code)
+            ) {
+              return {
+                ...itemThis,
+                lab_order_result_manual: dataCri.lab_order_result_manual,
+              };
+            }
+            return itemThis;
+          });
+
+          console.log("found", dataDump);
         } else {
           dataDump = [
             ...criricalValue,
@@ -194,40 +217,6 @@ const LabOrderComponent = (props) => {
           lab_order_result_instrument:
             itemCheckCritical["lab_order_result_instrument"],
         };
-      }
-    }
-  };
-
-  const checkCriticalValue = (itemCheckCritical) => {
-    if (!!itemCheckCritical["lab_order_result_manual"]) {
-      if (
-        parseFloat(itemCheckCritical["lab_order_result_manual"]) >
-          parseFloat(itemCheckCritical["critical_range_max"]) ||
-        parseFloat(itemCheckCritical["lab_order_result_manual"]) <
-          parseFloat(itemCheckCritical["critical_range_min"])
-      ) {
-        return (
-          <WarningOutlined
-            onClick={() => {
-              actionDeltaCheck(itemCheckCritical);
-            }}
-          />
-        );
-      }
-    } else if (!!itemCheckCritical["lab_order_result_instrument"]) {
-      if (
-        parseFloat(itemCheckCritical["lab_order_result_instrument"]) >
-          parseFloat(itemCheckCritical["critical_range_max"]) ||
-        parseFloat(itemCheckCritical["lab_order_result_instrument"]) <
-          parseFloat(itemCheckCritical["critical_range_min"])
-      ) {
-        return (
-          <WarningOutlined
-            onClick={() => {
-              actionDeltaCheck(itemCheckCritical);
-            }}
-          />
-        );
       }
     }
   };
@@ -296,26 +285,6 @@ const LabOrderComponent = (props) => {
     }
   };
 
-  const actionDeltaCheck = (dataItem) => {
-    //criricalValue = dataCriticalOrderNumber;
-    console.log(dataCriticalOrderNumber);
-    Modal.confirm({
-      centered: true,
-      title: "บันทึกข้อมูล ค่าวิกฤติ",
-      icon: <WarningOutlined />,
-      width: 730,
-      content: (
-        <LabOrderCriticalComponent
-          dataItem={dataItem}
-          dataCriticalForm={dataCriticalForm}
-          dataOrderNumber={criricalValue}
-        />
-      ),
-      onOk() {
-        dataAcceptForm();
-      },
-    });
-  };
   const optionsGraph = {
     responsive: true,
     plugins: {
@@ -709,15 +678,13 @@ const LabOrderComponent = (props) => {
                           {item["lab_order_result_instrument"]}
                         </td>
                         <LabOrderResultManualComponent
-                          key={item["lab_items_code"]}
+                          key={item["lab_items_code"] + labOrderNumber}
                           item={item}
                           reportStatus={reportStatus}
                           formDisable={formDisable}
                           labOrderData={labOrderData}
                           labOrderNumber={labOrderNumber}
                           checkCritical={checkCritical}
-                          checkCriticalValue={checkCriticalValue}
-                          actionDeltaCheck={actionDeltaCheck}
                           showModalCritical={showModalCritical}
                         />
                         <td style={{ border: "1px solid #f0f0f0" }}>

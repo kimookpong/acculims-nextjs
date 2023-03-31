@@ -80,7 +80,7 @@ export default function handler(req, res) {
     TIMEDIFF(lab_head.approved_time ,lab_head.receive_time)) 
   as timediff,
 
-  (SELECT lis_critical.lab_order_number FROM lis_critical  WHERE  lis_critical.lab_order_number = lab_head.lab_order_number limit 1) AS lis_critical,
+  (SELECT lis_critical.lab_order_number FROM lis_critical  WHERE  lis_critical.lab_order_number = order_number limit 1) AS lis_critical,
 
   lab_head.department as department,
   lab_head.receive_status, 
@@ -95,7 +95,6 @@ export default function handler(req, res) {
   GROUP BY lab_head.lab_order_number
   ORDER BY order_date_time DESC;`;
 
-  console.log(query);
   const connection = dbconnect();
   connection.connect(function (err) {
     if (err) {
