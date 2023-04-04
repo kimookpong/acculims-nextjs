@@ -17,6 +17,7 @@ import {
   AlertOutlined,
   SnippetsOutlined,
   FundOutlined,
+  UsergroupAddOutlined,
 } from "@ant-design/icons";
 import { Menu, Layout } from "antd";
 import Link from "next/link";
@@ -77,6 +78,11 @@ const MenuItem = () => {
       <Link href="/tools/tools_uservalref">จัดการข้อมูลผู้ใช้งาน</Link>,
       "tools_uservalref",
       <UserOutlined />
+    ),
+    getItem(
+      <Link href="/tools/patient">จัดการข้อมูล Patient</Link>,
+      "patient",
+      <UsergroupAddOutlined />
     ),
     getItem(
       <Link href="/tools/tools_optionvalref">Option</Link>,

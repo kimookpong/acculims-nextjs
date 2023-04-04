@@ -135,6 +135,7 @@ import DetailThingComponent from "./DetailThingComponent";
 import BarcodeComponent from "./BarcodeComponent";
 import CancelComponent from "./CancelComponent";
 import AddFormComponent from "./AddFormComponent";
+import AddPatientFormComponent from "./AddPatientFormComponent";
 
 import { useSession } from "next-auth/react";
 import LoginComponent from "../layout/LoginComponent";
@@ -178,16 +179,26 @@ function LabReq() {
   };
 
   const showAddForm = () => {
-    return axios.post("/api/get_lab_items_sub_group").then(function (response) {
-      console.log(response.data);
+    return axios.post("/api/get_lab_detail").then(function (response) {
       Modal.confirm({
         centered: true,
         width: 800,
         title: "เพิ่มใบรับ LAB",
         icon: <FormOutlined />,
-        content: <AddFormComponent list={response.data} />,
+        content: (
+          <AddFormComponent list={response.data} addPatient={addPatient} />
+        ),
         footer: <></>,
       });
+    });
+  };
+  const addPatient = () => {
+    Modal.confirm({
+      centered: true,
+      width: 700,
+      title: "แบบฟอร์มเพิ่ม Patient",
+      content: <AddPatientFormComponent />,
+      footer: <></>,
     });
   };
   const getDoctor = (action) => {

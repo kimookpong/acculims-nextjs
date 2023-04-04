@@ -2,6 +2,7 @@ import dbconnect from "./dbconnect";
 
 export default function handler(req, res) {
   const findText = req.body.findText;
+  const findHN = req.body.findHN;
   let query = `SELECT 
   hn,
   cid,
@@ -9,14 +10,39 @@ export default function handler(req, res) {
   fname,
   lname,
   birthday,
+  sex,
+  nationality,
+  religion,
+  bloodgrp,
+  passport_no,
+  clinic,
+
+  informaddr,
+  informtel,
+  hometel,
+  email,
+
+  workaddr,
+  worktel,
+
+  informname,
+
   concat(patient.pname, '', patient.fname, ' ', patient.lname) AS patient_name,
   DATE_FORMAT(DATE_ADD(birthday, INTERVAL 543 YEAR),'%d-%m-%Y') AS date
   FROM patient`;
 
-  if (!!findText) {
-    query =
-      query +
-      ` WHERE fname like '%${findText}%' OR lname like '%${findText}%' OR hn like '%${findText}%' `;
+  if (!!findText || !!findHN) {
+    if (!!findText && !!findHN) {
+      query =
+        query +
+        ` WHERE fname like '%${findText}%' OR lname like '%${findText}%' OR hn like '%${findText}%' OR cid like '%${findText}%' OR hn like '%${findHN}%' `;
+    } else if (!!findText) {
+      query =
+        query +
+        ` WHERE fname like '%${findText}%' OR lname like '%${findText}%' OR hn like '%${findText}%' OR cid like '%${findText}%' `;
+    } else if (!!findHN) {
+      query = query + ` WHERE hn like '%${findHN}%' `;
+    }
   }
 
   const connection = dbconnect();

@@ -20,8 +20,10 @@ import {
   Form,
   Input,
   message,
+  Typography,
 } from "antd";
 const { Content } = Layout;
+const { Title } = Typography;
 
 // THAI DATEPICKER
 import DatePicker from "react-multi-date-picker";
@@ -120,7 +122,6 @@ const thai_th = {
 };
 // END THAI DATEPICKER
 
-import styles from "../../styles/Home.module.css";
 import ReactToPrint from "react-to-print";
 import dayjs from "dayjs";
 
@@ -158,7 +159,6 @@ const CritReport = () => {
       title: "วันที่",
       dataIndex: "date_save",
       key: "date_save",
-      ellipsis: true,
       render: (text) => (
         <>{dayjs(text).add(543, "year").format("DD-MM-YYYY")}</>
       ),
@@ -168,78 +168,62 @@ const CritReport = () => {
       title: "เวลา",
       dataIndex: "time_call",
       key: "time_call",
-      ellipsis: true,
-      width: 100,
+      width: 70,
+    },
+
+    {
+      title: "หน่วยงาน",
+      dataIndex: "position",
+      key: "position",
+      width: 120,
     },
     {
       title: "ผู้โทร",
       dataIndex: "call_name",
       key: "call_name",
-      ellipsis: true,
-      width: 100,
-    },
-    {
-      title: "หน่วยงาน",
-      dataIndex: "position",
-      key: "position",
-      ellipsis: true,
       width: 120,
     },
     {
       title: "HN",
       dataIndex: "hn",
       key: "hn",
-      ellipsis: true,
-      width: 100,
+      width: 80,
     },
     {
       title: "ชื่อ-สกุล",
       dataIndex: "patient_name",
       key: "patient_name",
-      ellipsis: true,
       width: 160,
     },
     {
-      title: "เพิ่ม LAB",
+      title: "รายการตรวจวิเคราะห์",
       dataIndex: "test_name",
       key: "test_name",
-      ellipsis: true,
-      width: 100,
+      width: 150,
     },
     {
-      title: "ยกเลิก LAB",
-      dataIndex: "",
-      key: "",
-      ellipsis: true,
-      width: 120,
-    },
-    {
-      title: "ค่าวิกฤติ",
+      title: "ค่าวิกฤต",
       dataIndex: "critical_ref",
       key: "critical_ref",
-      ellipsis: true,
       width: 200,
     },
     {
       title: "ผล LAB",
       dataIndex: "result",
       key: "result",
-      ellipsis: true,
       width: 200,
     },
     {
       title: "เวลา",
       dataIndex: "time_take",
       key: "time_take",
-      ellipsis: true,
-      width: 100,
+      width: 70,
     },
     {
       title: "ผู้รับโทรศัพท์",
       dataIndex: "take_name",
       key: "take_name",
-      ellipsis: true,
-      width: 160,
+      width: 120,
     },
   ];
 
@@ -268,6 +252,19 @@ const CritReport = () => {
       });
   }
 
+  const dataTable = () => {
+    return (
+      <Table
+        dataSource={data}
+        rowKey={"lab_order_number"}
+        columns={columns}
+        size="small"
+        bordered
+        pagination={false}
+      />
+    );
+  };
+
   return (
     <ConfigProvider renderEmpty={customizeRenderEmpty}>
       {messageContext}
@@ -275,7 +272,7 @@ const CritReport = () => {
         <Content>
           <Row>
             <Col xs={24} lg={3} className="iconMenu">
-              <h1 style={{ margin: "auto 0" }}>รายงานค่าวิกฤติ</h1>
+              <h1 style={{ margin: "auto 0" }}>รายงานค่าวิกฤต</h1>
             </Col>
             <Col xs={24} lg={21}>
               <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
@@ -408,6 +405,16 @@ const CritReport = () => {
                       />
                       <div style={{ display: "none" }}>
                         <div ref={componentRef}>
+                          <h3 style={{ textAlign: "center" }}>
+                            รายงานค่าวิกฤต ระหว่างวันที่{" "}
+                            {dayjs(date_start, dateFormat)
+                              .add(543, "year")
+                              .format("DD-MM-YYYY")}{" "}
+                            ถึง{" "}
+                            {dayjs(date_stop, dateFormat)
+                              .add(543, "year")
+                              .format("DD-MM-YYYY")}
+                          </h3>
                           <Table
                             dataSource={data}
                             rowKey={"lab_order_number"}

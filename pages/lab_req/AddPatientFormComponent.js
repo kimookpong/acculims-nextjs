@@ -1,6 +1,6 @@
 import {
   Divider,
-  Modal,
+  Modal as ModalForm,
   Input,
   Button,
   Form,
@@ -112,134 +112,22 @@ const thai_th = {
 const dateFormat = "YYYY-MM-DD";
 const { TextArea } = Input;
 const FormComponent = (props) => {
-  const { dataForm, reloadList } = props;
+  const { dataForm } = props;
   const [age, setAge] = useState();
-  const [fields, setFields] = useState([
-    {
-      name: ["cid"],
-      value: !!dataForm ? dataForm.cid : null,
-    },
-    {
-      name: ["passport_no"],
-      value: !!dataForm ? dataForm.passport_no : null,
-    },
-    {
-      name: ["hn"],
-      value: !!dataForm ? dataForm.hn : null,
-    },
-    {
-      name: ["pname"],
-      value: !!dataForm ? dataForm.pname : null,
-    },
-    {
-      name: ["fname"],
-      value: !!dataForm ? dataForm.fname : null,
-    },
-    {
-      name: ["lname"],
-      value: !!dataForm ? dataForm.lname : null,
-    },
-    {
-      name: ["birthday"],
-      value: !!dataForm
-        ? dayjs(dataForm.birthday, dateFormat)
-            .add(543, "year")
-            .format("DD-MM-YYYY")
-        : null,
-    },
-    {
-      name: ["clinic"],
-      value: !!dataForm ? dataForm.clinic : null,
-    },
-
-    {
-      name: ["sex"],
-      value: !!dataForm ? dataForm.sex : null,
-    },
-    {
-      name: ["nationality"],
-      value: !!dataForm ? dataForm.nationality : null,
-    },
-    {
-      name: ["religion"],
-      value: !!dataForm ? dataForm.religion : null,
-    },
-    {
-      name: ["bloodgrp"],
-      value: !!dataForm ? dataForm.bloodgrp : null,
-    },
-
-    {
-      name: ["informaddr"],
-      value: !!dataForm ? dataForm.informaddr : null,
-    },
-    {
-      name: ["informtel"],
-      value: !!dataForm ? dataForm.informtel : null,
-    },
-    {
-      name: ["email"],
-      value: !!dataForm ? dataForm.email : null,
-    },
-    {
-      name: ["line_id"],
-      value: !!dataForm ? dataForm.line_id : null,
-    },
-    {
-      name: ["workaddr"],
-      value: !!dataForm ? dataForm.workaddr : null,
-    },
-    {
-      name: ["worktel"],
-      value: !!dataForm ? dataForm.worktel : null,
-    },
-  ]);
+  const [fields, setFields] = useState([]);
 
   useEffect(() => {
     !!dataForm && !!dataForm.birthday
       ? calculateAge(dayjs(dataForm.birthday, dateFormat).format("YYYY-MM-DD"))
       : null;
   }, [dataForm]);
-  const deleteUser = () => {
-    console.log(dataForm.id_user);
-    return axios
-      .post("/api/delete_user", {
-        user_id: dataForm.id_user,
-      })
-      .then((response) => {
-        reloadList();
-        closeModal();
-      });
-  };
+
   const onFinish = (values) => {
-    if (!!dataForm) {
-      return axios
-        .post("/api/user_action", {
-          action: "update",
-          id_user: dataForm.id_user,
-          values: values,
-        })
-        .then((response) => {
-          console.log(response.data);
-          reloadList();
-          closeModal();
-        });
-    } else {
-      return axios
-        .post("/api/user_action", {
-          action: "create",
-          values: values,
-        })
-        .then((response) => {
-          console.log(response.data);
-          reloadList();
-          closeModal();
-        });
-    }
+    closeModal();
   };
 
   const closeModal = () => {
-    Modal.destroyAll();
+    ModalForm.destroyAll();
   };
 
   const calculateAge = (dateOfBirth) => {
@@ -288,6 +176,12 @@ const FormComponent = (props) => {
                 label="HN :"
                 name="hn"
                 style={{ marginBottom: "5px" }}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอก HN",
+                  },
+                ]}
               >
                 <Input />
               </Form.Item>
@@ -587,13 +481,6 @@ const FormComponent = (props) => {
         <Button key="back" onClick={closeModal}>
           ยกเลิก
         </Button>
-        {!!dataForm ? (
-          <Button danger onClick={deleteUser}>
-            ลบ
-          </Button>
-        ) : (
-          <></>
-        )}
         <Button type="primary" htmlType="submit">
           ยืนยัน
         </Button>

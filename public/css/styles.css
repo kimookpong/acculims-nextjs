@@ -108,3 +108,14 @@ th.ant-table-cell {
     border: 1px solid #f0f0f0;
     border-collapse: collapse;
   }
+
+
+.ant-checkbox-group-item {
+    margin-left: 0 !important;
+}
+
+
+
+
+
+

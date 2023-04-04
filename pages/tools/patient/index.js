@@ -90,7 +90,7 @@ function ToolsUservalref() {
   async function loadUser() {
     setLoadingData(true);
     return axios
-      .post("/api/get_lis_patient", { findText: findText })
+      .post("/api/get_lis_patient", { findText: findText, findHN: findHN })
       .then((response) => {
         console.log(response.data);
         setData(response.data);
@@ -121,6 +121,16 @@ function ToolsUservalref() {
     return age;
   };
 
+  const setSex = (sex) => {
+    if (sex === "1") {
+      return "ชาย";
+    }
+    if (sex === "2") {
+      return "หญิง";
+    }
+    return "";
+  };
+
   const columns = [
     // {
     //   title: "User ID",
@@ -149,6 +159,14 @@ function ToolsUservalref() {
       key: "patient_name",
       ellipsis: true,
     },
+    {
+      title: "เพศ",
+      dataIndex: "sex",
+      key: "sex",
+      render: (text) => setSex(text),
+      ellipsis: true,
+      width: 80,
+    },
 
     {
       title: "วันเกิด",
@@ -161,6 +179,12 @@ function ToolsUservalref() {
       dataIndex: "birthday",
       key: "birthday",
       render: (text) => calculateAge(text) + " ปี",
+      width: 80,
+    },
+    {
+      title: "เบอร์โทร",
+      dataIndex: "informtel",
+      key: "informtel",
       width: 100,
     },
     // {
@@ -174,7 +198,7 @@ function ToolsUservalref() {
   const dataTitle = {
     title: (
       <>
-        <BankOutlined /> จัดการข้อมูลผู้ใช้
+        <BankOutlined /> จัดการข้อมูล Patient
       </>
     ),
   };
@@ -192,12 +216,12 @@ function ToolsUservalref() {
         <Content>
           <Row>
             <Col xs={24} lg={3} className="iconMenu">
-              <h1 style={{ margin: "auto 0" }}>จัดการข้อมูลผู้ใช้งาน</h1>
+              <h1 style={{ margin: "auto 0" }}>จัดการข้อมูล Patient</h1>
             </Col>
             <Col xs={24} lg={21}>
               <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
                 <Row gutter={24}>
-                  <Col xs={12} lg={12}>
+                  <Col xs={8} lg={8}>
                     <Form.Item
                       style={{ marginBottom: 5, marginTop: 5 }}
                       label="ค้นหา HN  :"
@@ -208,10 +232,10 @@ function ToolsUservalref() {
                       />
                     </Form.Item>
                   </Col>
-                  <Col xs={12} lg={12}>
+                  <Col xs={16} lg={16}>
                     <Form.Item
                       style={{ marginBottom: 5, marginTop: 5 }}
-                      label="ค้นหา ชื่อ-สกุล :"
+                      label="ค้นหา ชื่อ-สกุล/เลขประจำตัวประชาชน :"
                     >
                       <Input
                         value={findText}
