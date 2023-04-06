@@ -192,12 +192,12 @@ function LabReq() {
       });
     });
   };
-  const addPatient = () => {
+  const addPatient = (dataDefault) => {
     Modal.confirm({
       centered: true,
       width: 700,
       title: "แบบฟอร์มเพิ่ม Patient",
-      content: <AddPatientFormComponent />,
+      content: <AddPatientFormComponent dataDefault={dataDefault} />,
       footer: <></>,
     });
   };

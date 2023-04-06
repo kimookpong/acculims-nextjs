@@ -208,10 +208,11 @@ const AddFormComponent = (props) => {
   };
 
   const [selectHN, setselectHN] = useState([]);
-
+  const [selectCurrentHN, setselectCurrentHN] = useState();
   const [loadingHN, setLoadingHN] = useState(false);
   const [optionsHN, setOptions] = useState([]);
   const handleSearchHN = (value) => {
+    setselectCurrentHN(value);
     if (value) {
       searchResult(value);
     } else {
@@ -224,7 +225,7 @@ const AddFormComponent = (props) => {
   const onSelectHN = (value) => {
     if (value === 0) {
       closeModal();
-      addPatient();
+      addPatient(selectCurrentHN);
     }
     if (selectHN.length) {
       let result = selectHN.find((obj) => {

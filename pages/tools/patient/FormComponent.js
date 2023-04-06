@@ -114,6 +114,7 @@ const { TextArea } = Input;
 const FormComponent = (props) => {
   const { dataForm, reloadList } = props;
   const [age, setAge] = useState();
+  const [editMode, setEditMode] = useState(!!dataForm ? true : false);
   const [fields, setFields] = useState([
     {
       name: ["cid"],
@@ -168,11 +169,37 @@ const FormComponent = (props) => {
       name: ["bloodgrp"],
       value: !!dataForm ? dataForm.bloodgrp : null,
     },
+    {
+      name: ["addrpart"],
+      value: !!dataForm ? dataForm.addrpart : null,
+    },
+    {
+      name: ["moopart"],
+      value: !!dataForm ? dataForm.moopart : null,
+    },
+    {
+      name: ["tmbpart"],
+      value: !!dataForm ? dataForm.tmbpart : null,
+    },
+    {
+      name: ["amppart"],
+      value: !!dataForm ? dataForm.amppart : null,
+    },
+    {
+      name: ["chwpart"],
+      value: !!dataForm ? dataForm.chwpart : null,
+    },
+
+    {
+      name: ["informname"],
+      value: !!dataForm ? dataForm.informname : null,
+    },
 
     {
       name: ["informaddr"],
       value: !!dataForm ? dataForm.informaddr : null,
     },
+
     {
       name: ["informtel"],
       value: !!dataForm ? dataForm.informtel : null,
@@ -203,8 +230,9 @@ const FormComponent = (props) => {
   const deleteUser = () => {
     console.log(dataForm.id_user);
     return axios
-      .post("/api/delete_user", {
-        user_id: dataForm.id_user,
+      .post("/api/patient_action", {
+        action: "delete",
+        hn: dataForm.hn,
       })
       .then((response) => {
         reloadList();
@@ -212,11 +240,21 @@ const FormComponent = (props) => {
       });
   };
   const onFinish = (values) => {
+    const myDate = new Date(values.birthday);
+
+    if (isNaN(myDate.getTime())) {
+      values.birthday = dayjs(values.birthday, "DD-MM-YYYY")
+        .add(-543, "year")
+        .format(dateFormat);
+    } else {
+      values.birthday = values.birthday.add(-543, "year").format(dateFormat);
+    }
+
     if (!!dataForm) {
       return axios
-        .post("/api/user_action", {
+        .post("/api/patient_action", {
           action: "update",
-          id_user: dataForm.id_user,
+          hn: dataForm.hn,
           values: values,
         })
         .then((response) => {
@@ -226,7 +264,7 @@ const FormComponent = (props) => {
         });
     } else {
       return axios
-        .post("/api/user_action", {
+        .post("/api/patient_action", {
           action: "create",
           values: values,
         })
@@ -288,8 +326,14 @@ const FormComponent = (props) => {
                 label="HN :"
                 name="hn"
                 style={{ marginBottom: "5px" }}
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอก HN",
+                  },
+                ]}
               >
-                <Input />
+                <Input disabled={editMode} />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -473,6 +517,7 @@ const FormComponent = (props) => {
             </Select>
           </Form.Item>
         </Col>
+
         <Col span={24}>
           <label
             style={{
@@ -483,14 +528,68 @@ const FormComponent = (props) => {
           >
             ที่อยู่ตามบัตรประชาชน :
           </label>
+        </Col>
+        <Col span={16}>
           <Form.Item
-            layout="vertical"
-            name="informaddr"
+            labelCol={{
+              span: 5,
+            }}
+            label="ที่อยู่ :"
+            name="addrpart"
             style={{ marginBottom: "5px" }}
           >
-            <TextArea rows={2} />
+            <Input />
           </Form.Item>
         </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="หมู่ :"
+            name="moopart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="ตำบล :"
+            name="tmbpart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="อำเภอ :"
+            name="amppart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="จังหวัด :"
+            name="chwpart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+
         <Col span={24}>
           <label
             style={{

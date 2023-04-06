@@ -112,18 +112,25 @@ const thai_th = {
 const dateFormat = "YYYY-MM-DD";
 const { TextArea } = Input;
 const FormComponent = (props) => {
-  const { dataForm } = props;
+  const { dataDefault } = props;
   const [age, setAge] = useState();
-  const [fields, setFields] = useState([]);
-
-  useEffect(() => {
-    !!dataForm && !!dataForm.birthday
-      ? calculateAge(dayjs(dataForm.birthday, dateFormat).format("YYYY-MM-DD"))
-      : null;
-  }, [dataForm]);
+  const [fields, setFields] = useState([
+    {
+      name: ["hn"],
+      value: !!dataDefault ? dataDefault : null,
+    },
+  ]);
 
   const onFinish = (values) => {
-    closeModal();
+    values.birthday = values.birthday.add(-543, "year").format(dateFormat);
+    return axios
+      .post("/api/patient_action", {
+        action: "create",
+        values: values,
+      })
+      .then((response) => {
+        closeModal();
+      });
   };
 
   const closeModal = () => {
@@ -367,6 +374,7 @@ const FormComponent = (props) => {
             </Select>
           </Form.Item>
         </Col>
+
         <Col span={24}>
           <label
             style={{
@@ -377,12 +385,65 @@ const FormComponent = (props) => {
           >
             ที่อยู่ตามบัตรประชาชน :
           </label>
+        </Col>
+        <Col span={16}>
           <Form.Item
-            layout="vertical"
-            name="informaddr"
+            labelCol={{
+              span: 5,
+            }}
+            label="ที่อยู่ :"
+            name="addrpart"
             style={{ marginBottom: "5px" }}
           >
-            <TextArea rows={2} />
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="หมู่ :"
+            name="moopart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="ตำบล :"
+            name="tmbpart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="อำเภอ :"
+            name="amppart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="จังหวัด :"
+            name="chwpart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Input />
           </Form.Item>
         </Col>
         <Col span={24}>

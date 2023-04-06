@@ -17,6 +17,12 @@ export default function handler(req, res) {
   passport_no,
   clinic,
 
+  addrpart,
+  moopart,
+  tmbpart,
+  amppart,
+  chwpart,
+
   informaddr,
   informtel,
   hometel,
