@@ -22,6 +22,7 @@ export default function handler(req, res) {
   tmbpart,
   amppart,
   chwpart,
+  po_code,
 
   informaddr,
   informtel,
@@ -35,7 +36,7 @@ export default function handler(req, res) {
 
   concat(patient.pname, '', patient.fname, ' ', patient.lname) AS patient_name,
   DATE_FORMAT(DATE_ADD(birthday, INTERVAL 543 YEAR),'%d-%m-%Y') AS date
-  FROM patient`;
+  FROM patient `;
 
   if (!!findText || !!findHN) {
     if (!!findText && !!findHN) {
@@ -50,6 +51,8 @@ export default function handler(req, res) {
       query = query + ` WHERE hn like '%${findHN}%' `;
     }
   }
+
+  query = query + ` LIMIT 10000`;
 
   const connection = dbconnect();
   connection.connect(function (err) {

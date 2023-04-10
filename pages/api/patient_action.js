@@ -29,7 +29,8 @@ export default function handler(req, res) {
     moopart =  '${values.moopart ? values.moopart : ""}',
     tmbpart =  '${values.tmbpart ? values.tmbpart : ""}',
     amppart =  '${values.amppart ? values.amppart : ""}',
-    chwpart =  '${values.chwpart ? values.chwpart : ""}'
+    chwpart =  '${values.chwpart ? values.chwpart : ""}',
+    po_code =  '${values.po_code ? values.po_code : ""}'
     WHERE hn = '${req.body.hn}';`;
   } else if (action === "create") {
     query = `INSERT INTO patient 
@@ -56,7 +57,8 @@ export default function handler(req, res) {
       moopart,
       tmbpart,
       amppart,
-      chwpart) 
+      chwpart,
+      po_code) 
     VALUES 
     (
       '${values.birthday}',
@@ -81,7 +83,8 @@ export default function handler(req, res) {
       '${values.moopart ? values.moopart : ""}',
       '${values.tmbpart ? values.tmbpart : ""}',
       '${values.amppart ? values.amppart : ""}',
-      '${values.chwpart ? values.chwpart : ""}'
+      '${values.chwpart ? values.chwpart : ""}',
+      '${values.po_code ? values.po_code : ""}'
       );`;
   } else if (action === "delete") {
     query = `DELETE FROM patient WHERE hn = '${req.body.hn}';`;

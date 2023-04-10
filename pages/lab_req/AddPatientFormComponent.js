@@ -121,6 +121,79 @@ const FormComponent = (props) => {
     },
   ]);
 
+  const searchResult = (query, field) => {
+    return axios
+      .post("/api/get_tambons", {
+        q: query,
+        field: field,
+      })
+      .then(function (response) {
+        if (field === "province") {
+          setchwpartOptions(response.data);
+          setloadingchw(false);
+        } else if (field === "amphoe") {
+          setamppartOptions(response.data);
+          setloadingamp(false);
+        } else if (field === "tambon") {
+          settmbpartOptions(response.data);
+          setloadingtmb(false);
+        }
+      });
+  };
+  const [loadingchw, setloadingchw] = useState(false);
+  const [chwpartOptions, setchwpartOptions] = useState([]);
+  const [chwpartSelect, setchwpartSelect] = useState();
+  const onChangechwpart = (value) => {
+    setchwpartSelect(value);
+    settmbpartOptions([]);
+    setFields([
+      {
+        name: ["amppart"],
+        value: null,
+      },
+      {
+        name: ["tmbpart"],
+        value: null,
+      },
+    ]);
+  };
+
+  const [loadingamp, setloadingamp] = useState(false);
+  const [amppartOptions, setamppartOptions] = useState([]);
+  const [amppartSelect, setamppartSelect] = useState();
+  const onChangeamppart = (value) => {
+    setamppartSelect(value);
+    setFields([
+      {
+        name: ["tmbpart"],
+        value: null,
+      },
+    ]);
+  };
+
+  const [loadingtmb, setloadingtmb] = useState(false);
+  const [tmbpartOptions, settmbpartOptions] = useState([]);
+  const [tmbpartSelect, settmbpartSelect] = useState();
+  const onChangetmbpart = (value) => {
+    settmbpartSelect(value);
+  };
+
+  const [po_codeSelect, setpo_codeSelect] = useState();
+  useEffect(() => {
+    setloadingchw(true);
+    searchResult("", "province");
+  }, []);
+
+  useEffect(() => {
+    setloadingamp(true);
+    searchResult(chwpartSelect, "amphoe");
+  }, [chwpartSelect]);
+
+  useEffect(() => {
+    setloadingtmb(true);
+    searchResult(chwpartSelect + amppartSelect, "tambon");
+  }, [amppartSelect]);
+
   const onFinish = (values) => {
     values.birthday = values.birthday.add(-543, "year").format(dateFormat);
     return axios
@@ -342,7 +415,10 @@ const FormComponent = (props) => {
             name="nationality"
             style={{ marginBottom: "5px" }}
           >
-            <Input />
+            <Select>
+              <Select.Option value="99">ไทย</Select.Option>
+              <Select.Option value="100">ต่างชาติ</Select.Option>
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -354,7 +430,14 @@ const FormComponent = (props) => {
             name="religion"
             style={{ marginBottom: "5px" }}
           >
-            <Input />
+            <Select>
+              <Select.Option value="01">พุทธ</Select.Option>
+              <Select.Option value="02">คริสต์</Select.Option>
+              <Select.Option value="03">อิสลาม</Select.Option>
+              <Select.Option value="04">พราหมณ์- ฮินดู</Select.Option>
+              <Select.Option value="05">ยิว</Select.Option>
+              <Select.Option value="06">ไม่นับถือ</Select.Option>
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -415,11 +498,16 @@ const FormComponent = (props) => {
             labelCol={{
               span: 10,
             }}
-            label="ตำบล :"
-            name="tmbpart"
+            label="จังหวัด :"
+            name="chwpart"
             style={{ marginBottom: "5px" }}
           >
-            <Input />
+            <Select
+              showSearch
+              onChange={onChangechwpart}
+              options={chwpartOptions}
+              loading={loadingchw}
+            />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -431,7 +519,12 @@ const FormComponent = (props) => {
             name="amppart"
             style={{ marginBottom: "5px" }}
           >
-            <Input />
+            <Select
+              showSearch
+              onChange={onChangeamppart}
+              options={amppartOptions}
+              loading={loadingamp}
+            />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -439,8 +532,25 @@ const FormComponent = (props) => {
             labelCol={{
               span: 10,
             }}
-            label="จังหวัด :"
-            name="chwpart"
+            label="ตำบล :"
+            name="tmbpart"
+            style={{ marginBottom: "5px" }}
+          >
+            <Select
+              showSearch
+              onChange={onChangetmbpart}
+              options={tmbpartOptions}
+              loading={loadingtmb}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="รหัสไปรษณีย์ :"
+            name="po_code"
             style={{ marginBottom: "5px" }}
           >
             <Input />
