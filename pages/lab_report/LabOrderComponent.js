@@ -8,7 +8,7 @@ import {
   Tooltip as TT,
 } from "antd";
 import { LineChartOutlined, WarningOutlined } from "@ant-design/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import {
   Chart as ChartJS,
@@ -47,6 +47,17 @@ const LabOrderComponent = (props) => {
     reloadReport,
     dataLab,
   } = props;
+
+  const inputRefs = useRef([]);
+  function handleKeyPress(event, index) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const nextIndex = index + 1;
+      if (nextIndex < inputRefs.current.length) {
+        inputRefs.current[nextIndex].focus();
+      }
+    }
+  }
 
   const [messageApi, messageContext] = message.useMessage();
 
@@ -686,6 +697,9 @@ const LabOrderComponent = (props) => {
                           labOrderNumber={labOrderNumber}
                           checkCritical={checkCritical}
                           showModalCritical={showModalCritical}
+                          handleKeyPress={handleKeyPress}
+                          inputRefs={inputRefs}
+                          index={index}
                         />
                         <td style={{ border: "1px solid #f0f0f0" }}>
                           {item["lab_order_result_rerun"]}

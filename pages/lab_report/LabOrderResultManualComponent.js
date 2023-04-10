@@ -12,6 +12,9 @@ const LabOrderResultManualComponent = (props) => {
     labOrderNumber,
     checkCritical,
     showModalCritical,
+    handleKeyPress,
+    inputRefs,
+    index,
   } = props;
 
   //find min and max
@@ -188,6 +191,8 @@ const LabOrderResultManualComponent = (props) => {
               onChange={eventCheck}
               id={item["lab_items_code"]}
               key={item["lab_order_number"] + item["lab_items_code"]}
+              onKeyPress={(e) => handleKeyPress(e, index)}
+              ref={(el) => (inputRefs.current[index] = el)}
             />
           ) : (
             <Input
@@ -197,6 +202,8 @@ const LabOrderResultManualComponent = (props) => {
               id={item["lab_items_code"]}
               key={item["lab_order_number"] + item["lab_items_code"]}
               disabled={formDisable}
+              onKeyPress={(e) => handleKeyPress(e, index)}
+              ref={(el) => (inputRefs.current[index] = el)}
             />
           )
         ) : null}
