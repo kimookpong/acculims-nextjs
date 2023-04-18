@@ -215,11 +215,11 @@ const AddFormComponent = (props) => {
       doctor_code: null,
       hn: values.hn,
       order_date: dayjs().format("YYYY-MM-DD"),
-      department: null,
+      department: values.department,
       form_name: values.form_name,
       sub_group_list: null,
       order_time: dayjs().format("HH:mm:ss"),
-      ward: values.ward,
+      ward: null,
       lis_order_no: null,
       receive_computer: null,
       order_department: null,
@@ -334,13 +334,13 @@ const AddFormComponent = (props) => {
         </Col>
         <Col span={6}>
           <Form.Item
-            label="ward :"
-            name="ward"
+            label="แผนก :"
+            name="department"
             style={{ marginBottom: 5 }}
             rules={[
               {
                 required: true,
-                message: "กรุณาเลือก Ward",
+                message: "กรุณาเลือกแผนก",
               },
             ]}
           >
