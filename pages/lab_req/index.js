@@ -179,14 +179,63 @@ function LabReq() {
   };
 
   const showAddForm = () => {
+    setLoadingAddForm(true);
     return axios.post("/api/get_lab_detail").then(function (response) {
+      let dataArrayGroup = [];
+      let count = 0;
+      if (!!response.data) {
+        response.data.forEach((data) => {
+          if (!!data) {
+            let dataArray = [];
+            let currentGroup = 0;
+            data.data.forEach((data2) => {
+              if (data2.single_profile === "s") {
+                if (
+                  !!dataArray[currentGroup] &&
+                  dataArray[currentGroup].name === "single"
+                ) {
+                  dataArray[currentGroup].data.push(data2);
+                } else {
+                  currentGroup++;
+                  dataArray[currentGroup] = { name: "single", data: [data2] };
+                }
+              } else if (data2.single_profile === "p") {
+                if (
+                  !!dataArray[currentGroup] &&
+                  dataArray[currentGroup].name ===
+                    data2.lab_items_sub_group_name
+                ) {
+                  dataArray[currentGroup].data.push(data2);
+                } else {
+                  currentGroup++;
+                  dataArray[currentGroup] = {
+                    name: data2.lab_items_sub_group_name,
+                    data: [data2],
+                    code: data2.lab_items_sub_group_code,
+                  };
+                }
+              }
+            });
+            dataArrayGroup[count] = {
+              name: data.name,
+              data: dataArray,
+            };
+            count++;
+          }
+        });
+      }
+      setLoadingAddForm(false);
       Modal.confirm({
         centered: true,
-        width: 800,
+        width: 1000,
         title: "เพิ่มใบรับ LAB",
         icon: <FormOutlined />,
         content: (
-          <AddFormComponent list={response.data} addPatient={addPatient} />
+          <AddFormComponent
+            list={dataArrayGroup}
+            addPatient={addPatient}
+            setRefreshKey={setRefreshKey}
+          />
         ),
         footer: <></>,
       });
@@ -350,6 +399,7 @@ function LabReq() {
   };
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
+  const [loadingAddForm, setLoadingAddForm] = useState(false);
   const [data, setData] = useState([]);
   const [statusList, setStatusList] = useState("All");
   const [dataCount, setDataCount] = useState({
@@ -724,347 +774,378 @@ function LabReq() {
   }
   return (
     <ConfigProvider locale={thTH} renderEmpty={customizeRenderEmpty}>
-      {messageContext}
-      <Layout style={{ background: "white" }}>
-        <Content>
-          <Row>
-            <Col xs={24} lg={18}>
-              <Content style={{ marginRight: "10px" }}>
-                <Row>
-                  <Col xs={24} lg={3} className="iconMenu">
-                    <h1 style={{ margin: "auto 0" }}>ใบรับ LAB</h1>
-                  </Col>
-                  <Col xs={24} lg={21}>
-                    <Card style={{ background: "#e2edf8", marginLeft: "10px" }}>
-                      <Row gutter={24}>
-                        <Col xs={12} lg={5}>
-                          <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <DatePicker
-                              calendar={thai}
-                              locale={thai_th}
-                              value={dayjs(sStartDate, dateFormat)
-                                .add(543, "year")
-                                .format("DD-MM-YYYY")}
-                              format="DD-MM-YYYY"
-                              onChange={handleDatePickerChangeStart}
-                              inputClass="datepicker-input"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={12} lg={5}>
-                          <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <DatePicker
-                              calendar={thai}
-                              locale={thai_th}
-                              value={dayjs(sEndDate, dateFormat)
-                                .add(543, "year")
-                                .format("DD-MM-YYYY")}
-                              format="DD-MM-YYYY"
-                              onChange={handleDatePickerChangeEnd}
-                              inputClass="datepicker-input"
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col>
-                          <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <Radio.Group onChange={inputSType} value={sType}>
-                              <Radio value={1}>Barcode</Radio>
-                              <Radio value={2}>HN</Radio>
-                              <Radio value={3}>ชื่อ-สกุล</Radio>
-                            </Radio.Group>
-                          </Form.Item>
-                        </Col>
-                        <Col flex="auto">
-                          <Form.Item
-                            style={{ marginBottom: 5, marginTop: 5 }}
-                            label=":"
-                          >
-                            <Input onChange={inputSInput} value={sInput} />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                      <Row gutter={24}>
-                        <Col>
-                          <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <Radio.Group onChange={inputSWork} value={sWork}>
-                              <Radio value={1}>งาน</Radio>
-                              <Radio value={2}>Lab form</Radio>
-                            </Radio.Group>
-                          </Form.Item>
-                        </Col>
-                        <Col>
-                          <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <Select
-                              showSearch
-                              onChange={inputSWorkType}
-                              value={sWorkType}
-                              style={{
-                                width: 200,
-                              }}
-                              options={sWorkTypeList}
-                            />
-                          </Form.Item>
-                        </Col>
-                        <Col>
-                          <Form.Item style={{ marginBottom: 5, marginTop: 5 }}>
-                            <Radio.Group
-                              onChange={inputSDepart}
-                              value={sDepart}
+      <Spin spinning={loadingAddForm} tip="กำลังโหลดข้อมูล" size="large">
+        {messageContext}
+        <Layout style={{ background: "white" }}>
+          <Content>
+            <Row>
+              <Col xs={24} lg={18}>
+                <Content style={{ marginRight: "10px" }}>
+                  <Row>
+                    <Col xs={24} lg={3} className="iconMenu">
+                      <h1 style={{ margin: "auto 0" }}>ใบรับ LAB</h1>
+                    </Col>
+                    <Col xs={24} lg={21}>
+                      <Card
+                        style={{ background: "#e2edf8", marginLeft: "10px" }}
+                      >
+                        <Row gutter={24}>
+                          <Col xs={12} lg={5}>
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
                             >
-                              <Radio value={"ALL"}>ALL</Radio>
-                              <Radio value={"OPD"}>OPD</Radio>
-                              <Radio value={"IPD"}>IPD</Radio>
-                            </Radio.Group>
-                          </Form.Item>
-                        </Col>
-                        <Col flex="auto">
-                          <Form.Item
-                            style={{ marginBottom: 5, marginTop: 5 }}
-                            label="ที่อยู่ :"
+                              <DatePicker
+                                calendar={thai}
+                                locale={thai_th}
+                                value={dayjs(sStartDate, dateFormat)
+                                  .add(543, "year")
+                                  .format("DD-MM-YYYY")}
+                                format="DD-MM-YYYY"
+                                onChange={handleDatePickerChangeStart}
+                                inputClass="datepicker-input"
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col xs={12} lg={5}>
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
+                            >
+                              <DatePicker
+                                calendar={thai}
+                                locale={thai_th}
+                                value={dayjs(sEndDate, dateFormat)
+                                  .add(543, "year")
+                                  .format("DD-MM-YYYY")}
+                                format="DD-MM-YYYY"
+                                onChange={handleDatePickerChangeEnd}
+                                inputClass="datepicker-input"
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col>
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
+                            >
+                              <Radio.Group onChange={inputSType} value={sType}>
+                                <Radio value={1}>Barcode</Radio>
+                                <Radio value={2}>HN</Radio>
+                                <Radio value={3}>ชื่อ-สกุล</Radio>
+                              </Radio.Group>
+                            </Form.Item>
+                          </Col>
+                          <Col flex="auto">
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
+                              label=":"
+                            >
+                              <Input onChange={inputSInput} value={sInput} />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                        <Row gutter={24}>
+                          <Col>
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
+                            >
+                              <Radio.Group onChange={inputSWork} value={sWork}>
+                                <Radio value={1}>งาน</Radio>
+                                <Radio value={2}>Lab form</Radio>
+                              </Radio.Group>
+                            </Form.Item>
+                          </Col>
+                          <Col>
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
+                            >
+                              <Select
+                                showSearch
+                                onChange={inputSWorkType}
+                                value={sWorkType}
+                                style={{
+                                  width: 200,
+                                }}
+                                options={sWorkTypeList}
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col>
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
+                            >
+                              <Radio.Group
+                                onChange={inputSDepart}
+                                value={sDepart}
+                              >
+                                <Radio value={"ALL"}>ALL</Radio>
+                                <Radio value={"OPD"}>OPD</Radio>
+                                <Radio value={"IPD"}>IPD</Radio>
+                              </Radio.Group>
+                            </Form.Item>
+                          </Col>
+                          <Col flex="auto">
+                            <Form.Item
+                              style={{ marginBottom: 5, marginTop: 5 }}
+                              label="ที่อยู่ :"
+                            >
+                              <Input
+                                onChange={inputSAddress}
+                                value={sAddress}
+                              />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </Card>
+                    </Col>
+                  </Row>
+                  <Row style={{ margin: "10px 0" }}>
+                    <Col span={16}>
+                      <Row>
+                        <Col span={6}>
+                          <Button
+                            onClick={() => setStatusListonClick("All")}
+                            type={statusList === "All" ? "primary" : "default"}
+                            block
                           >
-                            <Input onChange={inputSAddress} value={sAddress} />
-                          </Form.Item>
+                            All({dataCount["All"].toLocaleString()})
+                          </Button>
+                        </Col>
+                        <Col span={6}>
+                          <Button
+                            onClick={() => setStatusListonClick("Pending")}
+                            type={
+                              statusList === "Pending" ? "primary" : "default"
+                            }
+                            block
+                          >
+                            Pending({dataCount["Pending"].toLocaleString()})
+                          </Button>
+                        </Col>
+                        <Col span={6}>
+                          <Button
+                            onClick={() => setStatusListonClick("Received")}
+                            type={
+                              statusList === "Received" ? "primary" : "default"
+                            }
+                            block
+                          >
+                            Received({dataCount["Received"].toLocaleString()})
+                          </Button>
+                        </Col>
+                        <Col span={6}>
+                          <Button
+                            onClick={() => setStatusListonClick("Reject")}
+                            type={
+                              statusList === "Reject" ? "primary" : "default"
+                            }
+                            block
+                          >
+                            Reject({dataCount["Reject"].toLocaleString()})
+                          </Button>
                         </Col>
                       </Row>
-                    </Card>
-                  </Col>
-                </Row>
-                <Row style={{ margin: "10px 0" }}>
-                  <Col span={16}>
-                    <Row>
-                      <Col span={6}>
-                        <Button
-                          onClick={() => setStatusListonClick("All")}
-                          type={statusList === "All" ? "primary" : "default"}
-                          block
-                        >
-                          All({dataCount["All"].toLocaleString()})
-                        </Button>
-                      </Col>
-                      <Col span={6}>
-                        <Button
-                          onClick={() => setStatusListonClick("Pending")}
-                          type={
-                            statusList === "Pending" ? "primary" : "default"
-                          }
-                          block
-                        >
-                          Pending({dataCount["Pending"].toLocaleString()})
-                        </Button>
-                      </Col>
-                      <Col span={6}>
-                        <Button
-                          onClick={() => setStatusListonClick("Received")}
-                          type={
-                            statusList === "Received" ? "primary" : "default"
-                          }
-                          block
-                        >
-                          Received({dataCount["Received"].toLocaleString()})
-                        </Button>
-                      </Col>
-                      <Col span={6}>
-                        <Button
-                          onClick={() => setStatusListonClick("Reject")}
-                          type={statusList === "Reject" ? "primary" : "default"}
-                          block
-                        >
-                          Reject({dataCount["Reject"].toLocaleString()})
-                        </Button>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col span={8}>
-                    <Checkbox
-                      style={{ padding: 5, paddingLeft: 20 }}
-                      onChange={clickSeperateTupe}
+                    </Col>
+                    <Col span={8}>
+                      <Checkbox
+                        style={{ padding: 5, paddingLeft: 20 }}
+                        onChange={clickSeperateTupe}
+                      >
+                        Separate Tupe (FBS)
+                      </Checkbox>
+                    </Col>
+                  </Row>
+                </Content>
+                <Content style={{ marginRight: "10px" }}>
+                  <Spin spinning={loading} tip="กำลังโหลดข้อมูล" size="large">
+                    <Table
+                      rowSelection={rowSelection}
+                      columns={columns}
+                      dataSource={data.filter((d) => {
+                        if (statusList === "All") {
+                          return d;
+                        } else if (statusList === d["h_status"]) {
+                          return d;
+                        }
+                        return false;
+                      })}
+                      bordered
+                      rowKey={"order_number"}
+                      size="small"
+                      scroll={{
+                        x: 1100,
+                      }}
+                      // sticky
+                      onRow={(record, rowIndex) => {
+                        return {
+                          onClick: (event) => {
+                            loadDetail(record);
+                            clickSelectRow(record.order_number);
+                          }, // click row
+                        };
+                      }}
+                    />
+                  </Spin>
+                </Content>
+                <Row style={{ marginRight: "10px" }}>
+                  <Col span={24}>
+                    <Card
+                      className="backgroundGreen"
+                      style={{ marginTop: "10px" }}
                     >
-                      Separate Tupe (FBS)
-                    </Checkbox>
-                  </Col>
-                </Row>
-              </Content>
-              <Content style={{ marginRight: "10px" }}>
-                <Spin spinning={loading} tip="กำลังโหลดข้อมูล" size="large">
-                  <Table
-                    rowSelection={rowSelection}
-                    columns={columns}
-                    dataSource={data.filter((d) => {
-                      if (statusList === "All") {
-                        return d;
-                      } else if (statusList === d["h_status"]) {
-                        return d;
-                      }
-                      return false;
-                    })}
-                    bordered
-                    rowKey={"order_number"}
-                    size="small"
-                    scroll={{
-                      x: 1100,
-                    }}
-                    // sticky
-                    onRow={(record, rowIndex) => {
-                      return {
-                        onClick: (event) => {
-                          loadDetail(record);
-                          clickSelectRow(record.order_number);
-                        }, // click row
-                      };
-                    }}
-                  />
-                </Spin>
-              </Content>
-              <Row style={{ marginRight: "10px" }}>
-                <Col span={24}>
-                  <Card
-                    className="backgroundGreen"
-                    style={{ marginTop: "10px" }}
-                  >
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ display: "inline-flex" }}>
-                        <div style={{ padding: 5 }}>
-                          <Button
-                            style={{
-                              padding: 10,
-                              cursor: "pointer",
-                              height: "auto",
-                              minWidth: 100,
-                            }}
-                            onClick={() => {
-                              showAddForm();
-                            }}
-                          >
-                            <div>
-                              <PlusCircleOutlined
-                                style={{
-                                  fontSize: 40,
-                                }}
-                              />
-                            </div>
-                            <div>เพิ่มใบ LAB</div>
-                          </Button>
-                        </div>
-                        <div style={{ padding: 5 }}>
-                          <Button
-                            style={{
-                              padding: 10,
-                              cursor: "pointer",
-                              height: "auto",
-                              minWidth: 100,
-                            }}
-                            onClick={() => {
-                              showConfirm("accept");
-                            }}
-                            disabled={selectedRowKeys.length > 0 ? false : true}
-                          >
-                            <div>
-                              <CheckCircleOutlined
-                                style={{
-                                  fontSize: 40,
-                                }}
-                              />
-                            </div>
-                            <div>รับใบ LAB</div>
-                          </Button>
-                        </div>
-                        <div style={{ padding: 5 }}>
-                          <Button
-                            style={{
-                              padding: 10,
-                              cursor: "pointer",
-                              height: "auto",
-                              minWidth: 100,
-                            }}
-                            onClick={() => {
-                              showConfirmDelete("reject");
-                            }}
-                            disabled={selectedRowKeys.length !== 1}
-                          >
-                            <div>
-                              <StopOutlined
-                                style={{
-                                  fontSize: 40,
-                                }}
-                              />
-                            </div>
-                            <div>ปฎิเสธ</div>
-                          </Button>
-                        </div>
-                        <div style={{ padding: 5 }}>
-                          <Button
-                            danger
-                            style={{
-                              padding: 10,
-                              cursor: "pointer",
-                              height: "auto",
-                              minWidth: 100,
-                            }}
-                            onClick={() => {
-                              showConfirm("delete");
-                            }}
-                            disabled={selectedRowKeys.length > 0 ? false : true}
-                          >
-                            <div>
-                              <DeleteOutlined
-                                style={{
-                                  fontSize: 40,
-                                }}
-                              />
-                            </div>
-                            <div>ลบ</div>
-                          </Button>
-                        </div>
-                        <div style={{ padding: 5 }}>
-                          <Button
-                            style={{
-                              padding: 10,
-                              cursor: "pointer",
-                              height: "auto",
-                              minWidth: 100,
-                            }}
-                            onClick={() => {
-                              actionControl("print");
-                            }}
-                            disabled={selectedRowKeys.length > 0 ? false : true}
-                          >
-                            <div>
-                              <PrinterOutlined
-                                style={{
-                                  fontSize: 40,
-                                }}
-                              />
-                            </div>
-                            <div>พิมพ์ Barcode ซ้ำ</div>
-                          </Button>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ display: "inline-flex" }}>
+                          <div style={{ padding: 5 }}>
+                            <Button
+                              style={{
+                                padding: 10,
+                                cursor: "pointer",
+                                height: "auto",
+                                minWidth: 100,
+                              }}
+                              onClick={() => {
+                                showAddForm();
+                              }}
+                            >
+                              <div>
+                                <PlusCircleOutlined
+                                  style={{
+                                    fontSize: 40,
+                                  }}
+                                />
+                              </div>
+                              <div>เพิ่มใบ LAB</div>
+                            </Button>
+                          </div>
+                          <div style={{ padding: 5 }}>
+                            <Button
+                              style={{
+                                padding: 10,
+                                cursor: "pointer",
+                                height: "auto",
+                                minWidth: 100,
+                              }}
+                              onClick={() => {
+                                showConfirm("accept");
+                              }}
+                              disabled={
+                                selectedRowKeys.length > 0 ? false : true
+                              }
+                            >
+                              <div>
+                                <CheckCircleOutlined
+                                  style={{
+                                    fontSize: 40,
+                                  }}
+                                />
+                              </div>
+                              <div>รับใบ LAB</div>
+                            </Button>
+                          </div>
+                          <div style={{ padding: 5 }}>
+                            <Button
+                              style={{
+                                padding: 10,
+                                cursor: "pointer",
+                                height: "auto",
+                                minWidth: 100,
+                              }}
+                              onClick={() => {
+                                showConfirmDelete("reject");
+                              }}
+                              disabled={selectedRowKeys.length !== 1}
+                            >
+                              <div>
+                                <StopOutlined
+                                  style={{
+                                    fontSize: 40,
+                                  }}
+                                />
+                              </div>
+                              <div>ปฎิเสธ</div>
+                            </Button>
+                          </div>
+                          <div style={{ padding: 5 }}>
+                            <Button
+                              danger
+                              style={{
+                                padding: 10,
+                                cursor: "pointer",
+                                height: "auto",
+                                minWidth: 100,
+                              }}
+                              onClick={() => {
+                                showConfirm("delete");
+                              }}
+                              disabled={
+                                selectedRowKeys.length > 0 ? false : true
+                              }
+                            >
+                              <div>
+                                <DeleteOutlined
+                                  style={{
+                                    fontSize: 40,
+                                  }}
+                                />
+                              </div>
+                              <div>ลบ</div>
+                            </Button>
+                          </div>
+                          <div style={{ padding: 5 }}>
+                            <Button
+                              style={{
+                                padding: 10,
+                                cursor: "pointer",
+                                height: "auto",
+                                minWidth: 100,
+                              }}
+                              onClick={() => {
+                                actionControl("print");
+                              }}
+                              disabled={
+                                selectedRowKeys.length > 0 ? false : true
+                              }
+                            >
+                              <div>
+                                <PrinterOutlined
+                                  style={{
+                                    fontSize: 40,
+                                  }}
+                                />
+                              </div>
+                              <div>พิมพ์ Barcode ซ้ำ</div>
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                </Col>
-              </Row>
-            </Col>
-            <Col xs={24} lg={6}>
-              <StickyBox>
-                <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล" size="large">
-                  <Content>
-                    <Card
-                      title="รายละเอียด Lab Order"
-                      style={{ marginBottom: "10px" }}
-                    >
-                      {detail}
                     </Card>
-                    <Card title="Lab Note" style={{ marginBottom: "10px" }}>
-                      {detailNote}
-                    </Card>
-                    <Card title="ประเภทสิ่งส่งตรวจ">{detailThing}</Card>
-                  </Content>
-                </Spin>
-              </StickyBox>
-            </Col>
-          </Row>
-        </Content>
-      </Layout>
+                  </Col>
+                </Row>
+              </Col>
+              <Col xs={24} lg={6}>
+                <StickyBox>
+                  <Spin
+                    spinning={loadingData}
+                    tip="กำลังโหลดข้อมูล"
+                    size="large"
+                  >
+                    <Content>
+                      <Card
+                        title="รายละเอียด Lab Order"
+                        style={{ marginBottom: "10px" }}
+                      >
+                        {detail}
+                      </Card>
+                      <Card title="Lab Note" style={{ marginBottom: "10px" }}>
+                        {detailNote}
+                      </Card>
+                      <Card title="ประเภทสิ่งส่งตรวจ">{detailThing}</Card>
+                    </Content>
+                  </Spin>
+                </StickyBox>
+              </Col>
+            </Row>
+          </Content>
+        </Layout>
+      </Spin>
     </ConfigProvider>
   );
 }

@@ -9,6 +9,7 @@ import {
   Select,
   Checkbox,
 } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import { React, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -316,7 +317,7 @@ const FormComponent = (props) => {
     }
   }, [dataForm]);
 
-  const deleteUser = () => {
+  const deleteConfirm = () => {
     return axios
       .post("/api/patient_action", {
         action: "delete",
@@ -326,6 +327,23 @@ const FormComponent = (props) => {
         reloadList();
         closeModal();
       });
+  };
+  const deleteUser = () => {
+    Modal.confirm({
+      title: "คุณแน่ใจว่าต้องการลบข้อมูล?",
+      icon: <DeleteOutlined style={{ color: "red" }} />,
+      //content: "",
+      centered: true,
+      okText: "ยืนยัน",
+      okType: "danger",
+      cancelText: "ยกเลิก",
+      onOk() {
+        deleteConfirm();
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
   };
   const onFinish = (values) => {
     values.birthday = birthDateData.format(dateFormat);

@@ -15,124 +15,19 @@ import {
 import { React, useEffect, useState } from "react";
 import axios from "axios";
 import { PlusCircleOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const { TextArea } = Input;
 const AddFormComponent = (props) => {
-  const { dataForm, reloadList, list, addPatient } = props;
+  const { dataForm, setRefreshKey, list, addPatient } = props;
+  let countForList = 0;
 
-  const [individualTest, set_individualTest] = useState([]);
-  const [lipidProfile, set_lipidProfile] = useState([]);
-  const [liverFunctionTest, set_liverFunctionTest] = useState([]);
-  const [electrolyte, set_electrolyte] = useState([]);
-  const [renalFunctionTest, set_renalFunctionTest] = useState([]);
-  const [hematology, set_hematology] = useState([]);
-  const [urinalysis, set_urinalysis] = useState([]);
-  const [individualUrinetest, set_individualUrinetest] = useState([]);
-  const [tyroidFunction, set_tyroidFunction] = useState([]);
-  const [caTest, set_caTest] = useState([]);
-  const [covidTest, set_covidTest] = useState([]);
-  const [individualAnotherTest, set_individualAnotherTest] = useState([]);
+  const [dataSelect, setDataSelect] = useState(list);
+  const [fields, setFields] = useState([]);
 
-  useEffect(() => {
-    set_individualTest(list.individualTest);
-    set_lipidProfile(list.lipidProfile);
-    set_liverFunctionTest(list.liverFunctionTest);
-    set_electrolyte(list.electrolyte);
-    set_renalFunctionTest(list.renalFunctionTest);
-    set_hematology(list.hematology);
-    set_urinalysis(list.urinalysis);
-    set_individualUrinetest(list.individualUrinetest);
-    set_tyroidFunction(list.tyroidFunction);
-    set_caTest(list.caTest);
-    set_covidTest(list.covidTest);
-    set_individualAnotherTest(list.individualAnotherTest);
-  }, [list]);
-
-  //electrolyte
-  const [checkelectrolyte, setelectrolyte] = useState([]);
-  const onCheckElectrolyteAll = (e) => {
-    setelectrolyte(
-      e.target.checked ? electrolyte.map((option) => option.value) : []
-    );
-  };
-  const onCheckElectrolyte = (list) => {
-    setelectrolyte(list);
-  };
-
-  //renalFunctionTest
-  const [checkrenalFunctionTest, setrenalFunctionTest] = useState([]);
-  const onCheckrenalFunctionTestAll = (e) => {
-    setrenalFunctionTest(
-      e.target.checked ? renalFunctionTest.map((option) => option.value) : []
-    );
-  };
-  const onCheckrenalFunctionTest = (list) => {
-    setrenalFunctionTest(list);
-  };
-
-  //lipidProfile
-  const [checklipidProfile, setlipidProfile] = useState([]);
-  const onChecklipidProfileAll = (e) => {
-    setlipidProfile(
-      e.target.checked ? lipidProfile.map((option) => option.value) : []
-    );
-  };
-  const onChecklipidProfile = (list) => {
-    setlipidProfile(list);
-  };
-
-  //liverFunctionTest
-  const [checkliverFunctionTest, setliverFunctionTest] = useState([]);
-  const onCheckliverFunctionTestAll = (e) => {
-    setliverFunctionTest(
-      e.target.checked ? liverFunctionTest.map((option) => option.value) : []
-    );
-  };
-  const onCheckliverFunctionTest = (list) => {
-    setliverFunctionTest(list);
-  };
-
-  //urinalysis
-  const [checkurinalysis, seturinalysis] = useState([]);
-  const onCheckurinalysisAll = (e) => {
-    seturinalysis(
-      e.target.checked ? urinalysis.map((option) => option.value) : []
-    );
-  };
-  const onCheckurinalysis = (list) => {
-    seturinalysis(list);
-  };
-
-  //tyroidFunction
-  const [checktyroidFunction, settyroidFunction] = useState([]);
-  const onChecktyroidFunctionAll = (e) => {
-    settyroidFunction(
-      e.target.checked ? tyroidFunction.map((option) => option.value) : []
-    );
-  };
-  const onChecktyroidFunction = (list) => {
-    settyroidFunction(list);
-  };
-
-  //caTest
-  const [checkcaTest, setcaTest] = useState([]);
-  const onCheckcaTestAll = (e) => {
-    setcaTest(e.target.checked ? caTest.map((option) => option.value) : []);
-  };
-  const onCheckcaTest = (list) => {
-    setcaTest(list);
-  };
-
-  //covidTest
-  const [checkcovidTest, setcovidTest] = useState([]);
-  const onCheckcovidTestAll = (e) => {
-    setcovidTest(
-      e.target.checked ? covidTest.map((option) => option.value) : []
-    );
-  };
-  const onCheckcovidTest = (list) => {
-    setcovidTest(list);
-  };
+  // useEffect(() => {
+  //   setDataSelect(list);
+  // }, [list]);
 
   const searchResult = (query) => {
     setLoadingHN(true);
@@ -234,6 +129,10 @@ const AddFormComponent = (props) => {
       if (result) {
         setFields([
           {
+            name: ["hn"],
+            value: result.value,
+          },
+          {
             name: ["fullname"],
             value: result.label,
           },
@@ -255,34 +154,84 @@ const AddFormComponent = (props) => {
     }
   };
 
-  const checklistGroup = (major, minor) => {
-    return (
-      <>
-        <Checkbox onChange={major.onchangeFunc}>{major.label}</Checkbox>
-        <Checkbox.Group
-          style={{ display: "grid", marginLeft: "10px" }}
-          options={minor.optionsData}
-          value={minor.valueData}
-          onChange={minor.onchangeFunc}
-        />
-      </>
+  const onChangeChecklistGroup = (
+    event,
+    group,
+    group_index,
+    subgroup_index
+  ) => {
+    const updatedDataSelectUpdate = dataSelect[group_index].data[
+      subgroup_index
+    ].data.map((items) => {
+      return { ...items, status: event.target.checked };
+    });
+
+    let updatedDataSelect = [...dataSelect];
+    updatedDataSelect[group_index].data[subgroup_index].data =
+      updatedDataSelectUpdate;
+    setDataSelect(updatedDataSelect);
+  };
+
+  const onChangeChecklist = (
+    event,
+    items,
+    group,
+    group_index,
+    subgroup_index,
+    item_index
+  ) => {
+    let updatedDataSelect = [...dataSelect];
+    updatedDataSelect[group_index].data[subgroup_index].data[item_index] = {
+      ...dataSelect[group_index].data[subgroup_index].data[item_index],
+      status: event.target.checked,
+    };
+    setDataSelect(updatedDataSelect);
+
+    console.log(
+      !!dataSelect[group_index].data[subgroup_index].data[item_index].status &&
+        dataSelect[group_index].data[subgroup_index].data[item_index].status ===
+          true
     );
   };
 
-  const [fields, setFields] = useState([]);
-
   const onFinish = (values) => {
-    // return axios
-    //   .post("/api/user_action", {
-    //     action: "update",
-    //     id_user: dataForm.id_user,
-    //     values: values,
-    //   })
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     reloadList();
-    //     closeModal();
-    //   });
+    let dataOrder = [];
+    dataSelect.map((group) => {
+      group.data.map((subgroup) => {
+        subgroup.data.map((items) => {
+          if (!!items.status && items.status === true) {
+            dataOrder.push(items);
+          }
+        });
+      });
+    });
+
+    let dataHead = {
+      doctor_code: null,
+      hn: fields[0].value,
+      order_date: dayjs().format("YYYY-MM-DD"),
+      department: null,
+      form_name: null,
+      sub_group_list: null,
+      order_time: dayjs().format("HH:mm:ss"),
+      ward: null,
+      lis_order_no: null,
+      receive_computer: null,
+      order_department: null,
+      lab_priority_id: 0,
+      receive_status: "Pending",
+    };
+
+    return axios
+      .post("/api/add_new_lab_order", {
+        lab_head: dataHead,
+        lab_order: dataOrder,
+      })
+      .then((response) => {
+        console.log(response.data.lab_order_number);
+        setRefreshKey((oldKey) => oldKey + 1);
+        closeModal();
+      });
   };
 
   const closeModal = () => {
@@ -344,230 +293,101 @@ const AddFormComponent = (props) => {
           </Form.Item>
         </Col>
       </Row>
-      <Divider orientation="left">LAB DETAIL</Divider>
       <Row>
-        <Col span={6}>
-          <Form.Item
-            name="individualTest"
-            style={{ marginBottom: "0" }}
-            wrapperCol={{ span: 24 }}
-          >
-            <Checkbox.Group
-              style={{
-                width: "100%",
-              }}
-            >
-              <Row gutter={24}>
-                {!!individualTest ? (
-                  individualTest.map((item, index) => {
-                    return (
-                      <Col span={24} key={index}>
-                        <Checkbox value={item.value}>{item.label}</Checkbox>
-                      </Col>
-                    );
-                  })
-                ) : (
-                  <></>
-                )}
-              </Row>
-            </Checkbox.Group>
-          </Form.Item>
-
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "Electrolyte",
-                onchangeFunc: onCheckElectrolyteAll,
-              },
-              {
-                optionsData: electrolyte,
-                valueData: checkelectrolyte,
-                onchangeFunc: onCheckElectrolyte,
-              }
-            )}
-          </Form.Item>
-
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "Renal Function Test",
-                onchangeFunc: onCheckrenalFunctionTestAll,
-              },
-              {
-                optionsData: renalFunctionTest,
-                valueData: checkrenalFunctionTest,
-                onchangeFunc: onCheckrenalFunctionTest,
-              }
-            )}
-          </Form.Item>
-        </Col>
-
-        <Col span={6}>
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "lipidProfile",
-                onchangeFunc: onChecklipidProfileAll,
-              },
-              {
-                optionsData: lipidProfile,
-                valueData: checklipidProfile,
-                onchangeFunc: onChecklipidProfile,
-              }
-            )}
-          </Form.Item>
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "liverFunctionTest",
-                onchangeFunc: onCheckliverFunctionTestAll,
-              },
-              {
-                optionsData: liverFunctionTest,
-                valueData: checkliverFunctionTest,
-                onchangeFunc: onCheckliverFunctionTest,
-              }
-            )}
-          </Form.Item>
-        </Col>
-
-        <Col span={6}>
-          <Form.Item
-            name="hematology"
-            style={{ marginBottom: "0" }}
-            wrapperCol={{ span: 24 }}
-          >
-            <Checkbox.Group
-              style={{
-                width: "100%",
-              }}
-            >
-              <Row gutter={24}>
-                {!!hematology ? (
-                  hematology.map((item, index) => {
-                    return (
-                      <Col span={24} key={index}>
-                        <Checkbox value={item.value}>{item.label}</Checkbox>
-                      </Col>
-                    );
-                  })
-                ) : (
-                  <></>
-                )}
-              </Row>
-            </Checkbox.Group>
-          </Form.Item>
-
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "Urinalysis",
-                onchangeFunc: onCheckurinalysisAll,
-              },
-              {
-                optionsData: urinalysis,
-                valueData: checkurinalysis,
-                onchangeFunc: onCheckurinalysis,
-              }
-            )}
-          </Form.Item>
-
-          <Form.Item
-            name="individualUrinetest"
-            style={{ marginBottom: "0" }}
-            wrapperCol={{ span: 24 }}
-          >
-            <Checkbox.Group
-              style={{
-                width: "100%",
-              }}
-            >
-              <Row gutter={24}>
-                {!!individualUrinetest ? (
-                  individualUrinetest.map((item, index) => {
-                    return (
-                      <Col span={24} key={index}>
-                        <Checkbox value={item.value}>{item.label}</Checkbox>
-                      </Col>
-                    );
-                  })
-                ) : (
-                  <></>
-                )}
-              </Row>
-            </Checkbox.Group>
-          </Form.Item>
-
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "Tyroid Function",
-                onchangeFunc: onChecktyroidFunctionAll,
-              },
-              {
-                optionsData: tyroidFunction,
-                valueData: checktyroidFunction,
-                onchangeFunc: onChecktyroidFunction,
-              }
-            )}
-          </Form.Item>
-        </Col>
-
-        <Col span={6}>
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "CA Test",
-                onchangeFunc: onCheckcaTestAll,
-              },
-              {
-                optionsData: caTest,
-                valueData: checkcaTest,
-                onchangeFunc: onCheckcaTest,
-              }
-            )}
-          </Form.Item>
-
-          <Form.Item style={{ marginBottom: "0" }} wrapperCol={{ span: 24 }}>
-            {checklistGroup(
-              {
-                label: "Covid Test",
-                onchangeFunc: onCheckcovidTestAll,
-              },
-              {
-                optionsData: covidTest,
-                valueData: checkcovidTest,
-                onchangeFunc: onCheckcovidTest,
-              }
-            )}
-          </Form.Item>
-
-          <Form.Item
-            name="individualAnotherTest"
-            style={{ marginBottom: "0" }}
-            wrapperCol={{ span: 24 }}
-          >
-            <Checkbox.Group
-              style={{
-                width: "100%",
-              }}
-            >
-              <Row gutter={24}>
-                {!!individualAnotherTest ? (
-                  individualAnotherTest.map((item, index) => {
-                    return (
-                      <Col span={24} key={index}>
-                        <Checkbox value={item.value}>{item.label}</Checkbox>
-                      </Col>
-                    );
-                  })
-                ) : (
-                  <></>
-                )}
-              </Row>
-            </Checkbox.Group>
-          </Form.Item>
-        </Col>
+        {!!dataSelect ? (
+          dataSelect.map((items, group_index) => {
+            return (
+              <Col span={6} key={group_index}>
+                <Divider orientation="left">{items.name}</Divider>
+                <Row>
+                  {!!items.data ? (
+                    items.data.map((items2, subgroup_index) => {
+                      if (items2.name === "single") {
+                        return (
+                          <>
+                            {items2.data.map((labItems, item_index) => {
+                              countForList++;
+                              return (
+                                <Col span={24} key={labItems.lab_items_code}>
+                                  <Checkbox
+                                    onChange={(e) => {
+                                      onChangeChecklist(
+                                        e,
+                                        labItems.lab_items_code,
+                                        null,
+                                        group_index,
+                                        subgroup_index,
+                                        item_index
+                                      );
+                                    }}
+                                    checked={labItems.status}
+                                  >
+                                    {labItems.lab_items_name_ref}
+                                  </Checkbox>
+                                </Col>
+                              );
+                            })}
+                          </>
+                        );
+                      } else {
+                        return (
+                          <>
+                            <Col span={24} key={items2.name}>
+                              <Checkbox
+                                onChange={(e) => {
+                                  onChangeChecklistGroup(
+                                    e,
+                                    items2.code,
+                                    group_index,
+                                    subgroup_index
+                                  );
+                                }}
+                              >
+                                {items2.name}
+                              </Checkbox>
+                            </Col>
+                            {items2.data.map((labItems, item_index) => {
+                              countForList++;
+                              return (
+                                <Col
+                                  span={24}
+                                  key={
+                                    labItems.lab_items_code + "_" + item_index
+                                  }
+                                >
+                                  <Checkbox
+                                    style={{ marginLeft: "15px" }}
+                                    onChange={(e) => {
+                                      onChangeChecklist(
+                                        e,
+                                        labItems.lab_items_code,
+                                        items2.code,
+                                        group_index,
+                                        subgroup_index,
+                                        item_index
+                                      );
+                                    }}
+                                    checked={labItems.status}
+                                  >
+                                    {labItems.lab_items_name_ref}
+                                  </Checkbox>
+                                </Col>
+                              );
+                            })}
+                          </>
+                        );
+                      }
+                    })
+                  ) : (
+                    <></>
+                  )}
+                </Row>
+              </Col>
+            );
+          })
+        ) : (
+          <></>
+        )}
       </Row>
 
       <Row>

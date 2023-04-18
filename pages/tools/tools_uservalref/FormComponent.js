@@ -9,9 +9,11 @@ import {
   Select,
   Checkbox,
 } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import { React, useEffect, useState, useRef } from "react";
 import axios from "axios";
 const { TextArea } = Input;
+const { confirm } = Modal;
 const FormComponent = (props) => {
   const { dataForm, reloadList } = props;
   const [fields, setFields] = useState([
@@ -44,8 +46,7 @@ const FormComponent = (props) => {
       value: !!dataForm ? dataForm.password : null,
     },
   ]);
-  const deleteUser = () => {
-    console.log(dataForm.id_user);
+  const deleteConfirm = () => {
     return axios
       .post("/api/delete_user", {
         user_id: dataForm.id_user,
@@ -54,6 +55,23 @@ const FormComponent = (props) => {
         reloadList();
         closeModal();
       });
+  };
+  const deleteUser = () => {
+    Modal.confirm({
+      title: "คุณแน่ใจว่าต้องการลบข้อมูล?",
+      icon: <DeleteOutlined style={{ color: "red" }} />,
+      //content: "",
+      centered: true,
+      okText: "ยืนยัน",
+      okType: "danger",
+      cancelText: "ยกเลิก",
+      onOk() {
+        deleteConfirm();
+      },
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
   };
   const onFinish = (values) => {
     if (!!dataForm) {

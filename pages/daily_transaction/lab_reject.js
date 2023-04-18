@@ -391,6 +391,16 @@ const LabReject = () => {
                       />
                       <div style={{ display: "none" }}>
                         <div ref={componentRef}>
+                          <h3 style={{ textAlign: "center" }}>
+                            รายงานปฎิเสธสิ่งส่งตรวจ ระหว่างวันที่{" "}
+                            {dayjs(date_start, dateFormat)
+                              .add(543, "year")
+                              .format("DD-MM-YYYY")}{" "}
+                            ถึง{" "}
+                            {dayjs(date_stop, dateFormat)
+                              .add(543, "year")
+                              .format("DD-MM-YYYY")}
+                          </h3>
                           <Table
                             dataSource={data}
                             rowKey={"lab_order_number"}

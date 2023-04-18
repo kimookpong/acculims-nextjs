@@ -1,4 +1,5 @@
 import dbconnect from "./dbconnect";
+import dayjs from "dayjs";
 
 export default function handler(req, res) {
   const action = req.body.action;
@@ -6,7 +7,11 @@ export default function handler(req, res) {
   let text = "";
   let query = "";
   if (action === "accept") {
-    query = `UPDATE lab_head SET receive_status = 'Received' WHERE lab_order_number IN (${id.join()})`;
+    query = `UPDATE lab_head SET receive_status = 'Received',report_status = 'Pending',receive_date = '${dayjs().format(
+      "YYYY-MM-DD"
+    )}',receive_time='${dayjs().format(
+      "HH:mm:ss"
+    )}'  WHERE lab_order_number IN (${id.join()})`;
     text = "รับใบ LAB เรียบร้อยแล้ว";
   } else if (action === "reject") {
     query = `UPDATE lab_head SET receive_status = 'Reject' WHERE lab_order_number IN (${id.join()})`;

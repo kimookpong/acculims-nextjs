@@ -46,8 +46,8 @@ export default function handler(req, res) {
   FROM lab_head 
   LEFT JOIN patient ON lab_head.hn = patient.hn 
   LEFT JOIN kskdepartment ON lab_head.order_department = kskdepartment.depcode 
-  LEFT JOIN ovst ON lab_head.vn = ovst.vn 
-  LEFT JOIN pttype ON ovst.pttype = pttype.pttype 
+  LEFT JOIN ovst ON lab_head.vn = ovst.vn
+  LEFT JOIN pttype ON ovst.pttype = pttype.pttype
   LEFT JOIN lab_order ON lab_head.lab_order_number = lab_order.lab_order_number 
   LEFT JOIN doctor ON lab_head.doctor_code = doctor.code 
   LEFT JOIN ward ON lab_head.ward = ward.ward 
