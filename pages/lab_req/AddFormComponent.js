@@ -300,6 +300,7 @@ const AddFormComponent = (props) => {
         <Col span={6}>
           <Form.Item
             name="type"
+            label="รูปแบบ"
             style={{ marginBottom: 5, marginTop: 5 }}
             onChange={(e) => {
               return getWorkTypeListForm(e.target.value);
@@ -317,7 +318,7 @@ const AddFormComponent = (props) => {
             </Radio.Group>
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col span={10}>
           <Form.Item
             name="form_name"
             label="ฟอร์ม :"
@@ -332,7 +333,7 @@ const AddFormComponent = (props) => {
             <Select showSearch options={sWorkTypeList} />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col span={8}>
           <Form.Item
             label="แผนก :"
             name="department"
