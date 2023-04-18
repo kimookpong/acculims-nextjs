@@ -19,8 +19,7 @@ import dayjs from "dayjs";
 
 const { TextArea } = Input;
 const AddFormComponent = (props) => {
-  const { dataForm, setRefreshKey, list, addPatient } = props;
-  let countForList = 0;
+  const { setRefreshKey, list, addPatient } = props;
 
   const [dataSelect, setDataSelect] = useState(list);
   const [fields, setFields] = useState([]);
@@ -29,6 +28,19 @@ const AddFormComponent = (props) => {
   //   setDataSelect(list);
   // }, [list]);
 
+  const [sWorkTypeList, setSWorkTypeList] = useState([]);
+  const getWorkTypeListForm = (id) => {
+    if (id === "2") {
+      return axios.get("/api/get_lab_form_head").then(function (response) {
+        setSWorkTypeList(response.data);
+      });
+    } else if (id === "1") {
+      return axios.get("/api/get_lab_items_group").then(function (response) {
+        setSWorkTypeList(response.data);
+      });
+    }
+  };
+
   const searchResult = (query) => {
     setLoadingHN(true);
     return axios
@@ -36,7 +48,6 @@ const AddFormComponent = (props) => {
         q: query,
       })
       .then(function (response) {
-        console.log(response.data);
         if (response.data.length) {
           setselectHN(response.data);
           setOptions(
@@ -186,12 +197,6 @@ const AddFormComponent = (props) => {
       status: event.target.checked,
     };
     setDataSelect(updatedDataSelect);
-
-    console.log(
-      !!dataSelect[group_index].data[subgroup_index].data[item_index].status &&
-        dataSelect[group_index].data[subgroup_index].data[item_index].status ===
-          true
-    );
   };
 
   const onFinish = (values) => {
@@ -208,27 +213,25 @@ const AddFormComponent = (props) => {
 
     let dataHead = {
       doctor_code: null,
-      hn: fields[0].value,
+      hn: values.hn,
       order_date: dayjs().format("YYYY-MM-DD"),
       department: null,
-      form_name: null,
+      form_name: values.form_name,
       sub_group_list: null,
       order_time: dayjs().format("HH:mm:ss"),
-      ward: null,
+      ward: values.ward,
       lis_order_no: null,
       receive_computer: null,
       order_department: null,
       lab_priority_id: 0,
       receive_status: "Pending",
     };
-
     return axios
       .post("/api/add_new_lab_order", {
         lab_head: dataHead,
         lab_order: dataOrder,
       })
       .then((response) => {
-        console.log(response.data.lab_order_number);
         setRefreshKey((oldKey) => oldKey + 1);
         closeModal();
       });
@@ -294,6 +297,61 @@ const AddFormComponent = (props) => {
         </Col>
       </Row>
       <Row>
+        <Col span={6}>
+          <Form.Item
+            name="type"
+            style={{ marginBottom: 5, marginTop: 5 }}
+            onChange={(e) => {
+              return getWorkTypeListForm(e.target.value);
+            }}
+            rules={[
+              {
+                required: true,
+                message: "กรุณาเลือกรูปแบบ",
+              },
+            ]}
+          >
+            <Radio.Group>
+              <Radio value={1}>งาน</Radio>
+              <Radio value={2}>Lab form</Radio>
+            </Radio.Group>
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            name="form_name"
+            label="ฟอร์ม :"
+            style={{ marginBottom: 5, marginTop: 5 }}
+            rules={[
+              {
+                required: true,
+                message: "กรุณาเลือก Form Name",
+              },
+            ]}
+          >
+            <Select showSearch options={sWorkTypeList} />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item
+            label="ward :"
+            name="ward"
+            style={{ marginBottom: 5 }}
+            rules={[
+              {
+                required: true,
+                message: "กรุณาเลือก Ward",
+              },
+            ]}
+          >
+            <Radio.Group>
+              <Radio value={"OPD"}>OPD</Radio>
+              <Radio value={"IPD"}>IPD</Radio>
+            </Radio.Group>
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row>
         {!!dataSelect ? (
           dataSelect.map((items, group_index) => {
             return (
@@ -306,7 +364,6 @@ const AddFormComponent = (props) => {
                         return (
                           <>
                             {items2.data.map((labItems, item_index) => {
-                              countForList++;
                               return (
                                 <Col span={24} key={labItems.lab_items_code}>
                                   <Checkbox
@@ -347,7 +404,6 @@ const AddFormComponent = (props) => {
                               </Checkbox>
                             </Col>
                             {items2.data.map((labItems, item_index) => {
-                              countForList++;
                               return (
                                 <Col
                                   span={24}
