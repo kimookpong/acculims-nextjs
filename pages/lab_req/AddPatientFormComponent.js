@@ -112,7 +112,7 @@ const thai_th = {
 const dateFormat = "YYYY-MM-DD";
 const { TextArea } = Input;
 const FormComponent = (props) => {
-  const { dataDefault } = props;
+  const { showAddForm, dataDefault } = props;
   const [age, setAge] = useState();
   const [fields, setFields] = useState([
     {
@@ -202,12 +202,13 @@ const FormComponent = (props) => {
         values: values,
       })
       .then((response) => {
-        closeModal();
+        closeModal(values.hn);
       });
   };
 
-  const closeModal = () => {
+  const closeModal = (hn) => {
     ModalForm.destroyAll();
+    showAddForm(hn);
   };
 
   const calculateAge = (dateOfBirth) => {

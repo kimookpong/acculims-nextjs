@@ -1,20 +1,14 @@
 import dbconnect from "./dbconnect";
 
 export default function handler(req, res) {
-  const q = req.body.q.split(/, | /);
-  let condition = ``;
-  q.map((item) => {
-    condition += ` AND (hn like '%${item}%' OR fname like '%${item}%'  OR lname like '%${item}%')`;
-  });
+  const hn = req.body.hn;
+  let query = `SELECT * FROM hisvisit`;
 
-  console.log(condition);
+  if (!!hn) {
+    query = query + ` WHERE hn = '${hn}'`;
+  }
 
-  const query = `SELECT 
-  hn AS value,
-  sex,
-  birthday,
-  concat(pname, '', fname, ' ', lname)  AS label
-  FROM patient WHERE hn <> '' ${condition} LIMIT 5`;
+  query = query + ` ORDER BY start_date DESC`;
 
   const connection = dbconnect();
   connection.connect(function (err) {

@@ -178,7 +178,7 @@ function LabReq() {
     Modal.destroyAll();
   };
 
-  const showAddForm = () => {
+  const showAddForm = (hn) => {
     setLoadingAddForm(true);
     return axios.post("/api/get_lab_detail").then(function (response) {
       let dataArrayGroup = [];
@@ -235,6 +235,7 @@ function LabReq() {
             list={dataArrayGroup}
             addPatient={addPatient}
             setRefreshKey={setRefreshKey}
+            hnSelect={hn}
           />
         ),
         footer: <></>,
@@ -246,7 +247,12 @@ function LabReq() {
       centered: true,
       width: 700,
       title: "แบบฟอร์มเพิ่ม Patient",
-      content: <AddPatientFormComponent dataDefault={dataDefault} />,
+      content: (
+        <AddPatientFormComponent
+          dataDefault={dataDefault}
+          showAddForm={showAddForm}
+        />
+      ),
       footer: <></>,
     });
   };

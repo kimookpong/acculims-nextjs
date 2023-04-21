@@ -91,7 +91,7 @@ export default function handler(req, res) {
   LEFT JOIN lab_order ON lab_order.lab_order_number = lab_head.lab_order_number 
   LEFT JOIN patient ON lab_head.hn = patient.hn
   ${cond} 
-  AND lab_head.receive_status <> 'Delete'
+  AND lab_head.receive_status = 'Received'
   GROUP BY lab_head.lab_order_number
   ORDER BY order_date_time DESC;`;
 
