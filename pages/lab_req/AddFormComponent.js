@@ -157,6 +157,13 @@ const AddFormComponent = (props) => {
     setSelectedRadioKeys([record.visit_number]);
   };
 
+  useEffect(() => {
+    if (!!hnSelect) {
+      handleSearchHN(hnSelect);
+      //onSelectHN(hnSelect);
+    }
+  }, [hnSelect]);
+
   const columnsVisit = [
     {
       title: "vn",
@@ -219,7 +226,6 @@ const AddFormComponent = (props) => {
   ];
 
   const getVisitingList = (hn) => {
-    console.log("visiting form", hn);
     return axios
       .post("/api/get_hisvisit", {
         hn: hn,
@@ -304,13 +310,11 @@ const AddFormComponent = (props) => {
         ? values.start_date.add(-543, "year").format(dateFormat)
         : undefined,
     };
-    console.log(visitForm);
     return axios
       .post("/api/add_new_hisvisit", {
         form: visitForm,
       })
       .then((response) => {
-        console.log(response.data);
         getVisitingList(selectCurrentHN);
         closeVisitForm();
       });
@@ -340,7 +344,6 @@ const AddFormComponent = (props) => {
   const [dataWeight, setDataWeight] = useState(0);
 
   const onChangeHeight = (event) => {
-    console.log("bmi", dataWeight, event);
     if (dataWeight > 0) {
       setFieldsVisit([
         {
@@ -353,7 +356,6 @@ const AddFormComponent = (props) => {
   };
 
   const onChangeWeight = (event) => {
-    console.log("bmi", event, dataHeight);
     if (dataHeight > 0) {
       setFieldsVisit([
         {
@@ -386,24 +388,56 @@ const AddFormComponent = (props) => {
       .then(function (response) {
         if (response.data.length) {
           setselectHN(response.data);
-          setOptions(
-            response.data.map((item) => {
-              return {
-                value: item.value,
-                label: (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>{item.value}</span>
-                    <span>{item.label}</span>
-                  </div>
-                ),
-              };
-            })
-          );
+          let dataSerchList = response.data.map((item) => {
+            return {
+              value: item.value,
+              label: (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span>{item.value}</span>
+                  <span>{item.label}</span>
+                </div>
+              ),
+            };
+          });
+          setOptions(dataSerchList);
+
+          if (hnSelect === query) {
+            let result = response.data.find((obj) => {
+              return obj.value === hnSelect;
+            });
+
+            if (result) {
+              getVisitingList(result.value);
+              setselectCurrentHN(result.value);
+              setFields([
+                {
+                  name: ["hn"],
+                  value: result.value,
+                },
+                {
+                  name: ["fullname"],
+                  value: result.label,
+                },
+
+                {
+                  name: ["sex"],
+                  value: setSex(result.sex),
+                },
+                {
+                  name: ["age"],
+                  value: calculateAge(result.birthday),
+                },
+              ]);
+            } else {
+              setFields([]);
+              setselectCurrentHN();
+            }
+          }
         } else {
           setselectHN([]);
           setOptions([
@@ -432,8 +466,6 @@ const AddFormComponent = (props) => {
   const calculateBMI = (weight, height) => {
     // Convert height to meters if it's in centimeters
     height = height / 100;
-
-    console.log("height", height);
     // Calculate BMI using the formula: weight (kg) / height (m) squared
     const bmi = weight / (height * height);
     // Round BMI to two decimal places
@@ -481,6 +513,7 @@ const AddFormComponent = (props) => {
       let result = selectHN.find((obj) => {
         return obj.value === value;
       });
+
       if (result) {
         getVisitingList(result.value);
         setselectCurrentHN(result.value);
@@ -545,11 +578,28 @@ const AddFormComponent = (props) => {
 
   const onFinish = (values) => {
     if (!!selectedRadioKeys.join()) {
+      let sub_group_select = [];
+      let countSame = [];
       let dataOrder = [];
       dataSelect.map((subgroup) => {
         if (!!subgroup) {
           subgroup.data.map((items) => {
             if (!!items.status && items.status === true) {
+              // get subgroup code
+              const targetSubgroup = sub_group_select.find(
+                (obj) => obj === items.lab_items_sub_group_code
+              );
+              if (!targetSubgroup && !!items.lab_items_sub_group_code) {
+                sub_group_select.push(items.lab_items_sub_group_code);
+              }
+
+              // check same item_code
+              const targetObject = dataOrder.find(
+                (obj) => obj.lab_items_code === items.lab_items_code
+              );
+              if (!!targetObject) {
+                countSame.push(items.lab_items_name_ref);
+              }
               dataOrder.push(items);
             }
           });
@@ -563,7 +613,7 @@ const AddFormComponent = (props) => {
         order_date: dayjs().format("YYYY-MM-DD"),
         department: values.department,
         form_name: values.form_name,
-        sub_group_list: null,
+        sub_group_list: sub_group_select.join(","),
         order_time: dayjs().format("HH:mm:ss"),
         ward: null,
         lis_order_no: null,
@@ -572,15 +622,22 @@ const AddFormComponent = (props) => {
         lab_priority_id: 0,
         receive_status: "Pending",
       };
-      return axios
-        .post("/api/add_new_lab_order", {
-          lab_head: dataHead,
-          lab_order: dataOrder,
-        })
-        .then((response) => {
-          setRefreshKey((oldKey) => oldKey + 1);
-          closeModal();
+      if (!!countSame && countSame.length > 0) {
+        messageApi.open({
+          type: "error",
+          content: "มีการสั่งรายการแล็บซ้ำ (" + countSame.join(", ") + ")",
         });
+      } else {
+        return axios
+          .post("/api/add_new_lab_order", {
+            lab_head: dataHead,
+            lab_order: dataOrder,
+          })
+          .then((response) => {
+            setRefreshKey((oldKey) => oldKey + 1);
+            closeModal();
+          });
+      }
     } else {
       messageApi.open({
         type: "error",
@@ -599,10 +656,11 @@ const AddFormComponent = (props) => {
       <Modal
         open={visitForm}
         title="Visit Form"
+        closable=""
         centered
         width="900px"
         // onOk={submitVisitForm}
-        onCancel={closeVisitForm}
+        //onCancel={closeVisitForm}
         footer={<></>}
       >
         <Form
@@ -1013,6 +1071,12 @@ const AddFormComponent = (props) => {
             </Radio.Group>
           </Form.Item>
         </Col> */}
+        </Row>
+        <Divider orientation="left">VISITING FORM</Divider>
+
+        {listVisitForm()}
+        <Divider orientation="left">LAB DETAIL</Divider>
+        <Row>
           <Col span={10}>
             <Form.Item
               name="form_name"
@@ -1025,10 +1089,10 @@ const AddFormComponent = (props) => {
                 },
               ]}
               labelCol={{
-                span: 9,
+                span: 6,
               }}
               wrapperCol={{
-                span: 15,
+                span: 18,
               }}
             >
               <Select
@@ -1058,14 +1122,7 @@ const AddFormComponent = (props) => {
               </Radio.Group>
             </Form.Item>
           </Col>
-        </Row>
-        <Divider orientation="left">VISITING FORM</Divider>
-
-        {listVisitForm()}
-
-        <Row>
           <Col span={24}>
-            <Divider orientation="left">LAB DETAIL</Divider>
             <Row>
               {!!dataSelect ? (
                 dataSelect.map((items2, subgroup_index) => {

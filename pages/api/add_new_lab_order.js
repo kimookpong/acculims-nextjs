@@ -46,7 +46,7 @@ export default function handler(req, res) {
         '${lab_head.order_date}',
         '${lab_head.department}',
         '${lab_head.form_name}',
-        ${lab_head.sub_group_list},
+        '${lab_head.sub_group_list ? lab_head.sub_group_list : ""}',
         '${lab_head.order_time}',
         '${lab_head.ward}',
         ${lab_head.lis_order_no},
@@ -74,11 +74,18 @@ export default function handler(req, res) {
               ${items.lab_items_sub_group_code},
               '${items.single_profile}',
               '${items.lab_items_name_ref}',
-              '${items.lab_items_normal_value_ref}',
+              '${
+                !!items.lab_items_normal_value_ref
+                  ? items.lab_items_normal_value_ref
+                  : ""
+              }',
               ${items.specimen_code}
             );`;
           });
         }
+
+        // console.log(query);
+        // res.status(200).json(query);
 
         const connection2 = dbconnect();
         connection2.connect(function (err) {

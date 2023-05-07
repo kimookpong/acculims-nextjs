@@ -12,6 +12,7 @@ import {
 import { React, useEffect, useState, useRef } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
+
 // THAI DATEPICKER
 import DatePicker from "react-multi-date-picker";
 const thai = {
@@ -312,7 +313,58 @@ const FormComponent = (props) => {
             ]}
             style={{ marginBottom: "5px" }}
           >
-            <Input />
+            <Select>
+              <Select.Option value="เด็กชาย">เด็กชาย</Select.Option>
+              <Select.Option value="เด็กหญิง">เด็กหญิง</Select.Option>
+              <Select.Option value="นาย">นาย</Select.Option>
+              <Select.Option value="นาง">นาง</Select.Option>
+              <Select.Option value="นางสาว">นางสาว</Select.Option>
+
+              <Select.Option value="หม่อมหลวง">หม่อมหลวง</Select.Option>
+              <Select.Option value="สามเณร">สามเณร</Select.Option>
+              <Select.Option value="พระอธิการ">พระอธิการ</Select.Option>
+              <Select.Option value="พระปลัด">พระปลัด</Select.Option>
+              <Select.Option value="พระใบฎีกา">พระใบฎีกา</Select.Option>
+              <Select.Option value="พระครูสมุห์">พระครูสมุห์</Select.Option>
+              <Select.Option value="พระมหา">พระมหา</Select.Option>
+              <Select.Option value="พระครูวินัยธร">พระครูวินัยธร</Select.Option>
+
+              <Select.Option value="พลเอก">พลเอก</Select.Option>
+              <Select.Option value="พลตรี">พลตรี</Select.Option>
+              <Select.Option value="พันโท">พันโท</Select.Option>
+              <Select.Option value="ร้อยเอก">ร้อยเอก</Select.Option>
+              <Select.Option value="ร้อยตรี">ร้อยตรี</Select.Option>
+              <Select.Option value="จ่าสิบโท">จ่าสิบโท</Select.Option>
+              <Select.Option value="สิบเอก">สิบเอก</Select.Option>
+              <Select.Option value="สิบตรี">สิบตรี</Select.Option>
+
+              <Select.Option value="พลอากาศเอก">พลอากาศเอก</Select.Option>
+              <Select.Option value="พลอากาศตรี">พลอากาศตรี</Select.Option>
+              <Select.Option value="นาวาอากาศโท">นาวาอากาศโท</Select.Option>
+              <Select.Option value="เรืออากาศเอก">เรืออากาศเอก</Select.Option>
+              <Select.Option value="เรืออากาศตรี">เรืออากาศตรี</Select.Option>
+              <Select.Option value="พันจ่าอากาศโท">พันจ่าอากาศโท</Select.Option>
+              <Select.Option value="จ่าอากาศเอก">จ่าอากาศเอก</Select.Option>
+              <Select.Option value="จ่าอากาศตรี">จ่าอากาศตรี</Select.Option>
+
+              <Select.Option value="พลเรือเอก">พลเรือเอก</Select.Option>
+              <Select.Option value="พลเรือตรี">พลเรือตรี</Select.Option>
+              <Select.Option value="นาวาโท">นาวาโท</Select.Option>
+              <Select.Option value="เรือเอก">เรือเอก</Select.Option>
+              <Select.Option value="เรือตรี">เรือตรี</Select.Option>
+              <Select.Option value="พันจ่าโท">พันจ่าโท</Select.Option>
+              <Select.Option value="จ่าเอก">จ่าเอก</Select.Option>
+              <Select.Option value="จ่าตรี">จ่าตรี</Select.Option>
+
+              <Select.Option value="พลตำรวจเอก">พลตำรวจเอก</Select.Option>
+              <Select.Option value="พลตำรวจตรี">พลตำรวจตรี</Select.Option>
+              <Select.Option value="พันตำรวจโท">พันตำรวจโท</Select.Option>
+              <Select.Option value="ร้อยตำรวจเอก">ร้อยตำรวจเอก</Select.Option>
+              <Select.Option value="ร้อยตำรวจตรี">ร้อยตำรวจตรี</Select.Option>
+              <Select.Option value="จ่าสิบตำรวจ">จ่าสิบตำรวจ</Select.Option>
+              <Select.Option value="สิบตำรวจโท">สิบตำรวจโท</Select.Option>
+              <Select.Option value="พลตำรวจ">พลตำรวจ</Select.Option>
+            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
