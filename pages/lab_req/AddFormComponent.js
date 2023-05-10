@@ -380,87 +380,89 @@ const AddFormComponent = (props) => {
   };
 
   const searchResult = (query) => {
-    setLoadingHN(true);
-    return axios
-      .post("/api/get_patient_from_hn", {
-        q: query,
-      })
-      .then(function (response) {
-        if (response.data.length) {
-          setselectHN(response.data);
-          let dataSerchList = response.data.map((item) => {
-            return {
-              value: item.value,
-              label: (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span>{item.value}</span>
-                  <span>{item.label}</span>
-                </div>
-              ),
-            };
-          });
-          setOptions(dataSerchList);
-
-          if (hnSelect === query) {
-            let result = response.data.find((obj) => {
-              return obj.value === hnSelect;
+    if (query) {
+      setLoadingHN(true);
+      return axios
+        .post("/api/get_patient_from_hn", {
+          q: query,
+        })
+        .then(function (response) {
+          if (response.data.length) {
+            setselectHN(response.data);
+            let dataSerchList = response.data.map((item) => {
+              return {
+                value: item.value,
+                label: (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>{item.value}</span>
+                    <span>{item.label}</span>
+                  </div>
+                ),
+              };
             });
+            setOptions(dataSerchList);
 
-            if (result) {
-              getVisitingList(result.value);
-              setselectCurrentHN(result.value);
-              setFields([
-                {
-                  name: ["hn"],
-                  value: result.value,
-                },
-                {
-                  name: ["fullname"],
-                  value: result.label,
-                },
+            if (hnSelect === query) {
+              let result = response.data.find((obj) => {
+                return obj.value === hnSelect;
+              });
 
-                {
-                  name: ["sex"],
-                  value: setSex(result.sex),
-                },
-                {
-                  name: ["age"],
-                  value: calculateAge(result.birthday),
-                },
-              ]);
-            } else {
-              setFields([]);
-              setselectCurrentHN();
+              if (result) {
+                getVisitingList(result.value);
+                setselectCurrentHN(result.value);
+                setFields([
+                  {
+                    name: ["hn"],
+                    value: result.value,
+                  },
+                  {
+                    name: ["fullname"],
+                    value: result.label,
+                  },
+
+                  {
+                    name: ["sex"],
+                    value: setSex(result.sex),
+                  },
+                  {
+                    name: ["age"],
+                    value: calculateAge(result.birthday),
+                  },
+                ]);
+              } else {
+                setFields([]);
+                setselectCurrentHN();
+              }
             }
+          } else {
+            setselectHN([]);
+            setOptions([
+              {
+                value: 0,
+                label: (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>
+                      <PlusCircleOutlined /> เพิ่มข้อมูล Patient
+                    </span>
+                    <span></span>
+                  </div>
+                ),
+              },
+            ]);
           }
-        } else {
-          setselectHN([]);
-          setOptions([
-            {
-              value: 0,
-              label: (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span>
-                    <PlusCircleOutlined /> เพิ่มข้อมูล Patient
-                  </span>
-                  <span></span>
-                </div>
-              ),
-            },
-          ]);
-        }
-        setLoadingHN(false);
-      });
+          setLoadingHN(false);
+        });
+    }
   };
 
   const calculateBMI = (weight, height) => {

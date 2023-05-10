@@ -111,7 +111,7 @@ const thai_th = {
 // END THAI DATEPICKER
 
 const dateFormat = "YYYY-MM-DD";
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 const FormComponent = (props) => {
   const { showAddForm, dataDefault } = props;
   const [age, setAge] = useState();
@@ -209,7 +209,13 @@ const FormComponent = (props) => {
 
   const closeModal = (hn) => {
     ModalForm.destroyAll();
-    showAddForm(hn);
+
+    console.log(hn);
+    if (!!hn) {
+      showAddForm(hn);
+    } else {
+      showAddForm();
+    }
   };
 
   const calculateAge = (dateOfBirth) => {
@@ -222,6 +228,27 @@ const FormComponent = (props) => {
     }
     setAge(age);
   };
+  const [loadingIDcard, setLoadingIDcard] = useState(false);
+  const validateInputIDcard = (_, value) => {
+    if (!!value) {
+      setLoadingIDcard("validating");
+      return axios
+        .post("/api/get_patient_from_idcard", {
+          q: value,
+        })
+        .then((response) => {
+          if (!!response.data && response.data.length > 0) {
+            setLoadingIDcard("error");
+            return Promise.reject("เลขบัตรนี้ถูกใช้งานแล้ว");
+          } else {
+            setLoadingIDcard("success");
+            return Promise.resolve();
+          }
+        });
+    } else {
+      setLoadingIDcard(false);
+    }
+  };
 
   return (
     <Form name="basic" autoComplete="off" fields={fields} onFinish={onFinish}>
@@ -231,8 +258,11 @@ const FormComponent = (props) => {
             labelCol={{
               span: 12,
             }}
-            label="เลขบัตประจำตัวประชาชน :"
+            label="เลขประจำตัวประชาชน :"
             name="cid"
+            hasFeedback
+            validateStatus={loadingIDcard}
+            rules={[{ validator: validateInputIDcard }]}
             style={{ marginBottom: "5px" }}
           >
             <Input />
@@ -702,7 +732,12 @@ const FormComponent = (props) => {
         </Col>
       </Row>
       <div className="ant-modal-confirm-btns">
-        <Button key="back" onClick={closeModal}>
+        <Button
+          key="back"
+          onClick={() => {
+            return closeModal(0);
+          }}
+        >
           ยกเลิก
         </Button>
         <Button type="primary" htmlType="submit">

@@ -8,6 +8,7 @@ import {
   Row,
   Select,
   Checkbox,
+  AutoComplete,
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { React, useEffect, useState, useRef } from "react";
@@ -394,6 +395,36 @@ const FormComponent = (props) => {
     setAge(age);
   };
 
+  const [optionsLocation, setOptionsLocation] = useState([]);
+  const findLocation = (value, type) => {
+    if (value) {
+      return axios
+        .post("/api/get_locations", {
+          q: value,
+        })
+        .then(function (response) {
+          console.log(response.data);
+          let dataSerchList = response.data.map((item) => {
+            return {
+              value: item.value,
+              label: (
+                <>
+                  {item.province}
+                  {" > "}
+                  {item.amphoe}
+                  {" > "}
+                  {item.tambon}
+                  {" > "}
+                  {item.zipcode}
+                </>
+              ),
+            };
+          });
+          setOptionsLocation(dataSerchList);
+        });
+    }
+  };
+
   return (
     <Form name="basic" autoComplete="off" fields={fields} onFinish={onFinish}>
       <Row>
@@ -664,6 +695,24 @@ const FormComponent = (props) => {
             style={{ marginBottom: "5px" }}
           >
             <Input />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            labelCol={{
+              span: 10,
+            }}
+            label="จังหวัด(test) :"
+            name="chwpart"
+            style={{ marginBottom: "5px" }}
+          >
+            <AutoComplete
+              dropdownMatchSelectWidth={400}
+              options={optionsLocation}
+              //onSelect={onSelectHN}
+              onSearch={findLocation}
+              //loading={loadingHN}
+            ></AutoComplete>
           </Form.Item>
         </Col>
         <Col span={8}>
