@@ -18,6 +18,7 @@ import {
   SnippetsOutlined,
   FundOutlined,
   UsergroupAddOutlined,
+  FileOutlined,
 } from "@ant-design/icons";
 import { Menu, Layout } from "antd";
 import Link from "next/link";
@@ -47,7 +48,7 @@ const MenuItem = () => {
       <FileSearchOutlined />
     ),
 
-    getItem("รายงานผล", "report", <FileSearchOutlined />, [
+    getItem("รายงานผล", "report", <FileOutlined />, [
       getItem(
         <Link href="/daily_transaction/crit_report">รายงานค่าวิกฤติ</Link>,
         "crit_report",
@@ -70,7 +71,7 @@ const MenuItem = () => {
         <LineChartOutlined />
       ),
     ]),
-    getItem("จัดการข้อมูล", "management", <FileSearchOutlined />, [
+    getItem("จัดการข้อมูล", "management", <SettingOutlined />, [
       getItem(
         <Link href="/tools/tools_hosvalref">จัดการข้อมูลโรงพยาบาล</Link>,
         "tools_hosvalref",
