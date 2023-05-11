@@ -245,7 +245,7 @@ function LabReq() {
   const addPatient = (dataDefault) => {
     Modal.confirm({
       centered: true,
-      width: 700,
+      width: 800,
       title: "แบบฟอร์มเพิ่ม Patient",
       content: (
         <AddPatientFormComponent

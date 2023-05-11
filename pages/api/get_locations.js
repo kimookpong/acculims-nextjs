@@ -1,20 +1,26 @@
 import dbconnect from "./dbconnect";
 
 export default function handler(req, res) {
-  const q = req.body.q;
+  const q = req.body.q.split(/, | /);
+  let condition = ``;
+  q.map((item) => {
+    condition += ` AND (province like '%${item}%' OR amphoe like '%${item}%' OR tambon like '%${item}%' OR zipcode like '%${item}%')`;
+  });
+
   let query;
 
   query = ` SELECT 
-            province_code, 
-            province,
-            amphoe_code,
-            amphoe,
+            max(province_code) AS province_code, 
+            max(province) AS province,
+            max(amphoe_code) AS amphoe_code,
+            max(amphoe) AS amphoe,
             tambon_code,
-            tambon,
-            zipcode
+            max(tambon) AS tambon,
+            max(zipcode) AS zipcode
             FROM tambons
-            WHERE province like '%${q}%' OR amphoe like '%${q}%' OR tambon like '%${q}%' OR zipcode like '%${q}%' 
-            LIMIT 20;`;
+            WHERE province <> '' ${condition}
+            GROUP BY tambon_code
+            ;`;
 
   console.log(query);
 

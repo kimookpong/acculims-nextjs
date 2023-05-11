@@ -8,6 +8,7 @@ import {
   Row,
   Select,
   Checkbox,
+  AutoComplete,
 } from "antd";
 import { React, useEffect, useState, useRef } from "react";
 import axios from "axios";
@@ -122,6 +123,12 @@ const FormComponent = (props) => {
     },
   ]);
 
+  // location usestate
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [optionsLocation, setOptionsLocation] = useState([]);
+  const [selectLocation, setSelectLocation] = useState([]);
+  const [optionsLocationShow, setOptionsLocationShow] = useState([]);
+
   const searchResult = (query, field) => {
     return axios
       .post("/api/get_tambons", {
@@ -197,6 +204,17 @@ const FormComponent = (props) => {
 
   const onFinish = (values) => {
     values.birthday = values.birthday.add(-543, "year").format(dateFormat);
+
+    values.tmbpart = selectLocation.tambon_code
+      ? selectLocation.tambon_code.slice(-2)
+      : "";
+    values.amppart = selectLocation.amphoe_code
+      ? selectLocation.amphoe_code.slice(-2)
+      : "";
+    values.chwpart = selectLocation.province_code
+      ? selectLocation.province_code.slice(-2)
+      : "";
+
     return axios
       .post("/api/patient_action", {
         action: "create",
@@ -248,6 +266,83 @@ const FormComponent = (props) => {
     } else {
       setLoadingIDcard(false);
     }
+  };
+
+  const findLocation = (value, type) => {
+    setFields([
+      {
+        name: ["tmbpart"],
+        value: null,
+      },
+      {
+        name: ["amppart"],
+        value: null,
+      },
+      {
+        name: ["chwpart"],
+        value: null,
+      },
+      {
+        name: ["po_code"],
+        value: null,
+      },
+    ]);
+    if (value) {
+      setLoadingLocation(true);
+      return axios
+        .post("/api/get_locations", {
+          q: value,
+        })
+        .then(function (response) {
+          setOptionsLocation(response.data);
+          let dataSerchList = response.data.map((item) => {
+            return {
+              value: item.tambon_code,
+              label: (
+                <>
+                  {item.province}
+                  {" > "}
+                  {item.amphoe}
+                  {" > "}
+                  {item.tambon}
+                  {" > "}
+                  {item.zipcode}
+                </>
+              ),
+            };
+          });
+          setOptionsLocationShow(dataSerchList);
+          setLoadingLocation(false);
+        });
+    }
+  };
+  const onSelectLocations = (value) => {
+    const result = optionsLocation.find((obj) => {
+      return obj.tambon_code === value;
+    });
+    setSelectLocation(result);
+    setFields([
+      {
+        name: ["tmbpart"],
+        value: result.tambon,
+      },
+      {
+        name: ["amppart"],
+        value: result.amphoe,
+      },
+      {
+        name: ["chwpart"],
+        value: result.province,
+      },
+      {
+        name: ["po_code"],
+        value: result.zipcode,
+      },
+      {
+        name: ["locations"],
+        value: null,
+      },
+    ]);
   };
 
   return (
@@ -576,6 +671,25 @@ const FormComponent = (props) => {
             <Input />
           </Form.Item>
         </Col>
+        <Col span={16}>
+          <Form.Item
+            labelCol={{
+              span: 5,
+            }}
+            label="ค้นหา"
+            tooltip="ค้นหาตำแหน่งจังหวัด,อำเภอ,ตำบลและรหัสไปรษณีย์"
+            name="locations"
+            style={{ marginBottom: "5px" }}
+          >
+            <AutoComplete
+              dropdownMatchSelectWidth={400}
+              options={optionsLocationShow}
+              onSelect={onSelectLocations}
+              onSearch={findLocation}
+              loading={loadingLocation}
+            ></AutoComplete>
+          </Form.Item>
+        </Col>
         <Col span={8}>
           <Form.Item
             labelCol={{
@@ -585,12 +699,7 @@ const FormComponent = (props) => {
             name="chwpart"
             style={{ marginBottom: "5px" }}
           >
-            <Select
-              showSearch
-              onChange={onChangechwpart}
-              options={chwpartOptions}
-              loading={loadingchw}
-            />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -602,12 +711,7 @@ const FormComponent = (props) => {
             name="amppart"
             style={{ marginBottom: "5px" }}
           >
-            <Select
-              showSearch
-              onChange={onChangeamppart}
-              options={amppartOptions}
-              loading={loadingamp}
-            />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -619,12 +723,7 @@ const FormComponent = (props) => {
             name="tmbpart"
             style={{ marginBottom: "5px" }}
           >
-            <Select
-              showSearch
-              onChange={onChangetmbpart}
-              options={tmbpartOptions}
-              loading={loadingtmb}
-            />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -636,7 +735,7 @@ const FormComponent = (props) => {
             name="po_code"
             style={{ marginBottom: "5px" }}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={24}>
