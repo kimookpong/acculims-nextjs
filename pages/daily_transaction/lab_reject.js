@@ -154,106 +154,120 @@ const LabReject = () => {
       render: (text) => (
         <>{dayjs(text).add(543, "year").format("DD-MM-YYYY")}</>
       ),
-      width: 90,
+      className: "no-wrap",
     },
     {
       title: "Ward",
       dataIndex: "",
       key: "",
+      className: "no-wrap",
     },
     {
       title: "Lab Order Number",
       dataIndex: "lab_order_number",
       key: "lab_order_number",
+      className: "no-wrap",
     },
     {
       title: "ไม่มีรายการตรวจทาง LAB",
       dataIndex: "ch1",
       key: "ch1",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "เจาเลือดไม่ถูกชนิด",
       dataIndex: "ch2",
       key: "ch2",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "ชื่อในใบกับหลอดเลือดไม่ตรงกัน",
       dataIndex: "ch3",
       key: "ch3",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "ปิดฝาหลอดเลือดสลับกัน",
       dataIndex: "ch4",
       key: "ch4",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "ไม่มีฉลากติด",
       dataIndex: "ch5",
       key: "ch5",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "Hemolysis",
       dataIndex: "ch6",
       key: "ch6",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "เลือด Clotted (CBC, FBS)",
       dataIndex: "ch7",
       key: "ch7",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "ไม่มีใบนำส่ง",
       dataIndex: "ch8",
       key: "ch8",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "ไม่มี Sample",
       dataIndex: "ch9",
       key: "ch9",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "ส่ง LAB ผิด",
       dataIndex: "ch10",
       key: "ch10",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "ปริมาณ Sample ไม่ถูกต้อง",
       dataIndex: "ch11",
       key: "ch11",
       render: (text) => <>{text === "1" ? "✓" : null}</>,
+      className: "no-wrap",
     },
     {
       title: "อื่นๆ",
       dataIndex: "note",
       key: "note",
+      className: "no-wrap",
     },
     {
       title: "ผู้ตรวจสอบ / ผู้เเจ้ง",
       dataIndex: "name_call",
       key: "name_call",
-      width: 150,
+      className: "no-wrap",
     },
     {
       title: "แนวทางแก้ไข",
       dataIndex: "edit",
       key: "edit",
-      width: 150,
+      className: "no-wrap",
     },
     {
       title: "ผู้รับแจ้ง",
       dataIndex: "name_rec",
       key: "name_rec",
-      width: 150,
+      className: "no-wrap",
     },
     {
       title: "เวลาที่แจ้ง",
@@ -262,7 +276,7 @@ const LabReject = () => {
       render: (text) => (
         <>{dayjs(text).add(543, "year").format("DD-MM-YYYY")}</>
       ),
-      width: 90,
+      className: "no-wrap",
     },
   ];
 
@@ -355,7 +369,7 @@ const LabReject = () => {
                     columns={columns}
                     size="small"
                     bordered
-                    //scroll={{ x: 1500 }}
+                    scroll={{ x: true }}
                   />
                 </div>
               </Spin>
@@ -408,6 +422,7 @@ const LabReject = () => {
                             size="small"
                             bordered
                             pagination={false}
+                            scroll={{ x: true }}
                           />
                         </div>
                       </div>

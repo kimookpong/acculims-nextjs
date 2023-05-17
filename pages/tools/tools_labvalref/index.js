@@ -66,51 +66,61 @@ const ToolsLabvalref = () => {
       title: "รหัส",
       dataIndex: "lab_items_code",
       key: "lab_items_code",
+      className: "no-wrap",
     },
     {
       title: "Order",
       dataIndex: "display_order",
       key: "display_order",
+      className: "no-wrap",
     },
     {
       title: "Sub Group",
       dataIndex: "",
       key: "",
+      className: "no-wrap",
     },
     {
       title: "ชื่อ Lab",
       dataIndex: "lab_items_name",
       key: "lab_items_name",
+      className: "no-wrap",
     },
     {
       title: "หน่วย",
       dataIndex: "lab_items_unit",
       key: "lab_items_unit",
+      className: "no-wrap",
     },
     {
       title: "ค่าปกติ",
       dataIndex: "lab_items_normal_value",
       key: "lab_items_normal_value",
+      className: "no-wrap",
     },
     {
       title: "คำช่วยเหลือ",
       dataIndex: "lab_items_hint",
       key: "lab_items_hint",
+      className: "no-wrap",
     },
     {
       title: "ค่ามาตรฐาน",
       dataIndex: "",
       key: "",
+      className: "no-wrap",
     },
     {
       title: "ราคา",
       dataIndex: "service_price",
       key: "service_price",
+      className: "no-wrap",
     },
     {
       title: "Out Lab",
       dataIndex: "range_check",
       key: "range_check",
+      className: "no-wrap",
     },
   ];
 
@@ -229,6 +239,7 @@ const ToolsLabvalref = () => {
                       }, // click row
                     };
                   }}
+                  scroll={{ x: true }}
                 />
               </Spin>
             </Col>

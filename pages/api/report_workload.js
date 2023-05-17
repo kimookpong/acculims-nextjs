@@ -5,27 +5,27 @@ export default function handler(req, res) {
   let date_stop = req.body.date_stop;
   let items_group = req.body.items_group;
 
-  const query = `SELECT 
-lab_items.lab_items_code as lab_items_code,
-sub_list.lab_items_sub_group_code,
-if(sub_list.lab_items_sub_group_code is null,'Single','Profile') as single_profile,
-(
-  SELECT count(lab_order.lab_items_code) 
-  FROM lab_order 					
+  const query = `
+  SELECT 
+	lab_order.lab_items_code,
+  lab_items.lab_items_name,
+	sub_list.lab_items_sub_group_code,
+	sub_group.lab_items_sub_group_name,
+	if(sub_list.lab_items_sub_group_code is null,'Single','Profile') as single_profile,
+  count(lab_order.lab_items_code) as total
+	
+  FROM lab_order
   INNER JOIN lab_head ON lab_head.lab_order_number = lab_order.lab_order_number
-  WHERE lab_order.lab_items_code = lab_items.lab_items_code 					
-  AND (lab_head.order_date BETWEEN '${date_start}' AND '${date_stop}') 					
+  INNER JOIN lab_items ON lab_items.lab_items_code = lab_order.lab_items_code
+	LEFT JOIN lab_items_sub_group_list as sub_list ON sub_list.lab_items_code = lab_items.lab_items_code
+	LEFT JOIN lab_items_sub_group as sub_group ON sub_group.lab_items_sub_group_code = sub_list.lab_items_sub_group_code
+		
+		
+  WHERE (lab_head.order_date BETWEEN '${date_start}' AND '${date_stop}')
+  AND lab_items.lab_items_group = ${items_group} 
   AND lab_head.report_status = 'Approved'
-) as total,
-lab_items.lab_items_name,
-sub_group.lab_items_sub_group_name
-FROM lab_items
-INNER JOIN lab_items_group ON lab_items.lab_items_group = lab_items_group.lab_items_group_code
-LEFT JOIN lab_items_sub_group_list as sub_list ON sub_list.lab_items_code = lab_items.lab_items_code
-LEFT JOIN lab_items_sub_group as sub_group ON sub_group.lab_items_sub_group_code = sub_list.lab_items_sub_group_code
-WHERE lab_items.lab_items_group = ${items_group} 
-AND lab_items.lab_items_name != ''
-ORDER BY single_profile,sub_list.lab_items_sub_group_code,lab_items.display_order ASC;`;
+  GROUP BY lab_order.lab_items_code,sub_list.lab_items_sub_group_code
+	ORDER BY single_profile,sub_list.lab_items_sub_group_code,lab_items.display_order ASC;`;
 
   console.log(query);
 

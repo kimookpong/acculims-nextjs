@@ -642,57 +642,57 @@ function LabReq() {
       title: "เลขที่สั่ง",
       dataIndex: "order_number",
       key: "order_number",
-      width: 70,
+      className: "no-wrap",
     },
     {
       title: "Status",
       dataIndex: "h_status",
       key: "h_status",
-      width: 85,
+      className: "no-wrap",
     },
     {
       title: "HN",
       dataIndex: "HN",
       key: "HN",
-      width: 80,
+      className: "no-wrap",
     },
     {
       title: "ชื่อผู้ป่วย",
       dataIndex: "patient_name",
       key: "patient_name",
       ellipsis: true,
-      width: 200,
+      className: "no-wrap",
     },
     {
       title: "ชื่อใบสั่ง",
       dataIndex: "form_name",
       key: "form_name",
       ellipsis: true,
-      width: 200,
+      className: "no-wrap",
     },
     {
       title: "ความเร่งด่วน",
       dataIndex: "priority",
       key: "priority",
-      width: 100,
+      className: "no-wrap",
     },
     {
       title: "วันเวลาที่สั่ง",
       dataIndex: "order_date_time",
       key: "order_date_time",
-      width: 150,
+      className: "no-wrap",
     },
     {
       title: "วันเวลาที่รับ",
       dataIndex: "time_receive_report",
       key: "time_receive_report",
-      width: 150,
+      className: "no-wrap",
     },
     {
       title: "แผนก",
       dataIndex: "department",
       key: "department",
-      width: 70,
+      className: "no-wrap",
     },
   ];
   // let acceptCondition = [];
@@ -976,9 +976,7 @@ function LabReq() {
                       bordered
                       rowKey={"order_number"}
                       size="small"
-                      scroll={{
-                        x: 1100,
-                      }}
+                      scroll={{ x: true }}
                       // sticky
                       onRow={(record, rowIndex) => {
                         return {
