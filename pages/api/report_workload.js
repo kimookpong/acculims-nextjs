@@ -3,29 +3,31 @@ import dbconnect from "./dbconnect";
 export default function handler(req, res) {
   let date_start = req.body.date_start;
   let date_stop = req.body.date_stop;
-
-  let cond = ``;
-  if (date_start != undefined && date_stop != undefined) {
-    cond =
-      cond + `WHERE t1.order_date BETWEEN '${date_start}' AND '${date_stop}'  `;
-  }
+  let items_group = req.body.items_group;
 
   const query = `SELECT 
-  t1.form_name, 
-  count(t1.form_name) as total,
-  AVG(TIMESTAMPDIFF(SECOND, CONCAT(t1.receive_date,' ',t1.receive_time), CONCAT(t1.approved_date,' ',t1.approved_time))) as datediff
-  
-  FROM lab_head AS t1
-  ${cond} AND t1.report_status = 'Approved'
-  GROUP BY t1.form_name
-  ORDER BY total DESC
-`;
+lab_items.lab_items_code as lab_items_code,
+sub_list.lab_items_sub_group_code,
+if(sub_list.lab_items_sub_group_code is null,'Single','Profile') as single_profile,
+(
+  SELECT count(lab_order.lab_items_code) 
+  FROM lab_order 					
+  INNER JOIN lab_head ON lab_head.lab_order_number = lab_order.lab_order_number
+  WHERE lab_order.lab_items_code = lab_items.lab_items_code 					
+  AND (lab_head.order_date BETWEEN '${date_start}' AND '${date_stop}') 					
+  AND lab_head.report_status = 'Approved'
+) as total,
+lab_items.lab_items_name,
+sub_group.lab_items_sub_group_name
+FROM lab_items
+INNER JOIN lab_items_group ON lab_items.lab_items_group = lab_items_group.lab_items_group_code
+LEFT JOIN lab_items_sub_group_list as sub_list ON sub_list.lab_items_code = lab_items.lab_items_code
+LEFT JOIN lab_items_sub_group as sub_group ON sub_group.lab_items_sub_group_code = sub_list.lab_items_sub_group_code
+WHERE lab_items.lab_items_group = ${items_group} 
+AND lab_items.lab_items_name != ''
+ORDER BY single_profile,sub_list.lab_items_sub_group_code,lab_items.display_order ASC;`;
 
   console.log(query);
-
-  // t2.lab_items_name_ref,
-  // COUNT(t2.lab_items_name_ref),
-  //GROUP BY t2.lab_items_name_ref
 
   const connection = dbconnect();
   connection.connect(function (err) {

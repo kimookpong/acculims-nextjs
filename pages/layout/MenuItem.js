@@ -108,9 +108,12 @@ const MenuItem = () => {
 
     getItem(
       <Link href="/about/about">เกี่ยวกับ AccuLIMS</Link>,
-      "about",
+      "/about/about",
       <NotificationOutlined />
     ),
+    {
+      type: "divider",
+    },
     session
       ? getItem(
           <Link href="#" onClick={() => signOut()}>
@@ -161,6 +164,7 @@ const MenuItem = () => {
         onOpenChange={onOpenChange}
         theme="dark"
         items={items}
+        //style={{ backgroundColor: "#f0f0f0" }}
       />
     </Sider>
   );
