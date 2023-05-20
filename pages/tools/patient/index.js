@@ -59,7 +59,7 @@ function ToolsUservalref() {
   const showModal = (data) => {
     Modal.confirm({
       centered: true,
-      width: 730,
+      width: 800,
       title: "แบบฟอร์มจัดการผู้ใช้งาน",
       icon: <FormOutlined />,
       content: <FormComponent dataForm={data} reloadList={reloadList} />,

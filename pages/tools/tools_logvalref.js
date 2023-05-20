@@ -145,26 +145,31 @@ const ToolsLogvalref = () => {
       title: "Date Time",
       dataIndex: "date_time",
       key: "date_time",
+      className: "no-wrap",
     },
     {
       title: "Approved Drder",
       dataIndex: "approved_order",
       key: "approved_order",
+      className: "no-wrap",
     },
     {
       title: "Computer Name",
       dataIndex: "com_name",
       key: "com_name",
+      className: "no-wrap",
     },
     {
       title: "Report Name",
       dataIndex: "report_name",
       key: "report_name",
+      className: "no-wrap",
     },
     {
       title: "Approved Name",
       dataIndex: "approved_name",
       key: "approved_name",
+      className: "no-wrap",
     },
   ];
   useEffect(() => {
@@ -245,6 +250,7 @@ const ToolsLogvalref = () => {
                   dataSource={data}
                   rowKey={"id_link_instrument"}
                   columns={columns}
+                  scroll={{ x: true }}
                 />
               </Spin>
             </Col>

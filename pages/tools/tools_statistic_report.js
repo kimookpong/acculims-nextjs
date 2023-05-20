@@ -19,6 +19,7 @@ import {
   Card,
   Form,
   Radio,
+  Select,
 } from "antd";
 
 // THAI DATEPICKER
@@ -118,6 +119,8 @@ const thai_th = {
 };
 // END THAI DATEPICKER
 
+const API_get_lab_items_group = "/api/get_lab_items_group_report";
+
 import ExportExcel from "../layout/ExportExcel";
 
 import dayjs from "dayjs";
@@ -144,126 +147,39 @@ const ToolsStatreport = () => {
   const [date_stop, setdatestop] = useState(currDate.format(dateFormat));
   const [data, setData] = useState();
   const [count, setCount] = useState(0);
-  let columns = [];
+  const [columnsHeader, setColumnsHeader] = useState([]);
+  //let columnsHeader = [];
 
-  if (count == 0) {
-    columns = [
-      {
-        title: "วันที่ส่งตรวจ",
-        dataIndex: "order_date",
-        key: "order_date",
-      },
-      {
-        title: "เวลาที่ส่งตรวจ",
-        dataIndex: "order_time",
-        key: "order_time",
-      },
-      {
-        title: "HN",
-        dataIndex: "hn",
-        key: "hn",
-      },
-      {
-        title: "คำนำหน้าชื่อ",
-        dataIndex: "pname",
-        key: "pname",
-      },
-      {
-        title: "ชื่อ",
-        dataIndex: "fname",
-        key: "fname",
-      },
-      {
-        title: "สกุล",
-        dataIndex: "lname",
-        key: "lname",
-      },
-      {
-        title: "วันเกิด",
-        dataIndex: "birthday",
-        key: "birthday",
-      },
-      {
-        title: "หน่วย",
-        dataIndex: "department",
-        key: "department",
-      },
-      {
-        title: "เวลาที่รับ",
-        dataIndex: "receive_time",
-        key: "receive_time",
-      },
-      {
-        title: "รับรองผล",
-        dataIndex: "approved_time",
-        key: "approved_time",
-      },
-      {
-        title: "Laboratory",
-        dataIndex: "form_name",
-        key: "form_name",
-      },
-      {
-        title: "Testing",
-        dataIndex: "lab_items_name_ref",
-        key: "lab_items_name_ref",
-      },
-      {
-        title: "Value",
-        dataIndex: "lab_order_result",
-        key: "lab_order_result",
-      },
-      {
-        title: "ชื่อผู้รายงาน",
-        dataIndex: "reporter_name",
-        key: "reporter_name",
-      },
-      {
-        title: "ชื่อผู้ยืนยันผล",
-        dataIndex: "approve_staff",
-        key: "approve_staff",
-      },
-    ];
-  } else if (count == 1) {
-    columns = [
-      {
-        title: "Lab Form",
-        dataIndex: "form_name",
-        key: "form_name",
-      },
-      {
-        title: "Turn around time (Average)",
-        dataIndex: "datediff",
-        key: "datediff",
-        render: (text) => datediffFormat(text),
-      },
-      {
-        title: "จำนวนใบรับแลป",
-        dataIndex: "total",
-        key: "total",
-      },
-    ];
-  } else if (count == 2) {
-    columns = [
-      {
-        title: "Lab Form",
-        dataIndex: "form_name",
-        key: "form_name",
-      },
-      {
-        title: "Turn around time (Average)",
-        dataIndex: "datediff",
-        key: "datediff",
-        render: (text) => datediffFormat(text),
-      },
-      {
-        title: "จำนวนใบรับแลป",
-        dataIndex: "total",
-        key: "total",
-      },
-    ];
-  }
+  const [sWorkTypeList, setSWorkTypeList] = useState([]);
+  const [formGroup, setFormGroup] = useState();
+  const [itemList, setItemList] = useState([]);
 
+  const inputSWorkType = (value) => {
+    setFormGroup(value);
+  };
+
+  useEffect(() => {
+    axios.get(API_get_lab_items_group).then(function (response) {
+      setItemList(response.data.items);
+      setSWorkTypeList(response.data.group);
+      setFormGroup(response.data.group[0].value);
+    });
+  }, []);
+
+  const calculateAge = (dateOfBirth) => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const month = today.getMonth() - birthDate.getMonth();
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+  const datediffMin = (raw) => {
+    const minutes = Math.floor(raw / 60);
+    return minutes;
+  };
   const datediffFormat = (raw) => {
     const seconds = Math.floor(raw);
     const minutes = Math.floor(seconds / 60);
@@ -292,8 +208,169 @@ const ToolsStatreport = () => {
     return display;
   };
   useEffect(() => {
+    let dataList = itemList.find((items) => {
+      return items.lab_group === formGroup;
+    });
+
+    if (count == 0) {
+      let mapLabel = [];
+      if (!!dataList) {
+        dataList.lab_items.map((items) => {
+          mapLabel = [
+            ...mapLabel,
+            {
+              title: items.lab_items_name,
+              dataIndex: "data_items_" + items.lab_items_code,
+              key: "data_items_" + items.lab_items_code,
+              className: "no-wrap",
+            },
+          ];
+        });
+      }
+
+      setColumnsHeader([
+        {
+          title: "วันที่รับตรวจ",
+          dataIndex: "receive_date",
+          key: "receive_date",
+          className: "no-wrap",
+        },
+        {
+          title: "เวลาที่รับตรวจ",
+          dataIndex: "receive_time",
+          key: "receive_time",
+          className: "no-wrap",
+        },
+        {
+          title: "HN",
+          dataIndex: "hn",
+          key: "hn",
+          className: "no-wrap",
+        },
+        {
+          title: "ชื่อ-สกุล",
+          dataIndex: "fullname",
+          key: "fullname",
+          className: "no-wrap",
+        },
+        {
+          title: "อายุ",
+          dataIndex: "birthday",
+          key: "birthday",
+          render: (text) => calculateAge(text) + " ปี",
+          className: "no-wrap",
+        },
+        {
+          title: "หน่วย",
+          dataIndex: "department",
+          key: "department",
+          className: "no-wrap",
+        },
+        {
+          title: "TAT",
+          dataIndex: "approved_time",
+          key: "approved_time",
+          className: "no-wrap",
+        },
+        ...mapLabel,
+        {
+          title: "ชื่อผู้รายงาน",
+          dataIndex: "reporter_name",
+          key: "reporter_name",
+          className: "no-wrap",
+        },
+        {
+          title: "ชื่อผู้ยืนยันผล",
+          dataIndex: "approve_staff",
+          key: "approve_staff",
+          className: "no-wrap",
+        },
+      ]);
+    } else if (count == 1) {
+      setColumnsHeader([
+        {
+          title: "กลุ่ม",
+          dataIndex: "single_profile",
+          key: "single_profile",
+          className: "no-wrap",
+        },
+        {
+          title: "กลุ่มรายการ",
+          dataIndex: "lab_items_sub_group_name",
+          key: "lab_items_sub_group_name",
+          className: "no-wrap",
+        },
+        {
+          title: "รายการ",
+          dataIndex: "lab_items_name",
+          key: "lab_items_name",
+          className: "no-wrap",
+        },
+        {
+          title: "จำนวน",
+          dataIndex: "total",
+          key: "total",
+          className: "no-wrap",
+        },
+      ]);
+    } else if (count == 2) {
+      setColumnsHeader([
+        {
+          title: "Test",
+          dataIndex: "lab_items_name",
+          key: "lab_items_name",
+          className: "no-wrap",
+        },
+        {
+          title: "เวลาที่กำหนด",
+          dataIndex: "wait_hour",
+          key: "wait_hour",
+          className: "no-wrap",
+        },
+        {
+          title: "ภายในเวลามาตราฐาน",
+          dataIndex: "in_standard",
+          key: "in_standard",
+          className: "no-wrap",
+        },
+        {
+          title: "เกินเวลามาตราฐาน",
+          dataIndex: "out_standard",
+          key: "out_standard",
+          className: "no-wrap",
+        },
+        {
+          title: "เวลาเฉลี่ยในการตรวจ (นาที)",
+          dataIndex: "avg_time",
+          key: "avg_time",
+          className: "no-wrap",
+        },
+        {
+          title: "ประสิทธิภาพ (+/- นาที)",
+          dataIndex: "perform",
+          key: "perform",
+          className: "no-wrap",
+        },
+        // {
+        //   title: "Turn around time (Average)",
+        //   dataIndex: "datediff",
+        //   key: "datediff",
+        //   className: "no-wrap",
+        //   render: (text) => datediffFormat(text),
+        // },
+        {
+          title: "รวม Test",
+          dataIndex: "total",
+          key: "total",
+          className: "no-wrap",
+        },
+      ]);
+    }
+  }, [count, formGroup]);
+
+  useEffect(() => {
     loadData();
-  }, [date_start, date_stop, type]);
+  }, [date_start, date_stop, type, formGroup]);
 
   async function loadData() {
     if (type === 1) {
@@ -310,31 +387,50 @@ const ToolsStatreport = () => {
   async function loadWorksheet(value) {
     setCount(0);
     setLoadingData(true);
-    return axios
-      .post("/api/report_worksheet", {
-        date_start: date_start,
-        date_stop: date_stop,
-      })
-      .then((response) => {
-        console.log(response.data);
-        setData(response.data);
-        setLoadingData(false);
-      })
-      .catch((error) => {
-        console.error(error);
+
+    if (!!sWorkTypeList && !!formGroup) {
+      const formname = sWorkTypeList.find((element) => {
+        return element.value === formGroup;
       });
+
+      let dataList = itemList.find((items) => {
+        return items.lab_group === formGroup;
+      });
+
+      let dataListItems = dataList.lab_items.map((items) => {
+        return items.lab_items_code;
+      });
+
+      console.log("dataList", dataListItems);
+
+      return axios
+        .post("/api/report_worksheet", {
+          date_start: date_start,
+          date_stop: date_stop,
+          items_group: formname.label,
+          dataListItems: dataListItems,
+        })
+        .then((response) => {
+          setData(response.data);
+          setLoadingData(false);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }
 
   async function loadWorkload(value) {
     setCount(1);
     setLoadingData(true);
+
     return axios
       .post("/api/report_workload", {
         date_start: date_start,
         date_stop: date_stop,
+        items_group: formGroup,
       })
       .then((response) => {
-        console.log(response.data);
         setData(response.data);
         setLoadingData(false);
       })
@@ -346,13 +442,14 @@ const ToolsStatreport = () => {
   async function loadTurnaroundtime(value) {
     setCount(2);
     setLoadingData(true);
+
     return axios
       .post("/api/report_worktat", {
         date_start: date_start,
         date_stop: date_stop,
+        items_group: formGroup,
       })
       .then((response) => {
-        console.log(response.data);
         setData(response.data);
         setLoadingData(false);
       })
@@ -409,7 +506,23 @@ const ToolsStatreport = () => {
                             />
                           </Form.Item>
                         </Col>
-                        <Col xs={24} lg={24}>
+                        <Col>
+                          <Form.Item
+                            style={{ marginBottom: 5, marginTop: 5 }}
+                            label="Lab Form :"
+                          >
+                            <Select
+                              showSearch
+                              onChange={inputSWorkType}
+                              style={{
+                                width: 200,
+                              }}
+                              value={formGroup}
+                              options={sWorkTypeList}
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col>
                           <Form.Item
                             style={{ marginBottom: 5, marginTop: 5 }}
                             label="เลือกรายงาน :"
@@ -431,13 +544,16 @@ const ToolsStatreport = () => {
               </Content>
               <Content style={{ marginRight: "10px", marginTop: "10px" }}>
                 <Spin spinning={loadingData} tip="กำลังโหลดข้อมูล">
-                  <Table
-                    dataSource={data}
-                    rowKey={"lab_order_number"}
-                    columns={columns}
-                    size="small"
-                    bordered
-                  />
+                  <div style={{ overflowX: "auto" }}>
+                    <Table
+                      dataSource={data}
+                      rowKey={"lab_order_number"}
+                      columns={columnsHeader}
+                      size="small"
+                      bordered
+                      scroll={{ x: true }}
+                    />
+                  </div>
                 </Spin>
               </Content>
               <Row style={{ marginRight: "10px" }}>
@@ -451,7 +567,8 @@ const ToolsStatreport = () => {
                         <div style={{ padding: 5 }}>
                           <ExportExcel
                             excelData={data}
-                            fileName={"Export Work Sheet"}
+                            columns={columnsHeader}
+                            fileName={"Export Static Report"}
                           />
                         </div>
                       </div>

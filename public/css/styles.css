@@ -114,6 +114,10 @@ th.ant-table-cell {
     margin-left: 0 !important;
 }
 
+.no-wrap {
+    white-space: nowrap;
+  }
+
 
 
 

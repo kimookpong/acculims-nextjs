@@ -8,6 +8,7 @@ import {
   Row,
   Select,
   Checkbox,
+  AutoComplete,
 } from "antd";
 import { React, useEffect, useState, useRef } from "react";
 import axios from "axios";
@@ -111,7 +112,7 @@ const thai_th = {
 // END THAI DATEPICKER
 
 const dateFormat = "YYYY-MM-DD";
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 const FormComponent = (props) => {
   const { showAddForm, dataDefault } = props;
   const [age, setAge] = useState();
@@ -121,6 +122,12 @@ const FormComponent = (props) => {
       value: !!dataDefault ? dataDefault : null,
     },
   ]);
+
+  // location usestate
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [optionsLocation, setOptionsLocation] = useState([]);
+  const [selectLocation, setSelectLocation] = useState([]);
+  const [optionsLocationShow, setOptionsLocationShow] = useState([]);
 
   const searchResult = (query, field) => {
     return axios
@@ -197,6 +204,17 @@ const FormComponent = (props) => {
 
   const onFinish = (values) => {
     values.birthday = values.birthday.add(-543, "year").format(dateFormat);
+
+    values.tmbpart = selectLocation.tambon_code
+      ? selectLocation.tambon_code.slice(-2)
+      : "";
+    values.amppart = selectLocation.amphoe_code
+      ? selectLocation.amphoe_code.slice(-2)
+      : "";
+    values.chwpart = selectLocation.province_code
+      ? selectLocation.province_code.slice(-2)
+      : "";
+
     return axios
       .post("/api/patient_action", {
         action: "create",
@@ -209,7 +227,13 @@ const FormComponent = (props) => {
 
   const closeModal = (hn) => {
     ModalForm.destroyAll();
-    showAddForm(hn);
+
+    console.log(hn);
+    if (!!hn) {
+      showAddForm(hn);
+    } else {
+      showAddForm();
+    }
   };
 
   const calculateAge = (dateOfBirth) => {
@@ -222,6 +246,104 @@ const FormComponent = (props) => {
     }
     setAge(age);
   };
+  const [loadingIDcard, setLoadingIDcard] = useState(false);
+  const validateInputIDcard = (_, value) => {
+    if (!!value) {
+      setLoadingIDcard("validating");
+      return axios
+        .post("/api/get_patient_from_idcard", {
+          q: value,
+        })
+        .then((response) => {
+          if (!!response.data && response.data.length > 0) {
+            setLoadingIDcard("error");
+            return Promise.reject("เลขบัตรนี้ถูกใช้งานแล้ว");
+          } else {
+            setLoadingIDcard("success");
+            return Promise.resolve();
+          }
+        });
+    } else {
+      setLoadingIDcard(false);
+    }
+  };
+
+  const findLocation = (value, type) => {
+    setFields([
+      {
+        name: ["tmbpart"],
+        value: null,
+      },
+      {
+        name: ["amppart"],
+        value: null,
+      },
+      {
+        name: ["chwpart"],
+        value: null,
+      },
+      {
+        name: ["po_code"],
+        value: null,
+      },
+    ]);
+    if (value) {
+      setLoadingLocation(true);
+      return axios
+        .post("/api/get_locations", {
+          q: value,
+        })
+        .then(function (response) {
+          setOptionsLocation(response.data);
+          let dataSerchList = response.data.map((item) => {
+            return {
+              value: item.tambon_code,
+              label: (
+                <>
+                  {item.province}
+                  {" > "}
+                  {item.amphoe}
+                  {" > "}
+                  {item.tambon}
+                  {" > "}
+                  {item.zipcode}
+                </>
+              ),
+            };
+          });
+          setOptionsLocationShow(dataSerchList);
+          setLoadingLocation(false);
+        });
+    }
+  };
+  const onSelectLocations = (value) => {
+    const result = optionsLocation.find((obj) => {
+      return obj.tambon_code === value;
+    });
+    setSelectLocation(result);
+    setFields([
+      {
+        name: ["tmbpart"],
+        value: result.tambon,
+      },
+      {
+        name: ["amppart"],
+        value: result.amphoe,
+      },
+      {
+        name: ["chwpart"],
+        value: result.province,
+      },
+      {
+        name: ["po_code"],
+        value: result.zipcode,
+      },
+      {
+        name: ["locations"],
+        value: null,
+      },
+    ]);
+  };
 
   return (
     <Form name="basic" autoComplete="off" fields={fields} onFinish={onFinish}>
@@ -231,8 +353,11 @@ const FormComponent = (props) => {
             labelCol={{
               span: 12,
             }}
-            label="เลขบัตประจำตัวประชาชน :"
+            label="เลขประจำตัวประชาชน :"
             name="cid"
+            hasFeedback
+            validateStatus={loadingIDcard}
+            rules={[{ validator: validateInputIDcard }]}
             style={{ marginBottom: "5px" }}
           >
             <Input />
@@ -546,6 +671,25 @@ const FormComponent = (props) => {
             <Input />
           </Form.Item>
         </Col>
+        <Col span={16}>
+          <Form.Item
+            labelCol={{
+              span: 5,
+            }}
+            label="ค้นหา"
+            tooltip="ค้นหาตำแหน่งจังหวัด,อำเภอ,ตำบลและรหัสไปรษณีย์"
+            name="locations"
+            style={{ marginBottom: "5px" }}
+          >
+            <AutoComplete
+              dropdownMatchSelectWidth={400}
+              options={optionsLocationShow}
+              onSelect={onSelectLocations}
+              onSearch={findLocation}
+              loading={loadingLocation}
+            ></AutoComplete>
+          </Form.Item>
+        </Col>
         <Col span={8}>
           <Form.Item
             labelCol={{
@@ -555,12 +699,7 @@ const FormComponent = (props) => {
             name="chwpart"
             style={{ marginBottom: "5px" }}
           >
-            <Select
-              showSearch
-              onChange={onChangechwpart}
-              options={chwpartOptions}
-              loading={loadingchw}
-            />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -572,12 +711,7 @@ const FormComponent = (props) => {
             name="amppart"
             style={{ marginBottom: "5px" }}
           >
-            <Select
-              showSearch
-              onChange={onChangeamppart}
-              options={amppartOptions}
-              loading={loadingamp}
-            />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -589,12 +723,7 @@ const FormComponent = (props) => {
             name="tmbpart"
             style={{ marginBottom: "5px" }}
           >
-            <Select
-              showSearch
-              onChange={onChangetmbpart}
-              options={tmbpartOptions}
-              loading={loadingtmb}
-            />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -606,7 +735,7 @@ const FormComponent = (props) => {
             name="po_code"
             style={{ marginBottom: "5px" }}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
         </Col>
         <Col span={24}>
@@ -702,7 +831,12 @@ const FormComponent = (props) => {
         </Col>
       </Row>
       <div className="ant-modal-confirm-btns">
-        <Button key="back" onClick={closeModal}>
+        <Button
+          key="back"
+          onClick={() => {
+            return closeModal(0);
+          }}
+        >
           ยกเลิก
         </Button>
         <Button type="primary" htmlType="submit">

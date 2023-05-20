@@ -28,51 +28,61 @@ const ToolsHisvalref = () => {
       title: "Instrument",
       dataIndex: "Instrument",
       key: "Instrument",
+      className: "no-wrap",
     },
     {
       title: "Link EQ",
       dataIndex: "Link_EQ",
       key: "Link_EQ",
+      className: "no-wrap",
     },
     {
       title: "LIS Item Code",
       dataIndex: "Item_Code_LIS",
       key: "Item_Code_LIS",
+      className: "no-wrap",
     },
     {
       title: "HIS Item Code",
       dataIndex: "Item_Code_HIS",
       key: "Item_Code_HIS",
+      className: "no-wrap",
     },
     {
       title: "Item Name",
       dataIndex: "LIS_Items_Name",
       key: "LIS_Items_Name",
+      className: "no-wrap",
     },
     {
       title: "Abb Name",
       dataIndex: "Abb_Name",
       key: "Abb_Name",
+      className: "no-wrap",
     },
     {
       title: "Sugar",
       dataIndex: "Sugar",
       key: "Sugar",
+      className: "no-wrap",
     },
     {
       title: "Calculation",
       dataIndex: "Calculation",
       key: "Calculation",
+      className: "no-wrap",
     },
     {
       title: "Remark",
       dataIndex: "Remark",
       key: "Remark",
+      className: "no-wrap",
     },
     {
       title: "Profile",
       dataIndex: "Profile",
       key: "Profile",
+      className: "no-wrap",
     },
   ];
 
@@ -117,6 +127,7 @@ const ToolsHisvalref = () => {
                   rowKey={"id_link_instrument"}
                   columns={columns}
                   size="small"
+                  scroll={{ x: true }}
                 />
               </Spin>
             </Col>

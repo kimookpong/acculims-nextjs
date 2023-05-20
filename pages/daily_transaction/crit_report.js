@@ -162,68 +162,68 @@ const CritReport = () => {
       render: (text) => (
         <>{dayjs(text).add(543, "year").format("DD-MM-YYYY")}</>
       ),
-      width: 90,
+      className: "no-wrap",
     },
     {
       title: "เวลา",
       dataIndex: "time_call",
       key: "time_call",
-      width: 70,
+      className: "no-wrap",
     },
 
     {
       title: "หน่วยงาน",
       dataIndex: "position",
       key: "position",
-      width: 120,
+      className: "no-wrap",
     },
     {
       title: "ผู้โทร",
       dataIndex: "call_name",
       key: "call_name",
-      width: 120,
+      className: "no-wrap",
     },
     {
       title: "HN",
       dataIndex: "hn",
       key: "hn",
-      width: 80,
+      className: "no-wrap",
     },
     {
       title: "ชื่อ-สกุล",
       dataIndex: "patient_name",
       key: "patient_name",
-      width: 160,
+      className: "no-wrap",
     },
     {
       title: "รายการตรวจวิเคราะห์",
       dataIndex: "test_name",
       key: "test_name",
-      width: 150,
+      className: "no-wrap",
     },
     {
       title: "ค่าวิกฤต",
       dataIndex: "critical_ref",
       key: "critical_ref",
-      width: 200,
+      className: "no-wrap",
     },
     {
       title: "ผล LAB",
       dataIndex: "result",
       key: "result",
-      width: 200,
+      className: "no-wrap",
     },
     {
       title: "เวลา",
       dataIndex: "time_take",
       key: "time_take",
-      width: 70,
+      className: "no-wrap",
     },
     {
       title: "ผู้รับโทรศัพท์",
       dataIndex: "take_name",
       key: "take_name",
-      width: 120,
+      className: "no-wrap",
     },
   ];
 
@@ -251,19 +251,6 @@ const CritReport = () => {
         console.error(error);
       });
   }
-
-  const dataTable = () => {
-    return (
-      <Table
-        dataSource={data}
-        rowKey={"lab_order_number"}
-        columns={columns}
-        size="small"
-        bordered
-        pagination={false}
-      />
-    );
-  };
 
   return (
     <ConfigProvider renderEmpty={customizeRenderEmpty}>
@@ -369,7 +356,7 @@ const CritReport = () => {
                     columns={columns}
                     size="small"
                     bordered
-                    //scroll={{ x: 1500 }}
+                    scroll={{ x: true }}
                   />
                 </div>
               </Spin>
@@ -422,6 +409,7 @@ const CritReport = () => {
                             size="small"
                             bordered
                             pagination={false}
+                            scroll={{ x: true }}
                           />
                         </div>
                       </div>
