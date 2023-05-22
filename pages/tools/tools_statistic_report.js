@@ -220,6 +220,7 @@ const ToolsStatreport = () => {
       if (!!dataList) {
         dataList.lab_items.map((items) => {
           if (
+            !!data &&
             data.some((record) => record["data_items_" + items.lab_items_code])
           ) {
             mapLabel = [
