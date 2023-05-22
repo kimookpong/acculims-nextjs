@@ -147,6 +147,9 @@ const ToolsStatreport = () => {
   const [date_stop, setdatestop] = useState(currDate.format(dateFormat));
   const [data, setData] = useState();
   const [count, setCount] = useState(0);
+
+  const [pagination, setPagination] = useState(true);
+
   const [columnsHeader, setColumnsHeader] = useState([]);
   //let columnsHeader = [];
 
@@ -216,18 +219,22 @@ const ToolsStatreport = () => {
       let mapLabel = [];
       if (!!dataList) {
         dataList.lab_items.map((items) => {
-          mapLabel = [
-            ...mapLabel,
-            {
-              title: items.lab_items_name,
-              dataIndex: "data_items_" + items.lab_items_code,
-              key: "data_items_" + items.lab_items_code,
-              className: "no-wrap",
-            },
-          ];
+          if (
+            data.some((record) => record["data_items_" + items.lab_items_code])
+          ) {
+            mapLabel = [
+              ...mapLabel,
+              {
+                title: items.lab_items_name,
+                dataIndex: "data_items_" + items.lab_items_code,
+                key: "data_items_" + items.lab_items_code,
+                className: "no-wrap",
+              },
+            ];
+          }
         });
       }
-
+      setPagination(true);
       setColumnsHeader([
         {
           title: "วันที่รับตรวจ",
@@ -287,33 +294,51 @@ const ToolsStatreport = () => {
         },
       ]);
     } else if (count == 1) {
+      setPagination(false);
       setColumnsHeader([
-        {
-          title: "กลุ่ม",
-          dataIndex: "single_profile",
-          key: "single_profile",
-          className: "no-wrap",
-        },
-        {
-          title: "กลุ่มรายการ",
-          dataIndex: "lab_items_sub_group_name",
-          key: "lab_items_sub_group_name",
-          className: "no-wrap",
-        },
         {
           title: "รายการ",
           dataIndex: "lab_items_name",
           key: "lab_items_name",
           className: "no-wrap",
+          onCell: (items, index) => ({
+            colSpan: !!items.type ? 2 : 1,
+          }),
+          render: (_, record) => {
+            if (record.type === "single_profile") {
+              return <b>{record.lab_items_name}</b>;
+            } else if (record.type === "sub_group") {
+              return (
+                <div style={{ marginLeft: "20px" }}>
+                  {record.lab_items_name}
+                </div>
+              );
+            } else {
+              return (
+                <div
+                  style={{
+                    marginLeft:
+                      record.single_profile === "Profile" ? "40px" : "20px",
+                  }}
+                >
+                  {record.lab_items_name}
+                </div>
+              );
+            }
+          },
         },
         {
           title: "จำนวน",
           dataIndex: "total",
           key: "total",
           className: "no-wrap",
+          onCell: (items, index) => ({
+            colSpan: !!items.type ? 0 : 1,
+          }),
         },
       ]);
     } else if (count == 2) {
+      setPagination(false);
       setColumnsHeader([
         {
           title: "Test",
@@ -329,15 +354,49 @@ const ToolsStatreport = () => {
         },
         {
           title: "ภายในเวลามาตราฐาน",
-          dataIndex: "in_standard",
-          key: "in_standard",
-          className: "no-wrap",
+          children: [
+            {
+              title: "รวมจำนวน",
+              dataIndex: "in_std",
+              key: "in_std",
+              className: "no-wrap",
+            },
+            {
+              title: "คิดเป็น%",
+              dataIndex: "in_std_percent",
+              key: "in_std_percent",
+              className: "no-wrap",
+              render: (_, record) => {
+                return ((record.in_std * 100) / record.total).toFixed(2);
+              },
+            },
+          ],
         },
         {
           title: "เกินเวลามาตราฐาน",
-          dataIndex: "out_standard",
-          key: "out_standard",
-          className: "no-wrap",
+          children: [
+            {
+              title: "รวมจำนวน",
+              dataIndex: "out_std",
+              key: "out_std",
+              className: "no-wrap",
+              render: (_, record) => {
+                return record.total - record.in_std;
+              },
+            },
+            {
+              title: "คิดเป็น%",
+              dataIndex: "out_std_percent",
+              key: "out_std_percent",
+              className: "no-wrap",
+              render: (_, record) => {
+                return (
+                  ((record.total - record.in_std) * 100) /
+                  record.total
+                ).toFixed(2);
+              },
+            },
+          ],
         },
         {
           title: "เวลาเฉลี่ยในการตรวจ (นาที)",
@@ -366,7 +425,7 @@ const ToolsStatreport = () => {
         },
       ]);
     }
-  }, [count, formGroup]);
+  }, [count, formGroup, data]);
 
   useEffect(() => {
     loadData();
@@ -431,7 +490,42 @@ const ToolsStatreport = () => {
         items_group: formGroup,
       })
       .then((response) => {
-        setData(response.data);
+        let dataResult = response.data;
+        let dataResultNew = [];
+        dataResult.map((items, index) => {
+          if (
+            index === 0 ||
+            dataResult[index].single_profile !==
+              dataResult[index - 1].single_profile
+          ) {
+            dataResultNew = [
+              ...dataResultNew,
+              {
+                lab_items_name: items.single_profile,
+                type: "single_profile",
+              },
+            ];
+          }
+
+          if (
+            (index === 0 ||
+              dataResult[index].lab_items_sub_group_code !==
+                dataResult[index - 1].lab_items_sub_group_code) &&
+            !!items.lab_items_sub_group_name
+          ) {
+            dataResultNew = [
+              ...dataResultNew,
+              {
+                lab_items_name: items.lab_items_sub_group_name,
+                type: "sub_group",
+              },
+            ];
+          }
+
+          dataResultNew = [...dataResultNew, items];
+        });
+
+        setData(dataResultNew);
         setLoadingData(false);
       })
       .catch((error) => {
@@ -552,6 +646,7 @@ const ToolsStatreport = () => {
                       size="small"
                       bordered
                       scroll={{ x: true }}
+                      pagination={pagination}
                     />
                   </div>
                 </Spin>

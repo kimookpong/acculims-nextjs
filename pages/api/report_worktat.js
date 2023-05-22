@@ -22,20 +22,29 @@ export default function handler(req, res) {
   //   ORDER BY total DESC
   // `;
 
-  const query = `SELECT lab_order.lab_items_code,
+  const query = `SELECT main.lab_items_code,
   lab_items.lab_items_name,
   lab_items.wait_hour as wait_hour,
+  (
+    SELECT count(child.lab_items_code)
+    FROM lab_order as child
+    INNER JOIN lab_head as child_head ON child_head.lab_order_number = child.lab_order_number
+    WHERE child.lab_items_code = main.lab_items_code
+    AND (child_head.order_date BETWEEN '${date_start}' AND '${date_stop}')
+    AND child_head.report_status = 'Approved'
+    AND ROUND(TIMESTAMPDIFF(SECOND, CONCAT(child_head.receive_date,' ',child_head.receive_time), CONCAT(child_head.approved_date,' ',child_head.approved_time))/60) <= lab_items.wait_hour
+  ) as in_std,
   ROUND(AVG(TIMESTAMPDIFF(SECOND, CONCAT(lab_head.receive_date,' ',lab_head.receive_time), CONCAT(lab_head.approved_date,' ',lab_head.approved_time)))/60) as avg_time,
   (lab_items.wait_hour - ROUND(AVG(TIMESTAMPDIFF(SECOND, CONCAT(lab_head.receive_date, ' ', lab_head.receive_time), CONCAT(lab_head.approved_date, ' ', lab_head.approved_time)))/60)) AS perform,
-  count(lab_order.lab_items_code) as total
-  FROM lab_order
-  INNER JOIN lab_head ON lab_head.lab_order_number = lab_order.lab_order_number
-  INNER JOIN lab_items ON lab_items.lab_items_code = lab_order.lab_items_code
+  count(main.lab_items_code) as total
+  FROM lab_order as main
+  INNER JOIN lab_head ON lab_head.lab_order_number = main.lab_order_number
+  INNER JOIN lab_items ON lab_items.lab_items_code = main.lab_items_code
   WHERE (lab_head.order_date BETWEEN '${date_start}' AND '${date_stop}')
   AND lab_items.lab_items_group = ${items_group} 
   AND lab_head.report_status = 'Approved'
-  GROUP BY lab_order.lab_items_code
-  ORDER BY lab_items.display_order ASC;`;
+  GROUP BY main.lab_items_code
+  ORDER BY lab_items.lab_items_name ASC;`;
 
   console.log(query);
 
