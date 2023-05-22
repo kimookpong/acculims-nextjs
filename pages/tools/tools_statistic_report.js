@@ -219,19 +219,22 @@ const ToolsStatreport = () => {
       let mapLabel = [];
       if (!!dataList) {
         dataList.lab_items.map((items) => {
-          if (
-            !!data &&
-            data.some((record) => record["data_items_" + items.lab_items_code])
-          ) {
-            mapLabel = [
-              ...mapLabel,
-              {
-                title: items.lab_items_name,
-                dataIndex: "data_items_" + items.lab_items_code,
-                key: "data_items_" + items.lab_items_code,
-                className: "no-wrap",
-              },
-            ];
+          if (!!data && data.length) {
+            if (
+              data.some(
+                (record) => record["data_items_" + items.lab_items_code]
+              )
+            ) {
+              mapLabel = [
+                ...mapLabel,
+                {
+                  title: items.lab_items_name,
+                  dataIndex: "data_items_" + items.lab_items_code,
+                  key: "data_items_" + items.lab_items_code,
+                  className: "no-wrap",
+                },
+              ];
+            }
           }
         });
       }
