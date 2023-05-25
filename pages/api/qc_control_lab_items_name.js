@@ -17,8 +17,7 @@ connection.connect(function(err) {
 
 export default function handler(req, res) {
   let items_group = req.body.items_group;
-  items_group = 3;
-  
+ 
   const query = `SELECT lab_items_name FROM lab_items WHERE lab_items_group = '${items_group}'`;
 
   connection.query(query, function(err, rows, fields) {
